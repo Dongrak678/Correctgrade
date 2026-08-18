@@ -26,10 +26,30 @@ class DashboardService {
   }
 
   /**
+   * ดึงข้อมูลผลการเรียนที่สัมพันธ์กับสิทธิ์ผู้ใช้ (ครูเห็นเฉพาะวิชาของตนเอง, นักเรียนเห็นเฉพาะของตนเอง)
+   */
+  getDashboardRecords() {
+    let records = db.get('records') || [];
+    const currentUser = authService.getCurrentUser();
+
+    if (currentUser) {
+      if (currentUser.role === APP_CONFIG.ROLES.STUDENT) {
+        records = records.filter(r => 
+          String(r.studentId) === String(currentUser.studentId) ||
+          String(r.studentName).includes(currentUser.name)
+        );
+      } else if (currentUser.role === APP_CONFIG.ROLES.TEACHER) {
+        records = records.filter(r => recordsService.isTeacherRecordOwner(r, currentUser));
+      }
+    }
+    return records;
+  }
+
+  /**
    * คำนวณและแสดงผลการ์ดสถิติรวม (KPI Cards)
    */
   renderKPIs() {
-    const records = db.get('records');
+    const records = this.getDashboardRecords();
     
     let count0 = 0;
     let countR = 0;
@@ -100,7 +120,7 @@ class DashboardService {
    * วาดแผนภูมิแท่งและโดนัท (Bar Chart & Donut Chart)
    */
   renderCharts() {
-    const records = db.get('records');
+    const records = this.getDashboardRecords();
 
     // 1. จัดกลุ่มข้อมูลตามระดับชั้น (ม.1 – ม.6, ปวช.1 – ปวช.3)
     const levels = APP_CONFIG.GRADE_LEVELS;

@@ -25,23 +25,17 @@ class RecordsService {
     let records = db.get('records') || [];
     const currentUser = authService.getCurrentUser();
 
-    // กรองตามสิทธิ์ผู้ใช้งาน
+    // กรองตามสิทธิ์ผู้ใช้งาน (Role-Based Access Control)
     if (currentUser) {
       if (currentUser.role === APP_CONFIG.ROLES.STUDENT) {
-        // นักเรียนเห็นเฉพาะของตัวเอง
+        // นักเรียนเห็นเฉพาะผลการเรียนของตัวเอง
         records = records.filter(r => 
           String(r.studentId) === String(currentUser.studentId) ||
           String(r.studentName).includes(currentUser.name)
         );
       } else if (currentUser.role === APP_CONFIG.ROLES.TEACHER) {
-        // ครูเห็นวิชาที่ตนสอน หรือนักเรียนที่ตนดูแล (หรือเลือกดูทั้งหมดได้ถ้าเป็นแอดมิน)
-        const isTeacherOwner = (r) => 
-          (r.teacherId && String(r.teacherId) === String(currentUser.teacherId)) ||
-          (r.teacherName && r.teacherName.includes(currentUser.name));
-        
-        // ถ้าเป็นครู แสดงทั้งที่ตนเองสอน และอนุญาตให้ดูทั้งระดับชั้น
-        // เราสามารถให้ครูเห็นงานที่ตนเองรับผิดชอบเป็นหลัก
-        // records = records.filter(isTeacherOwner);
+        // ครูจะเห็นเฉพาะนักเรียนที่มีผลการเรียนมีเงื่อนไขในวิชาที่ตัวเองสอนเท่านั้น
+        records = records.filter(r => this.isTeacherRecordOwner(r, currentUser));
       }
     }
 
@@ -73,6 +67,33 @@ class RecordsService {
     }
 
     return records;
+  }
+
+  /**
+   * ตรวจสอบว่ารายการผลการเรียนนี้เป็นวิชาที่ครูท่านนี้สอนหรือไม่
+   */
+  isTeacherRecordOwner(r, currentUser) {
+    if (!r || !currentUser) return false;
+
+    // 1. ตรวจสอบจาก teacherId กับ currentUser.teacherId หรือ username
+    const rTeacherId = String(r.teacherId || '').trim().toLowerCase();
+    const curTeacherId = String(currentUser.teacherId || '').trim().toLowerCase();
+    const curUsername = String(currentUser.username || '').trim().toLowerCase();
+
+    if (rTeacherId && (rTeacherId === curTeacherId || rTeacherId === curUsername)) {
+      return true;
+    }
+
+    // 2. ตรวจสอบจากชื่อครูผู้สอน (ตัดคำนำหน้าออกเพื่อเทียบชื่อ-นามสกุล)
+    if (r.teacherName && currentUser.name) {
+      const cleanR = String(r.teacherName).replace(/^(ครู|นาย|นางสาว|นาง|น\.ส\.)\s*/, '').trim().toLowerCase();
+      const cleanU = String(currentUser.name).replace(/^(ครู|นาย|นางสาว|นาง|น\.ส\.)\s*/, '').trim().toLowerCase();
+      if (cleanR === cleanU || cleanR.includes(cleanU) || cleanU.includes(cleanR)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   renderRecordsTable() {
@@ -541,11 +562,10 @@ class RecordsService {
 
     dropdown.innerHTML = filtered.slice(0, 35).map(t => `
       <div class="combobox-item" onclick="recordsService.selectTeacher('${t.id}')">
-        <div>
-          <span class="item-title">${t.name}</span>
-          <span class="item-sub">(${t.learningArea || '-'})</span>
+        <div style="width: 100%;">
+          <span class="item-title text-gray-900 font-semibold">${t.name}</span>
+          <span class="item-sub text-gray-500 font-normal">(${t.learningArea || '-'})</span>
         </div>
-        <span class="text-xs font-mono text-gray-400">${t.teacherId || ''}</span>
       </div>
     `).join('');
 

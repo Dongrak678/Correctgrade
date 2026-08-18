@@ -20,6 +20,23 @@ class AuditService {
 
   getFilteredLogs() {
     let logs = db.get('auditLogs') || [];
+    const currentUser = authService.getCurrentUser();
+
+    if (currentUser) {
+      if (currentUser.role === APP_CONFIG.ROLES.STUDENT) {
+        logs = logs.filter(l => 
+          String(l.studentId) === String(currentUser.studentId) ||
+          String(l.studentName).includes(currentUser.name)
+        );
+      } else if (currentUser.role === APP_CONFIG.ROLES.TEACHER) {
+        logs = logs.filter(l => {
+          const cleanL = String(l.teacherName || l.approvedBy || '').replace(/^(ครู|นาย|นางสาว|นาง|น\.ส\.)\s*/, '').trim().toLowerCase();
+          const cleanU = String(currentUser.name).replace(/^(ครู|นาย|นางสาว|นาง|น\.ส\.)\s*/, '').trim().toLowerCase();
+          return (l.teacherId && String(l.teacherId).toLowerCase() === String(currentUser.teacherId || currentUser.username).toLowerCase()) ||
+                 cleanL.includes(cleanU) || cleanU.includes(cleanL);
+        });
+      }
+    }
 
     if (this.searchQuery && this.searchQuery.trim()) {
       const q = this.searchQuery.trim().toLowerCase();
