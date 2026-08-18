@@ -8,7 +8,7 @@ class StudentsService {
     this.searchQuery = '';
     this.filterGradeLevel = 'all';
     this.currentPage = 1;
-    this.pageSize = 10;
+    this.pageSize = 15;
   }
 
   init() {
@@ -20,7 +20,7 @@ class StudentsService {
   }
 
   getFilteredStudents() {
-    let students = db.get('students') || [];
+    let students = [...(db.get('students') || [])];
 
     if (this.filterGradeLevel !== 'all') {
       students = students.filter(s => (s.gradeLevel || '').startsWith(this.filterGradeLevel));
@@ -35,6 +35,33 @@ class StudentsService {
         (s.gradeLevel && s.gradeLevel.toLowerCase().includes(q))
       );
     }
+
+    // เรียงลำดับตัวเลข 1, 2, 3, ... (Natural Numeric Sorting)
+    students.sort((a, b) => {
+      // 1. ระดับชั้น (เช่น ม.1, ม.2, ...)
+      const glA = a.gradeLevel || '';
+      const glB = b.gradeLevel || '';
+      if (glA !== glB) {
+        return glA.localeCompare(glB, 'th', { numeric: true });
+      }
+
+      // 2. ห้อง (เช่น 1, 2, 3)
+      const roomA = parseInt(a.room, 10) || 0;
+      const roomB = parseInt(b.room, 10) || 0;
+      if (roomA !== roomB) {
+        return roomA - roomB;
+      }
+
+      // 3. เรียงตามเลขที่แบบตัวเลข (1 มาก่อน 2, 2 มาก่อน 10)
+      const numA = parseInt(String(a.number).replace(/\D/g, ''), 10) || 0;
+      const numB = parseInt(String(b.number).replace(/\D/g, ''), 10) || 0;
+      if (numA !== numB) {
+        return numA - numB;
+      }
+
+      // 4. รหัสประจำตัว
+      return (a.studentId || '').localeCompare(b.studentId || '', undefined, { numeric: true });
+    });
 
     return students;
   }
@@ -85,7 +112,10 @@ class StudentsService {
             <span class="badge-level font-semibold">${gradeDisplay || '-'}</span>
           </td>
           <td>
-            <span class="text-xs text-gray-700"><i class="fas fa-user-shield text-gray-400 mr-1"></i> ${s.advisor || '-'}</span>
+            <div style="display: flex; align-items: center; gap: 6px; color: #334155; font-size: 13.5px; line-height: 1.4;">
+              <i class="fas fa-user-shield text-gray-400" style="font-size: 12px; flex-shrink: 0;"></i>
+              <span>${s.advisor || '-'}</span>
+            </div>
           </td>
           <td class="text-right">
             ${isAdmin ? `
