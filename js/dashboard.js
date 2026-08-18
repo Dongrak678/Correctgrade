@@ -145,24 +145,24 @@ class DashboardService {
             legend: {
               position: 'top',
               labels: {
-                font: { family: "'Prompt', sans-serif", size: 12 },
+                font: { family: "'Sarabun', sans-serif", size: 12 },
                 usePointStyle: true,
                 boxWidth: 8
               }
             },
             tooltip: {
-              titleFont: { family: "'Prompt', sans-serif" },
-              bodyFont: { family: "'Prompt', sans-serif" }
+              titleFont: { family: "'Sarabun', sans-serif" },
+              bodyFont: { family: "'Sarabun', sans-serif" }
             }
           },
           scales: {
             x: {
               grid: { display: false },
-              ticks: { font: { family: "'Prompt', sans-serif" } }
+              ticks: { font: { family: "'Sarabun', sans-serif" } }
             },
             y: {
               beginAtZero: true,
-              ticks: { stepSize: 1, font: { family: "'Prompt', sans-serif" } }
+              ticks: { stepSize: 1, font: { family: "'Sarabun', sans-serif" } }
             }
           }
         }
@@ -204,14 +204,14 @@ class DashboardService {
             legend: {
               position: 'bottom',
               labels: {
-                font: { family: "'Prompt', sans-serif", size: 12 },
+                font: { family: "'Sarabun', sans-serif", size: 12 },
                 usePointStyle: true,
                 padding: 15
               }
             },
             tooltip: {
-              titleFont: { family: "'Prompt', sans-serif" },
-              bodyFont: { family: "'Prompt', sans-serif" }
+              titleFont: { family: "'Sarabun', sans-serif" },
+              bodyFont: { family: "'Sarabun', sans-serif" }
             }
           }
         }
