@@ -306,51 +306,54 @@ class RecordsService {
     const modal = document.getElementById('record-form-modal');
     if (!modal) return;
 
-    const students = db.get('students');
-    const teachers = db.get('teachers');
-
     modal.innerHTML = `
       <div class="modal-backdrop" onclick="recordsService.closeModal()"></div>
       <div class="modal-dialog modal-lg">
         <div class="modal-header">
           <div class="modal-title-wrap">
             <span class="modal-badge badge-blue"><i class="fas fa-plus-circle"></i> บันทึกข้อมูล</span>
-            <h3>เพิ่มข้อมูลนักเรียนติด 0 / ร / มส</h3>
+            <h3 id="record-modal-title">เพิ่มข้อมูลนักเรียนติด 0 / ร / มส</h3>
           </div>
           <button class="btn-close-modal" onclick="recordsService.closeModal()">&times;</button>
         </div>
         <div class="modal-body">
           <form id="form-record-data" onsubmit="recordsService.handleRecordFormSubmit(event)">
             <div class="form-row">
+              <!-- เลือกนักเรียน (Searchable Autocomplete) -->
               <div class="form-group col-md-6">
-                <label for="rec-student-select">เลือกนักเรียน <span class="text-red-500">*</span></label>
-                <select id="rec-student-select" class="form-control" required onchange="recordsService.onStudentSelected(this.value)">
-                  <option value="">-- เลือกนักเรียนในทะเบียน --</option>
-                  ${students.map(s => `
-                    <option value="${s.studentId}">${s.studentId} - ${s.name} (${s.gradeLevel}/${s.room || '1'})</option>
-                  `).join('')}
-                </select>
+                <label for="rec-student-search">เลือกนักเรียน <span class="text-red-500">*</span> <span class="text-xs text-gray-500">(พิมพ์ค้นหาชื่อ หรือรหัสประจำตัว)</span></label>
+                <div class="searchable-combobox-wrap" id="student-combobox-wrap">
+                  <div class="searchable-input-wrapper">
+                    <i class="fas fa-search combobox-icon-left"></i>
+                    <input type="text" id="rec-student-search" class="form-control searchable-input" placeholder="พิมพ์ชื่อ, สกุล หรือรหัสประจำตัว..." autocomplete="off" oninput="recordsService.onStudentSearchInput(this.value)" onfocus="recordsService.renderStudentDropdown(this.value)">
+                    <button type="button" class="combobox-clear-btn" title="ล้างการเลือก" onclick="recordsService.clearStudentSelection()">&times;</button>
+                  </div>
+                  <div id="rec-student-dropdown-list" class="combobox-dropdown-list hidden"></div>
+                </div>
               </div>
 
+              <!-- ครูผู้สอนประจำวิชา (Searchable Autocomplete) -->
               <div class="form-group col-md-6">
-                <label for="rec-teacher-select">ครูผู้สอนประจำวิชา <span class="text-red-500">*</span></label>
-                <select id="rec-teacher-select" class="form-control" required onchange="recordsService.onTeacherSelected(this.value)">
-                  <option value="">-- เลือกครูผู้สอน --</option>
-                  ${teachers.map(t => `
-                    <option value="${t.teacherId || t.id}">${t.name} (${t.learningArea || '-'})</option>
-                  `).join('')}
-                </select>
+                <label for="rec-teacher-search">ครูผู้สอนประจำวิชา <span class="text-red-500">*</span> <span class="text-xs text-gray-500">(พิมพ์ค้นหาชื่อครู)</span></label>
+                <div class="searchable-combobox-wrap" id="teacher-combobox-wrap">
+                  <div class="searchable-input-wrapper">
+                    <i class="fas fa-chalkboard-teacher combobox-icon-left"></i>
+                    <input type="text" id="rec-teacher-search" class="form-control searchable-input" placeholder="พิมพ์ชื่อครู หรือกลุ่มสาระ..." autocomplete="off" oninput="recordsService.onTeacherSearchInput(this.value)" onfocus="recordsService.renderTeacherDropdown(this.value)">
+                    <button type="button" class="combobox-clear-btn" title="ล้างการเลือก" onclick="recordsService.clearTeacherSelection()">&times;</button>
+                  </div>
+                  <div id="rec-teacher-dropdown-list" class="combobox-dropdown-list hidden"></div>
+                </div>
               </div>
             </div>
 
             <div class="form-row">
               <div class="form-group col-md-4">
                 <label for="rec-student-id">รหัสประจำตัวนักเรียน</label>
-                <input type="text" id="rec-student-id" class="form-control" required placeholder="เช่น 50101">
+                <input type="text" id="rec-student-id" class="form-control" required placeholder="เช่น 09522">
               </div>
               <div class="form-group col-md-5">
                 <label for="rec-student-name">ชื่อ - นามสกุล นักเรียน</label>
-                <input type="text" id="rec-student-name" class="form-control" required placeholder="เช่น นายสมชาย สมบูรณ์">
+                <input type="text" id="rec-student-name" class="form-control" required placeholder="เช่น ด.ช.ศิลป์ชัย ชุเลิศ">
               </div>
               <div class="form-group col-md-3">
                 <label for="rec-grade-level">ระดับชั้น</label>
@@ -410,6 +413,177 @@ class RecordsService {
       </div>
     `;
     modal.classList.add('active');
+
+    this.setupComboboxClickOutside();
+  }
+
+  setupComboboxClickOutside() {
+    if (this._comboboxBound) return;
+    this._comboboxBound = true;
+    document.addEventListener('click', (e) => {
+      const sWrap = document.getElementById('student-combobox-wrap');
+      const tWrap = document.getElementById('teacher-combobox-wrap');
+      const sDropdown = document.getElementById('rec-student-dropdown-list');
+      const tDropdown = document.getElementById('rec-teacher-dropdown-list');
+
+      if (sDropdown && sWrap && !sWrap.contains(e.target)) {
+        sDropdown.classList.add('hidden');
+      }
+      if (tDropdown && tWrap && !tWrap.contains(e.target)) {
+        tDropdown.classList.add('hidden');
+      }
+    });
+  }
+
+  onStudentSearchInput(query) {
+    this.renderStudentDropdown(query);
+  }
+
+  renderStudentDropdown(query = '') {
+    const dropdown = document.getElementById('rec-student-dropdown-list');
+    if (!dropdown) return;
+
+    const students = db.get('students') || [];
+    const q = (query || '').trim().toLowerCase();
+
+    let filtered = students;
+    if (q) {
+      filtered = students.filter(s => 
+        (s.name && s.name.toLowerCase().includes(q)) ||
+        (s.studentId && String(s.studentId).toLowerCase().includes(q)) ||
+        (s.gradeLevel && s.gradeLevel.toLowerCase().includes(q)) ||
+        (s.advisor && s.advisor.toLowerCase().includes(q))
+      );
+    }
+
+    if (filtered.length === 0) {
+      dropdown.innerHTML = `<div class="combobox-empty"><i class="fas fa-info-circle mr-1"></i> ไม่พบรายชื่อนักเรียน "${query}"</div>`;
+      dropdown.classList.remove('hidden');
+      return;
+    }
+
+    dropdown.innerHTML = filtered.slice(0, 35).map(s => {
+      const roomText = s.room ? `${s.gradeLevel}/${s.room}` : (s.gradeLevel || '');
+      return `
+        <div class="combobox-item" onclick="recordsService.selectStudent('${s.id}')">
+          <div>
+            <span class="item-title">${s.studentId} - ${s.name}</span>
+            <span class="item-sub">(${roomText}${s.number ? ' เลขที่ ' + s.number : ''})</span>
+          </div>
+          <i class="fas fa-chevron-right text-gray-300 text-xs"></i>
+        </div>
+      `;
+    }).join('');
+
+    dropdown.classList.remove('hidden');
+  }
+
+  selectStudent(studentDbId) {
+    const student = db.getById('students', studentDbId);
+    if (!student) return;
+
+    const searchInput = document.getElementById('rec-student-search');
+    const idInput = document.getElementById('rec-student-id');
+    const nameInput = document.getElementById('rec-student-name');
+    const levelInput = document.getElementById('rec-grade-level');
+    const dropdown = document.getElementById('rec-student-dropdown-list');
+
+    const roomText = student.room ? `${student.gradeLevel}/${student.room}` : (student.gradeLevel || '');
+    if (searchInput) searchInput.value = `${student.studentId} - ${student.name} (${roomText})`;
+    if (idInput) idInput.value = student.studentId || '';
+    if (nameInput) nameInput.value = `${student.prefix ? student.prefix : ''}${student.name || ''}`;
+    if (levelInput && student.gradeLevel) {
+      let g = student.gradeLevel;
+      if (g.includes('/')) g = g.split('/')[0].trim();
+      levelInput.value = g;
+    }
+    if (dropdown) dropdown.classList.add('hidden');
+  }
+
+  clearStudentSelection() {
+    const searchInput = document.getElementById('rec-student-search');
+    const idInput = document.getElementById('rec-student-id');
+    const nameInput = document.getElementById('rec-student-name');
+    if (searchInput) {
+      searchInput.value = '';
+      searchInput.focus();
+    }
+    if (idInput) idInput.value = '';
+    if (nameInput) nameInput.value = '';
+    this.renderStudentDropdown('');
+  }
+
+  onTeacherSearchInput(query) {
+    this.renderTeacherDropdown(query);
+  }
+
+  renderTeacherDropdown(query = '') {
+    const dropdown = document.getElementById('rec-teacher-dropdown-list');
+    if (!dropdown) return;
+
+    const teachers = db.get('teachers') || [];
+    const q = (query || '').trim().toLowerCase();
+
+    let filtered = teachers;
+    if (q) {
+      filtered = teachers.filter(t => 
+        (t.name && t.name.toLowerCase().includes(q)) ||
+        (t.teacherId && String(t.teacherId).toLowerCase().includes(q)) ||
+        (t.learningArea && t.learningArea.toLowerCase().includes(q))
+      );
+    }
+
+    if (filtered.length === 0) {
+      dropdown.innerHTML = `<div class="combobox-empty"><i class="fas fa-info-circle mr-1"></i> ไม่พบข้อมูลครูผู้สอน "${query}"</div>`;
+      dropdown.classList.remove('hidden');
+      return;
+    }
+
+    dropdown.innerHTML = filtered.slice(0, 35).map(t => `
+      <div class="combobox-item" onclick="recordsService.selectTeacher('${t.id}')">
+        <div>
+          <span class="item-title">${t.name}</span>
+          <span class="item-sub">(${t.learningArea || '-'})</span>
+        </div>
+        <span class="text-xs font-mono text-gray-400">${t.teacherId || ''}</span>
+      </div>
+    `).join('');
+
+    dropdown.classList.remove('hidden');
+  }
+
+  selectTeacher(teacherDbId) {
+    const teacher = db.getById('teachers', teacherDbId);
+    if (!teacher) return;
+
+    const searchInput = document.getElementById('rec-teacher-search');
+    const nameHidden = document.getElementById('rec-teacher-name');
+    const areaInput = document.getElementById('rec-learning-area');
+    const subjCodeInput = document.getElementById('rec-subject-code');
+    const subjNameInput = document.getElementById('rec-subject-name');
+    const dropdown = document.getElementById('rec-teacher-dropdown-list');
+
+    if (searchInput) searchInput.value = `${teacher.name} (${teacher.learningArea || '-'})`;
+    if (nameHidden) nameHidden.value = teacher.name;
+    if (areaInput && teacher.learningArea) areaInput.value = teacher.learningArea;
+
+    if (teacher.subjects && teacher.subjects.length > 0) {
+      if (subjCodeInput && !subjCodeInput.value) subjCodeInput.value = teacher.subjects[0].code || '';
+      if (subjNameInput && !subjNameInput.value) subjNameInput.value = teacher.subjects[0].name || '';
+    }
+
+    if (dropdown) dropdown.classList.add('hidden');
+  }
+
+  clearTeacherSelection() {
+    const searchInput = document.getElementById('rec-teacher-search');
+    const nameHidden = document.getElementById('rec-teacher-name');
+    if (searchInput) {
+      searchInput.value = '';
+      searchInput.focus();
+    }
+    if (nameHidden) nameHidden.value = '';
+    this.renderTeacherDropdown('');
   }
 
   openEditRecordModal(id) {
@@ -418,11 +592,20 @@ class RecordsService {
 
     this.openAddRecordModal();
 
-    // Populate data
     setTimeout(() => {
+      const titleEl = document.getElementById('record-modal-title');
+      if (titleEl) titleEl.innerText = "แก้ไขข้อมูลนักเรียนติด 0 / ร / มส";
+
       document.getElementById('rec-edit-id').value = record.id;
       document.getElementById('rec-student-id').value = record.studentId || '';
       document.getElementById('rec-student-name').value = record.studentName || '';
+      
+      const sSearch = document.getElementById('rec-student-search');
+      if (sSearch) sSearch.value = `${record.studentId} - ${record.studentName} (${record.gradeLevel || ''})`;
+
+      const tSearch = document.getElementById('rec-teacher-search');
+      if (tSearch) tSearch.value = record.teacherName || '';
+
       document.getElementById('rec-grade-level').value = record.gradeLevel || 'ม.4';
       document.getElementById('rec-subject-code').value = record.subjectCode || '';
       document.getElementById('rec-subject-name').value = record.subjectName || '';
@@ -432,32 +615,6 @@ class RecordsService {
       document.getElementById('rec-academic-year').value = record.academicYear || '2569';
       document.getElementById('rec-teacher-name').value = record.teacherName || '';
     }, 50);
-  }
-
-  onStudentSelected(studentId) {
-    if (!studentId) return;
-    const student = db.get('students').find(s => s.studentId === studentId);
-    if (student) {
-      document.getElementById('rec-student-id').value = student.studentId;
-      document.getElementById('rec-student-name').value = `${student.prefix || ''}${student.name}`;
-      document.getElementById('rec-grade-level').value = student.gradeLevel || 'ม.4';
-    }
-  }
-
-  onTeacherSelected(teacherId) {
-    if (!teacherId) return;
-    const teacher = db.get('teachers').find(t => (t.teacherId === teacherId || t.id === teacherId));
-    if (teacher) {
-      document.getElementById('rec-teacher-name').value = teacher.name;
-      if (teacher.learningArea) {
-        document.getElementById('rec-learning-area').value = teacher.learningArea;
-      }
-      // ถ้าครูมีวิชาสอน ให้ใส่เป็นค่าแนะนำ
-      if (teacher.subjects && teacher.subjects.length > 0) {
-        document.getElementById('rec-subject-code').value = teacher.subjects[0].code || '';
-        document.getElementById('rec-subject-name').value = teacher.subjects[0].name || '';
-      }
-    }
   }
 
   async handleRecordFormSubmit(e) {

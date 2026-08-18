@@ -1337,3 +1337,109 @@ textarea.form-control {
 .flex { display: flex; }
 .gap-2 { gap: 6px; }
 .block { display: block; }
+
+/* Searchable Autocomplete Combobox */
+.searchable-combobox-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.searchable-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.searchable-input-wrapper i.combobox-icon-left {
+  position: absolute;
+  left: 10px;
+  color: #64748b;
+  font-size: 13px;
+  pointer-events: none;
+}
+
+.searchable-input-wrapper input.searchable-input {
+  padding-left: 32px;
+  padding-right: 28px;
+  width: 100%;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  font-size: 14px;
+}
+
+.searchable-input-wrapper input.searchable-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.searchable-input-wrapper .combobox-clear-btn {
+  position: absolute;
+  right: 8px;
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 2px 6px;
+  font-size: 15px;
+  border-radius: 50%;
+  line-height: 1;
+  transition: all 0.15s;
+}
+
+.searchable-input-wrapper .combobox-clear-btn:hover {
+  color: #ef4444;
+  background: #fee2e2;
+}
+
+.combobox-dropdown-list {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  max-height: 220px;
+  overflow-y: auto;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.08);
+  z-index: 1050;
+}
+
+.combobox-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 13.5px;
+  border-bottom: 1px solid #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background 0.12s ease;
+  color: #1e293b;
+}
+
+.combobox-item:last-child {
+  border-bottom: none;
+}
+
+.combobox-item:hover, .combobox-item.active {
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-weight: 500;
+}
+
+.combobox-item .item-title {
+  font-weight: 600;
+}
+
+.combobox-item .item-sub {
+  font-size: 12px;
+  color: #64748b;
+  margin-left: 8px;
+}
+
+.combobox-empty {
+  padding: 12px;
+  text-align: center;
+  color: #94a3b8;
+  font-size: 13px;
+}
