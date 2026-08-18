@@ -50,7 +50,7 @@ class StudentsService {
     if (filtered.length === 0) {
       tableBody.innerHTML = `
         <tr>
-          <td colspan="7" class="text-center py-8 text-gray-500">
+          <td colspan="6" class="text-center py-8 text-gray-500">
             <div class="empty-state-card">
               <i class="fas fa-user-graduate text-4xl mb-2 text-gray-300"></i>
               <p class="font-semibold">ไม่พบข้อมูลนักเรียน</p>
@@ -70,37 +70,38 @@ class StudentsService {
 
     const isAdmin = authService.isAdmin();
 
-    tableBody.innerHTML = pageStudents.map((s, idx) => `
-      <tr class="hover-row">
-        <td class="text-center text-xs text-gray-500 font-mono">${startIndex + idx + 1}</td>
-        <td class="font-mono font-bold text-indigo-700">${s.studentId}</td>
-        <td>
-          <div class="font-medium text-gray-900">${s.prefix || ''}${s.name}</div>
-          <span class="text-xs text-gray-400">เลขที่ ${s.number || '-'}</span>
-        </td>
-        <td class="text-center">
-          <span class="badge-level font-semibold">${s.gradeLevel}/${s.room || '1'}</span>
-        </td>
-        <td>
-          <span class="text-xs text-gray-700"><i class="fas fa-user-shield text-gray-400 mr-1"></i> ${s.advisor || '-'}</span>
-        </td>
-        <td class="text-xs text-gray-600">
-          ${s.phone ? `<i class="fas fa-phone text-gray-400 mr-1"></i> ${s.phone}` : '-'}
-        </td>
-        <td class="text-right">
-          ${isAdmin ? `
-            <div class="action-btn-group">
-              <button type="button" class="btn-icon text-indigo-600" title="แก้ไข" onclick="studentsService.openEditStudentModal('${s.id}')">
-                <i class="fas fa-edit"></i>
-              </button>
-              <button type="button" class="btn-icon text-red-600" title="ลบ" onclick="studentsService.deleteStudentPrompt('${s.id}', '${s.name}')">
-                <i class="fas fa-trash-alt"></i>
-              </button>
-            </div>
-          ` : '<span class="text-gray-300">-</span>'}
-        </td>
-      </tr>
-    `).join('');
+    tableBody.innerHTML = pageStudents.map((s, idx) => {
+      const roomDisplay = s.room ? `/${s.room}` : '';
+      const gradeDisplay = `${s.gradeLevel || ''}${roomDisplay}`;
+
+      return `
+        <tr class="hover-row">
+          <td class="text-center font-bold text-gray-800">${s.number || (startIndex + idx + 1)}</td>
+          <td class="font-mono font-bold text-indigo-700">${s.studentId}</td>
+          <td>
+            <div class="font-medium text-gray-900">${s.prefix || ''}${s.name}</div>
+          </td>
+          <td class="text-center">
+            <span class="badge-level font-semibold">${gradeDisplay || '-'}</span>
+          </td>
+          <td>
+            <span class="text-xs text-gray-700"><i class="fas fa-user-shield text-gray-400 mr-1"></i> ${s.advisor || '-'}</span>
+          </td>
+          <td class="text-right">
+            ${isAdmin ? `
+              <div class="action-btn-group">
+                <button type="button" class="btn-icon text-indigo-600" title="แก้ไข" onclick="studentsService.openEditStudentModal('${s.id}')">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button type="button" class="btn-icon text-red-600" title="ลบ" onclick="studentsService.deleteStudentPrompt('${s.id}', '${s.name}')">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </div>
+            ` : '<span class="text-gray-300">-</span>'}
+          </td>
+        </tr>
+      `;
+    }).join('');
 
     this.renderPagination(filtered.length);
   }
@@ -172,49 +173,29 @@ class StudentsService {
         <div class="modal-body">
           <form id="form-student-data" onsubmit="studentsService.handleStudentFormSubmit(event)">
             <div class="form-row">
+              <div class="form-group col-md-3">
+                <label for="std-num">เลขที่</label>
+                <input type="text" id="std-num" class="form-control" placeholder="เช่น 1">
+              </div>
               <div class="form-group col-md-4">
-                <label for="std-id">รหัสประจำตัวนักเรียน <span class="text-red-500">*</span></label>
+                <label for="std-id">รหัสประจำตัว <span class="text-red-500">*</span></label>
                 <input type="text" id="std-id" class="form-control" placeholder="เช่น 50101" required>
               </div>
-              <div class="form-group col-md-2">
-                <label for="std-prefix">คำนำหน้า</label>
-                <select id="std-prefix" class="form-control">
-                  <option value="เด็กชาย">ด.ช.</option>
-                  <option value="เด็กหญิง">ด.ญ.</option>
-                  <option value="นาย" selected>นาย</option>
-                  <option value="นางสาว">น.ส.</option>
-                </select>
-              </div>
-              <div class="form-group col-md-6">
-                <label for="std-name">ชื่อ - นามสกุล <span class="text-red-500">*</span></label>
-                <input type="text" id="std-name" class="form-control" placeholder="ชื่อ นามสกุล" required>
+              <div class="form-group col-md-5">
+                <label for="std-name">ชื่อ - สกุล <span class="text-red-500">*</span></label>
+                <input type="text" id="std-name" class="form-control" placeholder="เช่น นายสมชาย ใจดี" required>
               </div>
             </div>
 
             <div class="form-row">
-              <div class="form-group col-md-4">
-                <label for="std-level">ระดับชั้น <span class="text-red-500">*</span></label>
-                <select id="std-level" class="form-control" required>
-                  ${APP_CONFIG.GRADE_LEVELS.map(g => `<option value="${g}">${g}</option>`).join('')}
-                </select>
+              <div class="form-group col-md-6">
+                <label for="std-level">ระดับชั้น / ห้อง <span class="text-red-500">*</span></label>
+                <input type="text" id="std-level" class="form-control" placeholder="เช่น ม.4/1 หรือ ม.4" required value="ม.4/1">
               </div>
-              <div class="form-group col-md-2">
-                <label for="std-room">ห้อง</label>
-                <input type="text" id="std-room" class="form-control" value="1">
+              <div class="form-group col-md-6">
+                <label for="std-advisor">ครูที่ปรึกษา</label>
+                <input type="text" id="std-advisor" class="form-control" placeholder="เช่น ครูสมชาย ใจดี">
               </div>
-              <div class="form-group col-md-2">
-                <label for="std-num">เลขที่</label>
-                <input type="text" id="std-num" class="form-control" placeholder="1">
-              </div>
-              <div class="form-group col-md-4">
-                <label for="std-phone">เบอร์โทรศัพท์</label>
-                <input type="tel" id="std-phone" class="form-control" placeholder="09x-xxx-xxxx">
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label for="std-advisor">ครูที่ปรึกษา</label>
-              <input type="text" id="std-advisor" class="form-control" placeholder="ระบุชื่อครูที่ปรึกษา">
             </div>
 
             <input type="hidden" id="std-edit-id" value="">
@@ -241,13 +222,11 @@ class StudentsService {
     setTimeout(() => {
       document.getElementById('student-modal-title').innerText = "แก้ไขข้อมูลนักเรียน";
       document.getElementById('std-edit-id').value = student.id;
-      document.getElementById('std-id').value = student.studentId || '';
-      document.getElementById('std-prefix').value = student.prefix || 'นาย';
-      document.getElementById('std-name').value = student.name || '';
-      document.getElementById('std-level').value = student.gradeLevel || 'ม.4';
-      document.getElementById('std-room').value = student.room || '1';
       document.getElementById('std-num').value = student.number || '';
-      document.getElementById('std-phone').value = student.phone || '';
+      document.getElementById('std-id').value = student.studentId || '';
+      document.getElementById('std-name').value = `${student.prefix ? student.prefix : ''}${student.name || ''}`;
+      const lvl = student.room ? `${student.gradeLevel}/${student.room}` : (student.gradeLevel || 'ม.4/1');
+      document.getElementById('std-level').value = lvl;
       document.getElementById('std-advisor').value = student.advisor || '';
     }, 50);
   }
@@ -255,14 +234,20 @@ class StudentsService {
   async handleStudentFormSubmit(e) {
     e.preventDefault();
     const editId = document.getElementById('std-edit-id').value;
-    const studentId = document.getElementById('std-id').value.trim();
-    const prefix = document.getElementById('std-prefix').value;
-    const name = document.getElementById('std-name').value.trim();
-    const gradeLevel = document.getElementById('std-level').value;
-    const room = document.getElementById('std-room').value.trim();
     const number = document.getElementById('std-num').value.trim();
-    const phone = document.getElementById('std-phone').value.trim();
+    const studentId = document.getElementById('std-id').value.trim();
+    const fullName = document.getElementById('std-name').value.trim();
+    const levelInput = document.getElementById('std-level').value.trim();
     const advisor = document.getElementById('std-advisor').value.trim();
+
+    // Parse level and room e.g. "ม.4/1" -> gradeLevel: "ม.4", room: "1"
+    let gradeLevel = levelInput;
+    let room = "1";
+    if (levelInput.includes('/')) {
+      const parts = levelInput.split('/');
+      gradeLevel = parts[0].trim();
+      room = parts[1].trim() || "1";
+    }
 
     let student = editId ? db.getById('students', editId) : null;
     if (!student) {
@@ -272,13 +257,12 @@ class StudentsService {
       };
     }
 
+    student.number = number;
     student.studentId = studentId;
-    student.prefix = prefix;
-    student.name = name;
+    student.name = fullName;
+    student.prefix = "";
     student.gradeLevel = gradeLevel;
     student.room = room;
-    student.number = number;
-    student.phone = phone;
     student.advisor = advisor;
 
     await db.saveItem('students', student);
@@ -324,7 +308,10 @@ class StudentsService {
         <div class="modal-body">
           <div class="csv-guide-box">
             <h4><i class="fas fa-info-circle text-blue-500"></i> โครงสร้างไฟล์ CSV ที่ระบบรองรับ:</h4>
-            <code>student_id,prefix,name,number,grade_level,room,advisor,phone</code>
+            <div style="background: #ffffff; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; margin: 8px 0; font-family: monospace; font-weight: bold; color: #1e293b;">
+              เลขที่,รหัสประจำตัว,ชื่อ-สกุล,ระดับชั้น,ครูที่ปรึกษา
+            </div>
+            <p class="text-xs text-gray-500 mt-1">คอลัมน์ <strong>ระดับชั้น</strong> สามารถใส่เป็น "ม.4/1" หรือ "ม.4" ได้</p>
             <div class="mt-2">
               <button type="button" class="btn-sm btn-outline text-indigo-600 font-semibold" onclick="exportEngine.downloadTemplate('students')">
                 <i class="fas fa-download mr-1"></i> ดาวน์โหลดไฟล์ตัวอย่าง (Students CSV Template)
@@ -349,10 +336,10 @@ class StudentsService {
                 <table class="data-table text-xs">
                   <thead>
                     <tr>
-                      <th>รหัส นร.</th>
+                      <th class="text-center">เลขที่</th>
+                      <th>รหัสประจำตัว</th>
                       <th>ชื่อ-สกุล</th>
-                      <th>ชั้น/ห้อง</th>
-                      <th>เลขที่</th>
+                      <th class="text-center">ระดับชั้น</th>
                       <th>ครูที่ปรึกษา</th>
                     </tr>
                   </thead>
@@ -407,16 +394,32 @@ class StudentsService {
         row[h] = cleanValues[idx] || '';
       });
 
+      // Match flexibly by exact Thai names or common aliases
+      const number = row['เลขที่'] || row['number'] || row['no'] || `${i}`;
+      const studentId = row['รหัสประจำตัว'] || row['รหัสประจำ'] || row['รหัสนักเรียน'] || row['student_id'] || row['id'] || `501${i.toString().padStart(2, '0')}`;
+      const name = row['ชื่อ-สกุล'] || row['ชื่อ - สกุล'] || row['ชื่อ_สกุล'] || row['ชื่อ'] || row['name'] || '';
+      const levelRaw = row['ระดับชั้น'] || row['ระดับชั้น/ห้อง'] || row['ชั้น'] || row['grade_level'] || 'ม.4/1';
+      const advisor = row['ครูที่ปรึกษา'] || row['ที่ปรึกษา'] || row['advisor'] || '';
+
+      // Parse gradeLevel and room
+      let gradeLevel = levelRaw;
+      let room = "1";
+      if (levelRaw.includes('/')) {
+        const parts = levelRaw.split('/');
+        gradeLevel = parts[0].trim();
+        room = parts[1].trim() || "1";
+      }
+
       result.push({
         id: `s_${Date.now()}_${i}`,
-        studentId: row.student_id || row['รหัสนักเรียน'] || `501${i.toString().padStart(2, '0')}`,
-        prefix: row.prefix || row['คำนำหน้า'] || 'นาย',
-        name: row.name || row['ชื่อ-สกุล'] || row['ชื่อ'] || '',
-        number: row.number || row['เลขที่'] || `${i}`,
-        gradeLevel: row.grade_level || row['ระดับชั้น'] || 'ม.4',
-        room: row.room || row['ห้อง'] || '1',
-        advisor: row.advisor || row['ครูที่ปรึกษา'] || '',
-        phone: row.phone || row['เบอร์โทร'] || ''
+        studentId: studentId,
+        number: number,
+        prefix: "",
+        name: name,
+        gradeLevel: gradeLevel,
+        room: room,
+        advisor: advisor,
+        phone: ""
       });
     }
     return result;
@@ -439,10 +442,10 @@ class StudentsService {
     countEl.innerText = data.length;
     tbody.innerHTML = data.slice(0, 8).map(s => `
       <tr>
-        <td>${s.studentId}</td>
-        <td>${s.prefix || ''}${s.name}</td>
-        <td>${s.gradeLevel}/${s.room}</td>
-        <td>${s.number}</td>
+        <td class="text-center font-bold">${s.number}</td>
+        <td class="font-mono font-bold">${s.studentId}</td>
+        <td>${s.name}</td>
+        <td class="text-center">${s.gradeLevel}${s.room ? '/' + s.room : ''}</td>
         <td>${s.advisor || '-'}</td>
       </tr>
     `).join('');
