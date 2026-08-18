@@ -41,8 +41,9 @@ class FirebaseService {
       this.updateConnectionStatus('online', 'เชื่อมต่อฐานข้อมูลสำเร็จ (Realtime Live)');
     } catch (err) {
       console.warn("⚠️ ไม่สามารถเชื่อมต่อ Firebase ได้ทันที ใช้ข้อมูล Local Cache แทน:", err);
-      // ถ้าไม่มีข้อมูลใน LocalStorage เลย ให้โหลด Initial Seed
-      if (!this.cache.users || this.cache.users.length === 0) {
+      // ถ้าไม่มีการตั้งค่าระบบและไม่มีข้อมูลใน LocalStorage เลย ให้โหลด Initial Seed
+      const isInit = localStorage.getItem('dongrak_system_initialized');
+      if (!isInit && (!this.cache.users || this.cache.users.length === 0)) {
         this.seedInitialDataLocally();
       }
       this.updateConnectionStatus('offline', 'ทำงานในโหมด Offline Cache');
@@ -71,26 +72,31 @@ class FirebaseService {
   loadFromLocalStorage() {
     try {
       const keys = ['users', 'teachers', 'students', 'records', 'auditLogs', 'activityLogs'];
-      let foundAny = false;
+      const isInit = localStorage.getItem('dongrak_system_initialized');
+
+      if (!isInit) {
+        // ครั้งแรกสุดที่ยังไม่เคยเปิดแอปเลย
+        this.seedInitialDataLocally();
+        return;
+      }
+
       keys.forEach(key => {
         const stored = localStorage.getItem(`dongrak_${key}`);
-        if (stored) {
+        if (stored !== null) {
           this.cache[key] = JSON.parse(stored);
-          foundAny = true;
+        } else {
+          this.cache[key] = [];
         }
       });
-
-      if (!foundAny) {
-        this.seedInitialDataLocally();
-      }
     } catch (e) {
       console.error("Error loading from localStorage:", e);
-      this.seedInitialDataLocally();
+      this.cache = { users: [], teachers: [], students: [], records: [], auditLogs: [], activityLogs: [] };
     }
   }
 
   saveToLocalStorage() {
     try {
+      localStorage.setItem('dongrak_system_initialized', 'true');
       Object.keys(this.cache).forEach(key => {
         localStorage.setItem(`dongrak_${key}`, JSON.stringify(this.cache[key] || []));
       });
@@ -112,18 +118,28 @@ class FirebaseService {
       if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
       const data = await response.json();
 
-      if (!data || Object.keys(data).length === 0) {
-        // หาก Firebase ว่างเปล่า ให้ Seed ข้อมูลเริ่มต้นขึ้น Firebase ทันที
+      const isInit = localStorage.getItem('dongrak_system_initialized');
+
+      if ((!data || Object.keys(data).length === 0) && !isInit) {
+        // หาก Firebase ว่างเปล่าและยังไม่เคยเริ่มต้นระบบ ให้ Seed ข้อมูลเริ่มต้นขึ้น Firebase
         console.log("🌱 ฐานข้อมูล Firebase ยังว่างอยู่ กำลังเริ่มต้นส่งชุดข้อมูลตัวอย่าง...");
         await this.seedFirebaseDatabase();
       } else {
-        // แปลงข้อมูล Object จาก Firebase เป็น Array ในแต่ละหมวด
-        this.cache.users = this.normalizeCollection(data.users, INITIAL_SEED_DATA.users);
-        this.cache.teachers = this.normalizeCollection(data.teachers, INITIAL_SEED_DATA.teachers);
-        this.cache.students = this.normalizeCollection(data.students, INITIAL_SEED_DATA.students);
-        this.cache.records = this.normalizeCollection(data.records, INITIAL_SEED_DATA.records);
-        this.cache.auditLogs = this.normalizeCollection(data.auditLogs, INITIAL_SEED_DATA.auditLogs);
-        this.cache.activityLogs = this.normalizeCollection(data.activityLogs, INITIAL_SEED_DATA.activityLogs);
+        // ดึงข้อมูลจาก Firebase โดยเมื่อผู้ใช้ลบข้อมูลออก (data.collection เป็น undefined/null) ให้ได้เป็น [] (ว่างเปล่า)
+        // ไม่ทำการยัดเยียดค่าเริ่มต้นกลับมาทับสิ่งที่ผู้ใช้ลบไปแล้ว
+        this.cache.users = this.normalizeCollection(data ? data.users : null, []);
+        this.cache.teachers = this.normalizeCollection(data ? data.teachers : null, []);
+        this.cache.students = this.normalizeCollection(data ? data.students : null, []);
+        this.cache.records = this.normalizeCollection(data ? data.records : null, []);
+        this.cache.auditLogs = this.normalizeCollection(data ? data.auditLogs : null, []);
+        this.cache.activityLogs = this.normalizeCollection(data ? data.activityLogs : null, []);
+
+        // หากผู้ใช้มี user ใน cache แต่ใน Firebase ว่างเปล่า ให้คง user admin ไว้เพื่อไม่ให้ล็อกอินไม่ได้
+        if (this.cache.users.length === 0 && isInit) {
+          const adminUser = INITIAL_SEED_DATA.users[0];
+          this.cache.users = [adminUser];
+          await this.saveItem('users', adminUser);
+        }
 
         this.saveToLocalStorage();
       }
@@ -137,7 +153,7 @@ class FirebaseService {
   }
 
   normalizeCollection(data, fallback = []) {
-    if (!data) return fallback;
+    if (data === null || data === undefined) return fallback;
     if (Array.isArray(data)) return data.filter(item => item !== null && item !== undefined);
     if (typeof data === 'object') {
       return Object.keys(data).map(key => {
@@ -199,13 +215,13 @@ class FirebaseService {
           const res = await fetch(`${this.baseUrl}.json`);
           if (res.ok) {
             const data = await res.json();
-            if (data) {
-              this.cache.users = this.normalizeCollection(data.users, this.cache.users);
-              this.cache.teachers = this.normalizeCollection(data.teachers, this.cache.teachers);
-              this.cache.students = this.normalizeCollection(data.students, this.cache.students);
-              this.cache.records = this.normalizeCollection(data.records, this.cache.records);
-              this.cache.auditLogs = this.normalizeCollection(data.auditLogs, this.cache.auditLogs);
-              this.cache.activityLogs = this.normalizeCollection(data.activityLogs, this.cache.activityLogs);
+            if (data !== undefined) {
+              this.cache.users = this.normalizeCollection(data ? data.users : null, []);
+              this.cache.teachers = this.normalizeCollection(data ? data.teachers : null, []);
+              this.cache.students = this.normalizeCollection(data ? data.students : null, []);
+              this.cache.records = this.normalizeCollection(data ? data.records : null, []);
+              this.cache.auditLogs = this.normalizeCollection(data ? data.auditLogs : null, []);
+              this.cache.activityLogs = this.normalizeCollection(data ? data.activityLogs : null, []);
               this.saveToLocalStorage();
               this.notifyAllListeners();
             }
@@ -271,6 +287,13 @@ class FirebaseService {
       await fetch(`${this.baseUrl}${collection}/${id}.json`, {
         method: 'DELETE'
       });
+      
+      // ถ้าลบจนไม่มีข้อมูลเหลือเลย ให้ลบ key collection ออกหรือเซ็ตว่าง
+      if (this.cache[collection].length === 0) {
+        await fetch(`${this.baseUrl}${collection}.json`, {
+          method: 'DELETE'
+        });
+      }
     } catch (e) {
       console.warn(`Delete on Firebase for ${collection}/${id} failed, deleted locally.`, e);
     }
@@ -284,9 +307,7 @@ class FirebaseService {
 
     try {
       await fetch(`${this.baseUrl}${collection}.json`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({})
+        method: 'DELETE'
       });
     } catch (e) {
       console.warn(`Clear collection ${collection} failed on Firebase.`, e);

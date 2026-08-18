@@ -294,6 +294,16 @@ class StudentsService {
     }
   }
 
+  async clearAllStudentsPrompt() {
+    const confirmation = prompt('คำเตือน: คุณต้องการลบข้อมูลนักเรียนทั้งหมดในทะเบียนหรือไม่?\nพิมพ์ "ยืนยันลบนักเรียนทั้งหมด" เพื่อดำเนินการ:');
+    if (confirmation === 'ยืนยันลบนักเรียนทั้งหมด') {
+      await db.clearCollection('students');
+      app.showToast("ล้างข้อมูลทะเบียนนักเรียนทั้งหมดเรียบร้อยแล้ว", "warning");
+    } else if (confirmation !== null) {
+      alert("ข้อความยืนยันไม่ถูกต้อง ยกเลิกการลบ");
+    }
+  }
+
   /**
    * Bulk CSV Import สำหรับนำเข้านักเรียน
    */

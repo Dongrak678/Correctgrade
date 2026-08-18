@@ -313,6 +313,16 @@ class TeachersService {
     }
   }
 
+  async clearAllTeachersPrompt() {
+    const confirmation = prompt('คำเตือน: คุณต้องการลบข้อมูลครูผู้สอนทั้งหมดหรือไม่?\nพิมพ์ "ยืนยันลบครูทั้งหมด" เพื่อดำเนินการ:');
+    if (confirmation === 'ยืนยันลบครูทั้งหมด') {
+      await db.clearCollection('teachers');
+      app.showToast("ล้างข้อมูลทำเนียบครูทั้งหมดเรียบร้อยแล้ว", "warning");
+    } else if (confirmation !== null) {
+      alert("ข้อความยืนยันไม่ถูกต้อง ยกเลิกการลบ");
+    }
+  }
+
   /**
    * Bulk CSV Import สำหรับนำเข้ารายชื่อครู
    */

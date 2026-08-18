@@ -497,6 +497,9 @@
               <button type="button" class="btn btn-outline text-indigo-600 nav-admin-only" onclick="teachersService.openBulkImportModal()">
                 <i class="fas fa-file-csv"></i> นำเข้าครูด้วย CSV
               </button>
+              <button type="button" class="btn btn-outline text-red-600 nav-admin-only" onclick="teachersService.clearAllTeachersPrompt()">
+                <i class="fas fa-trash-alt"></i> ล้างทำเนียบครูทั้งหมด
+              </button>
               <button type="button" class="btn btn-primary nav-admin-only" onclick="teachersService.openAddTeacherModal()">
                 <i class="fas fa-user-plus"></i> เพิ่มข้อมูลครู
               </button>
@@ -546,6 +549,9 @@
             <div class="page-action-group">
               <button type="button" class="btn btn-outline text-indigo-600" onclick="studentsService.openBulkImportModal()">
                 <i class="fas fa-file-csv"></i> นำเข้านักเรียนด้วย CSV
+              </button>
+              <button type="button" class="btn btn-outline text-red-600" onclick="studentsService.clearAllStudentsPrompt()">
+                <i class="fas fa-trash-alt"></i> ล้างทะเบียนนักเรียนทั้งหมด
               </button>
               <button type="button" class="btn btn-primary" onclick="studentsService.openAddStudentModal()">
                 <i class="fas fa-user-plus"></i> เพิ่มข้อมูลนักเรียน
