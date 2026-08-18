@@ -20,8 +20,8 @@
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
   <!-- Application Stylesheets (with cache busting) -->
-  <link rel="stylesheet" href="css/main.css?v=2.0.0">
-  <link rel="stylesheet" href="css/components.css?v=2.0.0">
+  <link rel="stylesheet" href="css/main.css?v=2.1.0">
+  <link rel="stylesheet" href="css/components.css?v=2.1.0">
 </head>
 <body>
 
@@ -254,90 +254,211 @@
       <main class="page-body">
 
         <!-- ===================================================================
-             VIEW 1: EXECUTIVE DASHBOARD
+             VIEW 1: EXECUTIVE DASHBOARD (Modern Analytical Center)
              =================================================================== -->
         <section id="view-dashboard" class="app-view-panel active">
-          <div class="page-header-banner">
-            <div class="page-title-group">
-              <h2><i class="fas fa-tachometer-alt text-indigo-600"></i> แดชบอร์ดสรุปภาพรวม (Executive Dashboard)</h2>
-              <p>สถิติการติด 0, ร, มส และความคืบหน้าการแก้ผลการเรียนแบบเรียลไทม์</p>
+          
+          <!-- Executive Welcome & Live Status Hero Header -->
+          <div class="dashboard-hero-card">
+            <div class="hero-left">
+              <div class="hero-avatar-icon">
+                <i class="fas fa-chart-line"></i>
+              </div>
+              <div class="hero-text-group">
+                <div class="hero-badge-row">
+                  <span class="hero-status-pill">
+                    <span class="pulse-dot"></span> เชื่อมต่อ Realtime Live
+                  </span>
+                  <span class="hero-academic-pill" id="dashboard-hero-term">ปีการศึกษา 2569 ภาคเรียนที่ 1</span>
+                  <span class="hero-date-pill" id="dashboard-hero-date">
+                    <i class="far fa-calendar-alt"></i> วันนี้
+                  </span>
+                </div>
+                <h2 id="dashboard-welcome-heading">ศูนย์ติดตามและวิเคราะห์ผลการเรียน</h2>
+                <p id="dashboard-welcome-sub">รายงานสถิตินักเรียนติดเงื่อนไข 0, ร, มส และติดตามกระบวนการแก้ผลการเรียนแบบเรียลไทม์</p>
+              </div>
             </div>
-            <div class="page-action-group">
-              <button type="button" class="btn btn-outline" onclick="dashboardService.init()">
-                <i class="fas fa-sync-alt"></i> รีเฟรชสถิติ
+            <div class="hero-actions">
+              <button type="button" class="btn-hero btn-hero-refresh" onclick="dashboardService.refreshWithAnimation()" title="รีเฟรชข้อมูลและกราฟ">
+                <i class="fas fa-sync-alt" id="dashboard-refresh-icon"></i> รีเฟรชสถิติ
               </button>
-              <button type="button" class="btn btn-primary" onclick="exportEngine.openPrintReport()">
-                <i class="fas fa-print"></i> พิมพ์รายงานสรุป
+              <button type="button" class="btn-hero btn-hero-primary" onclick="app.switchView('records')">
+                <i class="fas fa-clipboard-list"></i> จัดการผลการเรียน
+              </button>
+              <button type="button" class="btn-hero btn-hero-print" onclick="exportEngine.openPrintReport()">
+                <i class="fas fa-print"></i> พิมพ์รายงาน
               </button>
             </div>
           </div>
 
-          <!-- KPI Cards Grid -->
+          <!-- 6 High-Impact KPI Metric Cards Grid -->
           <div class="kpi-grid">
-            <div class="kpi-card kpi-red">
-              <div class="kpi-icon-box">
-                <i class="fas fa-times-circle"></i>
-              </div>
+            <!-- Card 1: ติด 0 -->
+            <div class="kpi-card kpi-red" onclick="dashboardService.filterToRecords('0')" title="คลิกเพื่อดูรายการติด 0 ทั้งหมด">
+              <div class="kpi-icon-box"><i class="fas fa-times-circle"></i></div>
               <div class="kpi-details">
-                <span class="kpi-title">ติดผลการเรียน '0'</span>
-                <span class="kpi-number" id="kpi-count-0">0</span>
-                <span class="kpi-subtitle">รายการทั้งหมด</span>
+                <div class="kpi-header-row">
+                  <span class="kpi-title">ติดผลการเรียน '0'</span>
+                  <span class="kpi-badge-pct bg-red-soft" id="kpi-pct-0">0%</span>
+                </div>
+                <div class="kpi-number" id="kpi-count-0">0</div>
+                <div class="kpi-progress-track">
+                  <div class="kpi-progress-bar bg-red" id="kpi-bar-0" style="width: 0%;"></div>
+                </div>
+                <span class="kpi-subtitle">ผลการเรียนต่ำกว่าเกณฑ์</span>
               </div>
             </div>
 
-            <div class="kpi-card kpi-amber">
-              <div class="kpi-icon-box">
-                <i class="fas fa-exclamation-circle"></i>
-              </div>
+            <!-- Card 2: ติด ร -->
+            <div class="kpi-card kpi-amber" onclick="dashboardService.filterToRecords('ร')" title="คลิกเพื่อดูรายการติด ร ทั้งหมด">
+              <div class="kpi-icon-box"><i class="fas fa-exclamation-circle"></i></div>
               <div class="kpi-details">
-                <span class="kpi-title">ติดผลการเรียน 'ร'</span>
-                <span class="kpi-number" id="kpi-count-r">0</span>
-                <span class="kpi-subtitle">รอการตัดสิน</span>
+                <div class="kpi-header-row">
+                  <span class="kpi-title">ติดผลการเรียน 'ร'</span>
+                  <span class="kpi-badge-pct bg-amber-soft" id="kpi-pct-r">0%</span>
+                </div>
+                <div class="kpi-number" id="kpi-count-r">0</div>
+                <div class="kpi-progress-track">
+                  <div class="kpi-progress-bar bg-amber" id="kpi-bar-r" style="width: 0%;"></div>
+                </div>
+                <span class="kpi-subtitle">รอการตัดสิน / ค้างงาน</span>
               </div>
             </div>
 
-            <div class="kpi-card kpi-purple">
-              <div class="kpi-icon-box">
-                <i class="fas fa-user-clock"></i>
-              </div>
+            <!-- Card 3: ติด มส -->
+            <div class="kpi-card kpi-purple" onclick="dashboardService.filterToRecords('มส')" title="คลิกเพื่อดูรายการติด มส ทั้งหมด">
+              <div class="kpi-icon-box"><i class="fas fa-user-clock"></i></div>
               <div class="kpi-details">
-                <span class="kpi-title">ติดผลการเรียน 'มส'</span>
-                <span class="kpi-number" id="kpi-count-ms">0</span>
-                <span class="kpi-subtitle">หมดสิทธิ์สอบ</span>
+                <div class="kpi-header-row">
+                  <span class="kpi-title">ติดผลการเรียน 'มส'</span>
+                  <span class="kpi-badge-pct bg-purple-soft" id="kpi-pct-ms">0%</span>
+                </div>
+                <div class="kpi-number" id="kpi-count-ms">0</div>
+                <div class="kpi-progress-track">
+                  <div class="kpi-progress-bar bg-purple" id="kpi-bar-ms" style="width: 0%;"></div>
+                </div>
+                <span class="kpi-subtitle">เวลาเรียนไม่ถึง 80%</span>
               </div>
             </div>
 
-            <div class="kpi-card kpi-blue">
-              <div class="kpi-icon-box">
-                <i class="fas fa-layer-group"></i>
-              </div>
+            <!-- Card 4: ยอดรวมคำร้องทั้งหมด -->
+            <div class="kpi-card kpi-blue" onclick="dashboardService.filterToRecords('all')" title="คลิกเพื่อดูรายการทั้งหมด">
+              <div class="kpi-icon-box"><i class="fas fa-layer-group"></i></div>
               <div class="kpi-details">
-                <span class="kpi-title">ยอดรวมคำร้องทั้งหมด</span>
-                <span class="kpi-number" id="kpi-count-total">0</span>
-                <span class="kpi-subtitle">รายการทุกระดับชั้น</span>
+                <div class="kpi-header-row">
+                  <span class="kpi-title">ยอดรวมติดเงื่อนไข</span>
+                  <span class="kpi-badge-pct bg-blue-soft">ทั้งหมด</span>
+                </div>
+                <div class="kpi-number" id="kpi-count-total">0</div>
+                <div class="kpi-progress-track">
+                  <div class="kpi-progress-bar bg-blue" style="width: 100%;"></div>
+                </div>
+                <span class="kpi-subtitle">รายการในระบบทุกระดับชั้น</span>
               </div>
             </div>
 
-            <div class="kpi-card kpi-emerald">
-              <div class="kpi-icon-box">
-                <i class="fas fa-check-circle"></i>
-              </div>
+            <!-- Card 5: อยู่ระหว่างดำเนินการ / รอตรวจ -->
+            <div class="kpi-card kpi-orange" onclick="dashboardService.filterToRecordsByStatus('in_progress')" title="คลิกเพื่อดูรายการที่กำลังแก้ไข">
+              <div class="kpi-icon-box"><i class="fas fa-tasks"></i></div>
               <div class="kpi-details">
-                <span class="kpi-title">แก้ไขผ่านแล้ว (สำเร็จ)</span>
-                <span class="kpi-number" id="kpi-count-approved">0</span>
-                <span class="kpi-subtitle">คิดเป็น <strong id="kpi-pass-rate">0%</strong></span>
+                <div class="kpi-header-row">
+                  <span class="kpi-title">อยู่ระหว่างดำเนินการ</span>
+                  <span class="kpi-badge-pct bg-orange-soft" id="kpi-pct-inprogress">0%</span>
+                </div>
+                <div class="kpi-number" id="kpi-count-inprogress">0</div>
+                <div class="kpi-progress-track">
+                  <div class="kpi-progress-bar bg-orange" id="kpi-bar-inprogress" style="width: 0%;"></div>
+                </div>
+                <span class="kpi-subtitle">ยื่นแล้ว / มอบหมาย / รอตรวจ</span>
+              </div>
+            </div>
+
+            <!-- Card 6: แก้ไขผ่านแล้ว (สำเร็จ) -->
+            <div class="kpi-card kpi-emerald" onclick="dashboardService.filterToRecordsByStatus('approved')" title="คลิกเพื่อดูรายการที่อนุมัติผ่านแล้ว">
+              <div class="kpi-icon-box"><i class="fas fa-check-circle"></i></div>
+              <div class="kpi-details">
+                <div class="kpi-header-row">
+                  <span class="kpi-title">แก้ไขผ่านแล้ว (สำเร็จ)</span>
+                  <span class="kpi-badge-pct bg-emerald-soft font-bold" id="kpi-pass-rate">0%</span>
+                </div>
+                <div class="kpi-number" id="kpi-count-approved">0</div>
+                <div class="kpi-progress-track">
+                  <div class="kpi-progress-bar bg-emerald" id="kpi-bar-approved" style="width: 0%;"></div>
+                </div>
+                <span class="kpi-subtitle">คิดเป็นอัตราความสำเร็จ</span>
               </div>
             </div>
           </div>
 
-          <!-- Charts & Feed Grid -->
+          <!-- Workflow Progression Funnel Section -->
+          <div class="workflow-funnel-card">
+            <div class="funnel-header">
+              <div class="funnel-title-group">
+                <h4><i class="fas fa-stream text-primary"></i> เส้นทางความคืบหน้ากระบวนการแก้ไข (Remediation Workflow Pipeline)</h4>
+                <p>แสดงจำนวนคำร้องและอัตราส่วนในแต่ละลำดับขั้นของกระบวนการ 4 ขั้นตอน</p>
+              </div>
+              <div class="funnel-summary-badge">
+                <i class="fas fa-award text-emerald-600"></i>
+                <span>อัตราการแก้สำเร็จ:</span>
+                <strong id="funnel-success-rate">0%</strong>
+              </div>
+            </div>
+            <div class="funnel-steps-grid">
+              <div class="funnel-step-item" onclick="dashboardService.filterToRecordsByStatus('pending_request')" title="คลิกเพื่อดูรายการรอยื่นคำร้อง">
+                <div class="step-badge step-1">1</div>
+                <div class="step-info">
+                  <span class="step-label">รอยื่นคำร้อง</span>
+                  <span class="step-count" id="funnel-count-1">0 รายการ</span>
+                </div>
+                <div class="step-pct-pill" id="funnel-pct-1">0%</div>
+              </div>
+              <div class="funnel-step-arrow"><i class="fas fa-chevron-right"></i></div>
+              
+              <div class="funnel-step-item" onclick="dashboardService.filterToRecordsByStatus('requested')" title="คลิกเพื่อดูรายการรอมอบหมายงาน">
+                <div class="step-badge step-2">2</div>
+                <div class="step-info">
+                  <span class="step-label">ยื่นแล้ว / รอมอบงาน</span>
+                  <span class="step-count" id="funnel-count-2">0 รายการ</span>
+                </div>
+                <div class="step-pct-pill" id="funnel-pct-2">0%</div>
+              </div>
+              <div class="funnel-step-arrow"><i class="fas fa-chevron-right"></i></div>
+              
+              <div class="funnel-step-item" onclick="dashboardService.filterToRecordsByStatus('in_review')" title="คลิกเพื่อดูรายการที่มอบหมายหรือส่งงานแล้ว">
+                <div class="step-badge step-3">3</div>
+                <div class="step-info">
+                  <span class="step-label">มอบหมาย / รอตรวจ</span>
+                  <span class="step-count" id="funnel-count-3">0 รายการ</span>
+                </div>
+                <div class="step-pct-pill" id="funnel-pct-3">0%</div>
+              </div>
+              <div class="funnel-step-arrow"><i class="fas fa-chevron-right"></i></div>
+              
+              <div class="funnel-step-item step-completed" onclick="dashboardService.filterToRecordsByStatus('approved')" title="คลิกเพื่อดูรายการที่อนุมัติสำเร็จ">
+                <div class="step-badge step-4"><i class="fas fa-check"></i></div>
+                <div class="step-info">
+                  <span class="step-label">อนุมัติสำเร็จ</span>
+                  <span class="step-count" id="funnel-count-4">0 รายการ</span>
+                </div>
+                <div class="step-pct-pill success" id="funnel-pct-4">0%</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts Grid -->
           <div class="charts-grid">
             <!-- Left Chart: Bar Chart by Grade Level -->
             <div class="dashboard-card">
               <div class="card-header-flex">
                 <div class="card-title-group">
                   <h3><i class="fas fa-chart-bar text-indigo-600"></i> สรุปจำนวนนักเรียนที่ติดเงื่อนไขแยกตามระดับชั้น</h3>
-                  <p>จำนวนติด 0, ร, มส แยกตามระดับชั้น ม.1 - ม.6 และ ปวช.</p>
+                  <p>จำนวนติด 0, ร, มส เปรียบเทียบตามระดับชั้น</p>
+                </div>
+                <!-- Interactive Level Tabs -->
+                <div class="chart-level-tabs">
+                  <button type="button" class="btn-chart-tab active" data-level="all" onclick="dashboardService.setChartLevelFilter('all')">ทั้งหมด</button>
+                  <button type="button" class="btn-chart-tab" data-level="lower" onclick="dashboardService.setChartLevelFilter('lower')">ม.ต้น</button>
+                  <button type="button" class="btn-chart-tab" data-level="upper" onclick="dashboardService.setChartLevelFilter('upper')">ม.ปลาย & ปวช.</button>
                 </div>
               </div>
               <div class="chart-container-rel">
@@ -353,25 +474,62 @@
                   <p>ความคืบหน้าตามขั้นตอน Workflow</p>
                 </div>
               </div>
-              <div class="chart-container-rel">
-                <canvas id="dashboard-donut-chart"></canvas>
+              <div class="chart-donut-wrap">
+                <div class="chart-container-rel" style="height: 200px;">
+                  <canvas id="dashboard-donut-chart"></canvas>
+                  <div class="donut-center-metric">
+                    <span class="donut-metric-number" id="donut-center-pct">0%</span>
+                    <span class="donut-metric-label">สำเร็จแล้ว</span>
+                  </div>
+                </div>
+                <!-- Custom Donut Legend -->
+                <div id="dashboard-donut-legend" class="donut-legend-list">
+                  <!-- Rendered dynamically by JS -->
+                </div>
               </div>
             </div>
           </div>
 
-          <!-- Live Activity Feed Stream -->
-          <div class="dashboard-card mt-4">
-            <div class="card-header-flex">
-              <div class="card-title-group">
-                <h3><i class="fas fa-rss text-purple-600"></i> Live Feed Activity Logs</h3>
-                <p>ประวัติกิจกรรมและการดำเนินงานในระบบแบบสด</p>
+          <!-- Analytical Breakdown & Live Activity Row (Side by Side) -->
+          <div class="dashboard-bottom-grid">
+            <!-- Left Card: Top 5 Condition Subjects -->
+            <div class="dashboard-card">
+              <div class="card-header-flex">
+                <div class="card-title-group">
+                  <h3><i class="fas fa-fire-alt text-rose-600"></i> 5 อันดับวิชาที่ติดเงื่อนไขสูงสุด (Top 5 Subjects)</h3>
+                  <p>วิชาที่มีนักเรียนติด 0, ร, มส มากที่สุดในระบบ</p>
+                </div>
+                <button type="button" class="btn btn-xs btn-outline" onclick="app.switchView('records')">
+                  ดูทั้งหมด <i class="fas fa-arrow-right ml-1"></i>
+                </button>
+              </div>
+              <div id="dashboard-top-subjects" class="top-subjects-list">
+                <!-- Rendered dynamically by JS -->
               </div>
             </div>
-            <div id="dashboard-activity-feed" class="activity-feed-list">
-              <!-- Rendered by JS -->
+
+            <!-- Right Card: Live Activity Feed Stream -->
+            <div class="dashboard-card">
+              <div class="card-header-flex">
+                <div class="card-title-group">
+                  <h3><i class="fas fa-bolt text-purple-600"></i> Live Activity Feed Logs</h3>
+                  <p>ประวัติกิจกรรมและการดำเนินงานในระบบแบบเรียลไทม์</p>
+                </div>
+                <div class="activity-filter-tabs">
+                  <button type="button" class="btn-activity-tab active" data-type="all" onclick="dashboardService.setActivityFilter('all')">ทั้งหมด</button>
+                  <button type="button" class="btn-activity-tab" data-type="approval" onclick="dashboardService.setActivityFilter('approval')">อนุมัติ</button>
+                  <button type="button" class="btn-activity-tab" data-type="submission" onclick="dashboardService.setActivityFilter('submission')">ส่งงาน</button>
+                  <button type="button" class="btn-activity-tab" data-type="request" onclick="dashboardService.setActivityFilter('request')">คำร้อง</button>
+                </div>
+              </div>
+              <div id="dashboard-activity-feed" class="activity-feed-list">
+                <!-- Rendered dynamically by JS -->
+              </div>
             </div>
           </div>
+
         </section>
+
 
         <!-- ===================================================================
              VIEW 2: REMEDIATION RECORDS MANAGEMENT (0/ร/มส)
@@ -871,19 +1029,19 @@
   <div id="toast-container" class="toast-container"></div>
 
   <!-- Application Scripts (Loaded with Cache Busting) -->
-  <script src="js/config.js?v=1.0.0"></script>
-  <script src="js/firebase-service.js?v=1.0.0"></script>
-  <script src="js/cloudinary-service.js?v=1.0.0"></script>
-  <script src="js/auth.js?v=1.0.0"></script>
-  <script src="js/dashboard.js?v=1.0.0"></script>
-  <script src="js/workflow.js?v=1.0.0"></script>
-  <script src="js/records.js?v=1.0.0"></script>
-  <script src="js/audit.js?v=1.0.0"></script>
-  <script src="js/teachers.js?v=1.0.0"></script>
-  <script src="js/students.js?v=1.0.0"></script>
-  <script src="js/users.js?v=1.0.0"></script>
-  <script src="js/export-engine.js?v=1.0.0"></script>
-  <script src="js/app.js?v=1.0.0"></script>
+  <script src="js/config.js?v=2.0.0"></script>
+  <script src="js/firebase-service.js?v=2.0.0"></script>
+  <script src="js/cloudinary-service.js?v=2.0.0"></script>
+  <script src="js/auth.js?v=2.0.0"></script>
+  <script src="js/dashboard.js?v=2.1.0"></script>
+  <script src="js/workflow.js?v=2.0.0"></script>
+  <script src="js/records.js?v=2.0.0"></script>
+  <script src="js/audit.js?v=2.0.0"></script>
+  <script src="js/teachers.js?v=2.0.0"></script>
+  <script src="js/students.js?v=2.0.0"></script>
+  <script src="js/users.js?v=2.0.0"></script>
+  <script src="js/export-engine.js?v=2.0.0"></script>
+  <script src="js/app.js?v=2.0.0"></script>
 
   <script>
     // Tab role switcher helper in login view

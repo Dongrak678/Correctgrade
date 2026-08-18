@@ -108,8 +108,7 @@ class AppController {
 
     // Trigger การรีเฟรชข้อมูลตามหน้าจอ
     if (viewName === 'dashboard') {
-      dashboardService.renderKPIs();
-      dashboardService.renderCharts();
+      dashboardService.init();
     } else if (viewName === 'records') {
       recordsService.renderRecordsTable();
     } else if (viewName === 'audit') {
