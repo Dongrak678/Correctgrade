@@ -226,6 +226,10 @@ class WorkflowService {
         this.renderRequestModal(record);
         break;
       case 'assign':
+        if (record.status === 'pending_request' || !record.status) {
+          alert("ไม่สามารถมอบหมายงานได้ เนื่องจากนักเรียนยังไม่ได้กดยื่นคำร้องขอแก้ไขผลการเรียน");
+          return;
+        }
         this.renderAssignModal(record);
         break;
       case 'submit':

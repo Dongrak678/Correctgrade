@@ -207,28 +207,36 @@ class RecordsService {
 
     // 2. สิทธิ์ครูผู้สอน & Admin
     if (role === APP_CONFIG.ROLES.TEACHER || role === APP_CONFIG.ROLES.ADMIN) {
-      if (r.status === 'requested' || r.status === 'pending_request') {
+      if (r.status === 'pending_request' || !r.status) {
+        // ครูยังไม่สามารถมอบหมายงานได้ จนกว่านักเรียนจะกดยื่นคำร้อง
+        buttons += `
+          <button type="button" class="btn-sm btn-outline text-gray-400" disabled style="cursor: not-allowed; opacity: 0.65; border-color: #cbd5e1;" title="รอนักเรียนกดยื่นคำร้องขอแก้ไขผลการเรียนก่อน จึงจะสามารถมอบหมายงานได้">
+            <i class="fas fa-clock text-gray-400 mr-1"></i> รอนักเรียนยื่นคำร้อง
+          </button>
+        `;
+      } else if (r.status === 'requested') {
+        // นักเรียนยื่นคำร้องแล้ว -> ครูสามารถมอบหมายงานได้ทันที
         buttons += `
           <button type="button" class="btn-sm btn-amber" onclick="workflowService.openStepModal('${r.id}', 'assign')">
-            <i class="fas fa-tasks"></i> มอบหมายงาน
+            <i class="fas fa-tasks mr-1"></i> มอบหมายงาน
           </button>
         `;
       } else if (r.status === 'submitted') {
         buttons += `
           <button type="button" class="btn-sm btn-emerald" onclick="workflowService.openStepModal('${r.id}', 'review')">
-            <i class="fas fa-gavel"></i> ตรวจชิ้นงาน
+            <i class="fas fa-gavel mr-1"></i> ตรวจชิ้นงาน
           </button>
         `;
       } else if (r.status === 'assigned') {
         buttons += `
           <button type="button" class="btn-sm btn-outline text-amber-600" title="แก้ไขงานที่มอบหมาย" onclick="workflowService.openStepModal('${r.id}', 'assign')">
-            <i class="fas fa-edit"></i> แก้งาน
+            <i class="fas fa-edit mr-1"></i> แก้งาน
           </button>
         `;
       } else if (r.status === 'approved') {
         buttons += `
           <button type="button" class="btn-sm btn-outline text-emerald-600" title="ดูผลการอนุมัติ" onclick="workflowService.openStepModal('${r.id}', 'timeline')">
-            <i class="fas fa-check-circle"></i> ผ่านแล้ว
+            <i class="fas fa-check-circle mr-1"></i> ผ่านแล้ว
           </button>
         `;
       }
