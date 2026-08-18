@@ -465,10 +465,17 @@ class WorkflowService {
             
             ${record.taskAttachmentUrl ? `
             <div class="task-attachment-preview">
-              <span class="text-xs text-gray-500 font-semibold mb-1 block">ใบงานแนบจากครู:</span>
-              <img src="${record.taskAttachmentUrl}" alt="Task Attachment" onclick="cloudinaryService.previewImage('${record.taskAttachmentUrl}', 'ใบงานจากครู')">
-              <button type="button" class="btn-link" onclick="cloudinaryService.previewImage('${record.taskAttachmentUrl}', 'ใบงานจากครู')">
-                <i class="fas fa-search-plus"></i> คลิกเพื่อดูรูปใบงานขนาดใหญ่
+              <span class="text-xs text-gray-600 font-semibold mb-1 block">
+                <i class="fas fa-paperclip text-blue-500 mr-1"></i> ใบงานแนบจากครู:
+              </span>
+              <div class="task-img-thumb-wrap" onclick="cloudinaryService.previewImage('${record.taskAttachmentUrl}', 'ใบงานจากครู')" title="คลิกเพื่อขยายดูรูปขนาดใหญ่">
+                <img src="${record.taskAttachmentUrl}" alt="Task Attachment">
+                <div class="thumb-hover-overlay">
+                  <i class="fas fa-search-plus"></i> ดูรูปใหญ่
+                </div>
+              </div>
+              <button type="button" class="btn-link text-xs font-semibold text-indigo-600 mt-1" onclick="cloudinaryService.previewImage('${record.taskAttachmentUrl}', 'ใบงานจากครู')">
+                <i class="fas fa-search-plus mr-1"></i> คลิกเพื่อดูรูปใบงานขนาดใหญ่แบบเต็มจอ
               </button>
             </div>` : ''}
           </div>
