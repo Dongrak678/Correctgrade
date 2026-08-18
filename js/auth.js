@@ -70,16 +70,22 @@ class AuthService {
       (u.email && u.email.toLowerCase() === cleanUsername)
     );
 
-    // 2. หากยังไม่มีใน users ให้ค้นหาจากทะเบียนนักเรียน (students) โดยตรง
+    // 2. หากยังไม่มีใน users ให้ค้นหาจากทะเบียนนักเรียน (students) หรือ ทำเนียบครู (teachers) โดยตรง
     if (!user) {
       const student = students.find(s => 
         s.studentId && String(s.studentId).trim().toLowerCase() === cleanUsername
       );
 
+      const teachers = db.get('teachers') || [];
+      const teacher = teachers.find(t => 
+        (t.teacherId && String(t.teacherId).trim().toLowerCase() === cleanUsername) ||
+        (t.username && String(t.username).trim().toLowerCase() === cleanUsername) ||
+        (t.email && String(t.email).trim().toLowerCase() === cleanUsername)
+      );
+
       if (student) {
         // ถ้ารหัสผ่านตรงกับรหัสประจำตัวนักเรียน
         if (cleanPassword === String(student.studentId).trim()) {
-          // สร้างบัญชีผู้ใช้ในระบบให้อัตโนมัติ (Auto-Provisioning)
           user = {
             id: `u_std_${student.studentId}`,
             username: String(student.studentId).trim(),
@@ -101,9 +107,33 @@ class AuthService {
           );
           return { success: false, error: "รหัสผ่านไม่ถูกต้อง" };
         }
+      } else if (teacher) {
+        const teacherCode = String(teacher.teacherId || teacher.username || '').trim();
+        // ถ้ารหัสผ่านตรงกับรหัสครูผู้สอน
+        if (cleanPassword === teacherCode || cleanPassword === '123456') {
+          user = {
+            id: `u_tea_${teacher.teacherId || teacher.id}`,
+            username: teacherCode,
+            password: teacherCode,
+            name: teacher.name,
+            role: 'teacher',
+            teacherId: teacherCode,
+            learningArea: teacher.learningArea || '',
+            email: teacher.email || '',
+            phone: teacher.phone || '',
+            createdAt: new Date().toISOString()
+          };
+          await db.saveItem('users', user);
+        } else {
+          this.showLoginError(
+            `รหัสผ่านไม่ถูกต้อง!\n💡 สำหรับครูผู้สอน: กรุณาใช้ "รหัสครูผู้สอน (${teacherCode})" เป็นรหัสผ่าน`,
+            "password"
+          );
+          return { success: false, error: "รหัสผ่านไม่ถูกต้อง" };
+        }
       } else {
         this.showLoginError(
-          `ไม่พบบัญชีหรือรหัสประจำตัว "${username}" ในระบบ\nกรุณาตรวจสอบชื่อผู้ใช้หรือรหัสประจำตัวนักเรียนอีกครั้ง`,
+          `ไม่พบบัญชีหรือรหัส "${username}" ในระบบ\nกรุณาตรวจสอบชื่อผู้ใช้, รหัสประจำตัว หรือรหัสครูอีกครั้ง`,
           "username"
         );
         return { success: false, error: "ไม่พบชื่อผู้ใช้งานนี้ในระบบ" };
@@ -124,8 +154,21 @@ class AuthService {
           );
           return { success: false, error: "รหัสผ่านไม่ถูกต้อง" };
         }
+      } else if (user.role === 'teacher') {
+        // สำหรับครู: รหัสผ่านตรงกับ user.password หรือตรงกับ teacherId หรือตรงกับ username
+        isCorrect = (String(user.password).trim() === cleanPassword) ||
+                    (user.teacherId && String(user.teacherId).trim() === cleanPassword) ||
+                    (user.username && String(user.username).trim() === cleanPassword);
+        
+        if (!isCorrect) {
+          this.showLoginError(
+            `รหัสผ่านไม่ถูกต้อง!\n💡 สำหรับครูผู้สอน: กรุณาใช้ "รหัสครูผู้สอน" เป็นรหัสผ่าน`,
+            "password"
+          );
+          return { success: false, error: "รหัสผ่านไม่ถูกต้อง" };
+        }
       } else {
-        // สำหรับครูและแอดมิน: ตรวจสอบรหัสผ่านตรงกับ user.password
+        // สำหรับแอดมิน: ตรวจสอบรหัสผ่านตรงกับ user.password
         isCorrect = (String(user.password) === cleanPassword);
         if (!isCorrect) {
           this.showLoginError(

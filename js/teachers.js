@@ -301,15 +301,59 @@ class TeachersService {
     teacher.subjects = [...this.currentSubjectsList];
 
     await db.saveItem('teachers', teacher);
+
+    // ซิงค์บัญชีผู้ใช้งานครูไปยังฐานข้อมูล users อัตโนมัติ (Username & Password = teacherId)
+    const users = db.get('users') || [];
+    const tCode = String(teacher.teacherId).trim();
+    let userAcc = users.find(u => 
+      (u.teacherId && String(u.teacherId).trim() === tCode) ||
+      (u.username && String(u.username).trim() === tCode) ||
+      (u.id === `u_tea_${teacher.id}`)
+    );
+    if (!userAcc) {
+      userAcc = {
+        id: `u_tea_${teacher.id}`,
+        username: tCode,
+        password: tCode,
+        name: teacher.name,
+        role: 'teacher',
+        teacherId: tCode,
+        email: teacher.email || '',
+        phone: teacher.phone || '',
+        learningArea: teacher.learningArea || '',
+        createdAt: new Date().toISOString()
+      };
+    } else {
+      userAcc.username = tCode;
+      userAcc.teacherId = tCode;
+      userAcc.name = teacher.name;
+      userAcc.email = teacher.email || '';
+      userAcc.phone = teacher.phone || '';
+      userAcc.learningArea = teacher.learningArea || '';
+    }
+    await db.saveItem('users', userAcc);
+
     this.closeModal();
 
-    app.showToast(editId ? "อัปเดตข้อมูลครูสำเร็จ" : "เพิ่มข้อมูลครูผู้สอนสำเร็จ", "success");
+    app.showToast(editId ? "อัปเดตข้อมูลครูและบัญชีผู้ใช้สำเร็จ" : "เพิ่มข้อมูลครูและสร้างบัญชีเข้าสู่ระบบสำเร็จ", "success");
   }
 
   async deleteTeacherPrompt(id, name) {
     if (confirm(`คุณต้องการลบข้อมูล "${name}" หรือไม่?`)) {
+      const teacher = db.getById('teachers', id);
       await db.deleteItem('teachers', id);
-      app.showToast("ลบข้อมูลครูเรียบร้อยแล้ว", "info");
+      if (teacher && teacher.teacherId) {
+        const users = db.get('users') || [];
+        const u = users.find(x => 
+          (x.teacherId && x.teacherId === teacher.teacherId) || 
+          (x.username && x.username === teacher.teacherId) || 
+          (x.id === `u_tea_${id}`)
+        );
+        if (u) {
+          await db.deleteItem('users', u.id);
+        }
+      }
+      app.showToast("ลบข้อมูลครูและบัญชีผู้ใช้เรียบร้อยแล้ว", "info");
     }
   }
 
@@ -491,8 +535,37 @@ class TeachersService {
 
     try {
       await db.bulkInsert('teachers', this.parsedTeachers);
+
+      // สร้างบัญชีผู้ใช้งานสำหรับครูทุกคนที่นำเข้า (Username & Password = teacherId)
+      const users = db.get('users') || [];
+      for (const t of this.parsedTeachers) {
+        const tCode = String(t.teacherId).trim();
+        if (!tCode) continue;
+
+        const existing = users.find(u => 
+          (u.teacherId && String(u.teacherId).trim() === tCode) ||
+          (u.username && String(u.username).trim() === tCode)
+        );
+
+        if (!existing) {
+          const userAcc = {
+            id: `u_tea_${t.teacherId || t.id}`,
+            username: tCode,
+            password: tCode,
+            name: t.name,
+            role: 'teacher',
+            teacherId: tCode,
+            email: t.email || '',
+            phone: t.phone || '',
+            learningArea: t.learningArea || '',
+            createdAt: new Date().toISOString()
+          };
+          await db.saveItem('users', userAcc);
+        }
+      }
+
       this.closeCsvModal();
-      app.showToast(`นำเข้าข้อมูลครูผู้สอนสำเร็จจำนวน ${this.parsedTeachers.length} ท่าน`, "success");
+      app.showToast(`นำเข้าข้อมูลครูและสร้างบัญชีผู้ใช้สำเร็จจำนวน ${this.parsedTeachers.length} ท่าน`, "success");
     } catch (err) {
       alert("เกิดข้อผิดพลาด: " + err.message);
     } finally {

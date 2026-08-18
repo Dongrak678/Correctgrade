@@ -11,12 +11,68 @@ class UsersService {
     this.pageSize = 10;
   }
 
-  init() {
+  async init() {
+    await this.syncTeachersToUsers();
     this.renderUsersTable();
 
     db.subscribe('users', () => {
       this.renderUsersTable();
     });
+
+    db.subscribe('teachers', async () => {
+      await this.syncTeachersToUsers();
+      this.renderUsersTable();
+    });
+  }
+
+  /**
+   * ซิงค์ข้อมูลครูผู้สอนทั้งหมดจากทำเนียบครู เข้ามาเป็นบัญชีผู้ใช้งานในระบบอัตโนมัติ
+   * โดยใช้ รหัสครูผู้สอน (teacherId) เป็นทั้งชื่อผู้ใช้ (Username) และรหัสผ่านเริ่มต้น (Password)
+   */
+  async syncTeachersToUsers() {
+    const teachers = db.get('teachers') || [];
+    const users = db.get('users') || [];
+    let isChanged = false;
+
+    for (const t of teachers) {
+      if (!t.name || t.name.trim() === '') continue;
+      const tCode = String(t.teacherId || t.username || '').trim();
+      if (!tCode) continue;
+
+      // ตรวจสอบว่าครูมีบัญชีใน users หรือยัง
+      const existing = users.find(u => 
+        (u.teacherId && String(u.teacherId).trim() === tCode) ||
+        (u.username && String(u.username).trim() === tCode) ||
+        (u.name && u.name.trim() === t.name.trim() && u.role === 'teacher')
+      );
+
+      if (!existing) {
+        const newAcc = {
+          id: `u_tea_${t.teacherId || t.id}`,
+          username: tCode,
+          password: tCode,
+          name: t.name.trim(),
+          role: 'teacher',
+          teacherId: tCode,
+          email: t.email || '',
+          phone: t.phone || '',
+          learningArea: t.learningArea || '',
+          createdAt: t.createdAt || new Date().toISOString()
+        };
+        await db.saveItem('users', newAcc);
+        isChanged = true;
+      } else {
+        // หากครูมีบัญชีอยู่แล้วแต่อาจจะไม่มี teacherId หรือ username ให้ปรับให้ตรงกัน
+        if (!existing.teacherId || existing.name !== t.name) {
+          existing.teacherId = tCode;
+          existing.name = t.name;
+          if (t.email) existing.email = t.email;
+          if (t.phone) existing.phone = t.phone;
+          await db.saveItem('users', existing);
+          isChanged = true;
+        }
+      }
+    }
   }
 
   getFilteredUsers() {
