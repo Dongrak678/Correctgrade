@@ -12,6 +12,7 @@ class CloudinaryService {
 
   /**
    * อัปโหลดไฟล์รูปภาพไปยัง Cloudinary (Unsigned Preset)
+   * พร้อมระบบบีบอัดภาพอัตโนมัติก่อนส่ง (Client-Side Compression)
    * @param {File} file - ไฟล์รูปภาพจาก input[type=file]
    * @param {Function} onProgress - Callback แสดงเปอร์เซ็นต์ความคืบหน้า (0-100)
    * @returns {Promise<string>} URL ของรูปภาพบน CDN
@@ -24,14 +25,11 @@ class CloudinaryService {
       throw new Error("กรุณาเลือกไฟล์รูปภาพเท่านั้น (JPEG, PNG, WEBP, GIF)");
     }
 
-    // ตรวจสอบขนาดไฟล์ (ไม่เกิน 15MB)
-    const MAX_SIZE = 15 * 1024 * 1024;
-    if (file.size > MAX_SIZE) {
-      throw new Error("ขนาดไฟล์รูปภาพใหญ่เกิน 15MB กรุณาบีบอัดรูปภาพก่อนอัปโหลด");
-    }
+    // บีบอัดและปรับสัดส่วนภาพอัตโนมัติก่อนอัปโหลด เพื่อให้เร็วและประหยัดพื้นที่คลาวด์สูงสุด
+    const optimizedFile = await this.compressImageClientSide(file);
 
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append('file', optimizedFile);
     formData.append('upload_preset', this.uploadPreset);
 
     return new Promise((resolve, reject) => {
@@ -75,6 +73,64 @@ class CloudinaryService {
       };
 
       xhr.send(formData);
+    });
+  }
+
+  /**
+   * ย่อขนาดและบีบอัดไฟล์รูปภาพในฝั่งเบราว์เซอร์อัตโนมัติ (Client-Side Smart Compression)
+   * ปรับขนาดความกว้าง/สูงไม่เกิน 1600px และคุณภาพ 0.82 ช่วยลดขนาดไฟล์ลง 80-90% ก่อนส่งขึ้น Cloud
+   * @param {File} file
+   * @param {number} maxWidth
+   * @param {number} maxHeight
+   * @param {number} quality
+   * @returns {Promise<File>}
+   */
+  compressImageClientSide(file, maxWidth = 1600, maxHeight = 1600, quality = 0.82) {
+    return new Promise((resolve) => {
+      // ถ้าไม่ใช่รูปทั่วไป เช่น SVG หรือ GIF ให้ข้าม
+      if (file.type === 'image/gif' || file.type === 'image/svg+xml') {
+        return resolve(file);
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          let width = img.width;
+          let height = img.height;
+
+          // คำนวณสัดส่วนใหม่ถ้าขนาดใหญ่กว่าที่กำหนด
+          if (width > maxWidth || height > maxHeight) {
+            if (width > height) {
+              height = Math.round((height * maxWidth) / width);
+              width = maxWidth;
+            } else {
+              width = Math.round((width * maxHeight) / height);
+              height = maxHeight;
+            }
+          }
+
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          canvas.toBlob((blob) => {
+            if (blob && blob.size < file.size) {
+              console.log(`⚡ บีบอัดรูปภาพสำเร็จ: จาก ${(file.size / 1024 / 1024).toFixed(2)} MB เหลือ ${(blob.size / 1024).toFixed(0)} KB (ประหยัดพื้นที่ ${(100 - (blob.size / file.size) * 100).toFixed(0)}%)`);
+              const newFile = new File([blob], file.name.replace(/\.[^/.]+$/, ".jpg"), { type: 'image/jpeg' });
+              resolve(newFile);
+            } else {
+              resolve(file);
+            }
+          }, 'image/jpeg', quality);
+        };
+        img.onerror = () => resolve(file);
+        img.src = e.target.result;
+      };
+      reader.onerror = () => resolve(file);
+      reader.readAsDataURL(file);
     });
   }
 
