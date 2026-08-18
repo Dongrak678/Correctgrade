@@ -44,23 +44,25 @@ class AuthService {
 
   /**
    * Smart Universal Login Method
-   * ตรวจสอบรหัสผ่านอย่างเข้มงวด พร้อมค้นหาบทบาทบัญชีอัตโนมัติ
+   * นักเรียนสามารถเข้าสู่ระบบด้วย "รหัสประจำตัว" เป็นทั้ง Username และ Password
    */
   async login(username, password, explicitRole = null) {
     if (!username || !username.trim()) {
-      this.showLoginError("กรุณากรอกชื่อผู้ใช้งาน หรือรหัสประจำตัว", "username");
+      this.showLoginError("กรุณากรอกชื่อผู้ใช้งาน หรือรหัสประจำตัวนักเรียน", "username");
       return { success: false, error: "กรุณากรอกชื่อผู้ใช้งาน" };
     }
 
     if (!password) {
-      this.showLoginError("กรุณากรอกรหัสผ่าน", "password");
+      this.showLoginError("กรุณากรอกรหัสผ่าน (สำหรับนักเรียนใช้รหัสประจำตัว)", "password");
       return { success: false, error: "กรุณากรอกรหัสผ่าน" };
     }
 
     const cleanUsername = username.trim().toLowerCase();
-    const users = db.get('users');
+    const cleanPassword = password.trim();
+    const users = db.get('users') || [];
+    const students = db.get('students') || [];
 
-    // ค้นหาผู้ใช้จาก username, studentId, teacherId, หรือ email (Smart Account Detection)
+    // 1. ค้นหาในบัญชีผู้ใช้งาน (users)
     let user = users.find(u => 
       (u.username && u.username.toLowerCase() === cleanUsername) ||
       (u.studentId && String(u.studentId).toLowerCase() === cleanUsername) ||
@@ -68,22 +70,71 @@ class AuthService {
       (u.email && u.email.toLowerCase() === cleanUsername)
     );
 
-    // หากไม่พบผู้ใช้
+    // 2. หากยังไม่มีใน users ให้ค้นหาจากทะเบียนนักเรียน (students) โดยตรง
     if (!user) {
-      this.showLoginError(
-        `ไม่พบบัญชีผู้ใช้งาน "${username}" ในระบบ\nกรุณาตรวจสอบชื่อผู้ใช้หรือรหัสประจำตัวอีกครั้ง`,
-        "username"
+      const student = students.find(s => 
+        s.studentId && String(s.studentId).trim().toLowerCase() === cleanUsername
       );
-      return { success: false, error: "ไม่พบชื่อผู้ใช้งานนี้ในระบบ" };
-    }
 
-    // ตรวจสอบรหัสผ่านอย่างเข้มงวด (Strict Authentication)
-    if (String(user.password) !== String(password)) {
-      this.showLoginError(
-        "รหัสผ่านไม่ถูกต้อง! กรุณาตรวจสอบและลองใหม่อีกครั้ง",
-        "password"
-      );
-      return { success: false, error: "รหัสผ่านไม่ถูกต้อง" };
+      if (student) {
+        // ถ้ารหัสผ่านตรงกับรหัสประจำตัวนักเรียน
+        if (cleanPassword === String(student.studentId).trim()) {
+          // สร้างบัญชีผู้ใช้ในระบบให้อัตโนมัติ (Auto-Provisioning)
+          user = {
+            id: `u_std_${student.studentId}`,
+            username: String(student.studentId).trim(),
+            password: String(student.studentId).trim(),
+            name: `${student.prefix || ''}${student.name}`.trim(),
+            role: 'student',
+            studentId: String(student.studentId).trim(),
+            gradeLevel: student.gradeLevel || '',
+            room: student.room || '1',
+            advisor: student.advisor || '',
+            phone: student.phone || '',
+            createdAt: new Date().toISOString()
+          };
+          await db.saveItem('users', user);
+        } else {
+          this.showLoginError(
+            `รหัสผ่านไม่ถูกต้อง!\n💡 สำหรับนักเรียน: กรุณาใช้ "รหัสประจำตัวนักเรียน (${student.studentId})" เป็นรหัสผ่าน`,
+            "password"
+          );
+          return { success: false, error: "รหัสผ่านไม่ถูกต้อง" };
+        }
+      } else {
+        this.showLoginError(
+          `ไม่พบบัญชีหรือรหัสประจำตัว "${username}" ในระบบ\nกรุณาตรวจสอบชื่อผู้ใช้หรือรหัสประจำตัวนักเรียนอีกครั้ง`,
+          "username"
+        );
+        return { success: false, error: "ไม่พบชื่อผู้ใช้งานนี้ในระบบ" };
+      }
+    } else {
+      // 3. ถ้าพบบัญชีใน users อยู่แล้ว
+      let isCorrect = false;
+
+      if (user.role === 'student') {
+        // สำหรับนักเรียน: รหัสผ่านตรงกับ password หรือตรงกับ studentId ถือว่าถูกต้อง
+        isCorrect = (String(user.password).trim() === cleanPassword) || 
+                    (user.studentId && String(user.studentId).trim() === cleanPassword);
+        
+        if (!isCorrect) {
+          this.showLoginError(
+            `รหัสผ่านไม่ถูกต้อง!\n💡 สำหรับนักเรียน: กรุณาใช้ "รหัสประจำตัวนักเรียน" เป็นรหัสผ่าน`,
+            "password"
+          );
+          return { success: false, error: "รหัสผ่านไม่ถูกต้อง" };
+        }
+      } else {
+        // สำหรับครูและแอดมิน: ตรวจสอบรหัสผ่านตรงกับ user.password
+        isCorrect = (String(user.password) === cleanPassword);
+        if (!isCorrect) {
+          this.showLoginError(
+            "รหัสผ่านไม่ถูกต้อง! กรุณาตรวจสอบและลองใหม่อีกครั้ง",
+            "password"
+          );
+          return { success: false, error: "รหัสผ่านไม่ถูกต้อง" };
+        }
+      }
     }
 
     // บันทึก Session

@@ -372,9 +372,9 @@ class UsersService {
 
             <div class="quick-pass-suggest">
               <span class="text-xs text-gray-500 block mb-1">รหัสผ่านแนะนำด่วน:</span>
-              <div class="flex gap-2">
+              <div class="flex gap-2" style="flex-wrap: wrap;">
+                <button type="button" class="btn-xs btn-outline font-mono text-indigo-700" onclick="document.getElementById('new-reset-pass').value='${username}'">${username} (รหัสประจำตัว)</button>
                 <button type="button" class="btn-xs btn-outline" onclick="document.getElementById('new-reset-pass').value='123456'">123456</button>
-                <button type="button" class="btn-xs btn-outline" onclick="document.getElementById('new-reset-pass').value='password'">password</button>
                 <button type="button" class="btn-xs btn-outline" onclick="document.getElementById('new-reset-pass').value='${username}123'">${username}123</button>
               </div>
             </div>

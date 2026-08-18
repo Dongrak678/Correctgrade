@@ -58,31 +58,31 @@
       </div>
 
       <div class="login-card-body">
-        <div class="smart-detection-tip">
-          <i class="fas fa-magic"></i>
-          <span><strong>Smart Universal Login:</strong> กรอกชื่อผู้ใช้หรือรหัสประจำตัว ระบบจะนำเข้าสู่สิทธิ์ที่ถูกต้องให้อัตโนมัติ</span>
+        <div id="login-tip-banner" class="smart-detection-tip">
+          <i class="fas fa-info-circle text-blue-600"></i>
+          <span id="login-tip-text"><strong>สำหรับนักเรียน:</strong> ใช้ <b>"รหัสประจำตัวนักเรียน"</b> เป็นทั้งชื่อผู้ใช้และรหัสผ่านในการเข้าสู่ระบบ</span>
         </div>
 
         <form id="main-login-form">
           <div class="form-group">
-            <label for="login-username" id="label-login-username">ชื่อผู้ใช้งาน หรือ รหัสประจำตัวนักเรียน <span class="text-red-500">*</span></label>
+            <label for="login-username" id="label-login-username">รหัสประจำตัวนักเรียน <span class="text-red-500">*</span></label>
             <div class="search-input-box" style="min-width: 100%;">
               <i class="fas fa-user"></i>
-              <input type="text" id="login-username" class="form-control" placeholder="เช่น 50101, teacher01, admin" required autofocus autocomplete="username">
+              <input type="text" id="login-username" class="form-control" placeholder="กรอกรหัสประจำตัว เช่น 09513, 08750" required autofocus autocomplete="username">
             </div>
           </div>
 
           <div class="form-group">
-            <label for="login-password">รหัสผ่าน (Password) <span class="text-red-500">*</span></label>
+            <label for="login-password" id="label-login-password">รหัสผ่าน (Password) <span class="text-red-500">*</span></label>
             <div class="password-input-wrap">
-              <input type="password" id="login-password" class="form-control" placeholder="กรอกรหัสผ่าน" required autocomplete="current-password">
+              <input type="password" id="login-password" class="form-control" placeholder="ใช้รหัสประจำตัวนักเรียน เช่น 09513" required autocomplete="current-password">
               <button type="button" class="btn-toggle-pwd" onclick="authService.togglePasswordVisibility('login-password', 'login-pwd-icon')">
                 <i id="login-pwd-icon" class="fas fa-eye" title="แสดง/ซ่อนรหัสผ่าน"></i>
               </button>
             </div>
           </div>
 
-          <button type="submit" id="btn-submit-login" class="btn btn-primary" style="width: 100%; padding: 12px; margin-top: 10px; font-size: 15px;">
+          <button type="submit" id="btn-submit-login" class="btn btn-primary" style="width: 100%; padding: 10px; margin-top: 8px; font-size: 15px;">
             <i class="fas fa-sign-in-alt"></i> เข้าสู่ระบบ
           </button>
         </form>
@@ -861,15 +861,24 @@
       
       const label = document.getElementById('label-login-username');
       const input = document.getElementById('login-username');
+      const pwdInput = document.getElementById('login-password');
+      const tipText = document.getElementById('login-tip-text');
+
       if (role === 'student') {
-        label.innerHTML = 'ชื่อผู้ใช้งาน หรือ รหัสประจำตัวนักเรียน <span class="text-red-500">*</span>';
-        input.placeholder = 'เช่น 50101 หรือ std001';
+        label.innerHTML = 'รหัสประจำตัวนักเรียน <span class="text-red-500">*</span>';
+        input.placeholder = 'กรอกรหัสประจำตัว เช่น 09513, 08750, 50101';
+        pwdInput.placeholder = 'ใช้รหัสประจำตัวนักเรียน เช่น 09513';
+        if (tipText) tipText.innerHTML = '<strong>สำหรับนักเรียน:</strong> ใช้ <b>"รหัสประจำตัวนักเรียน"</b> เป็นทั้งชื่อผู้ใช้และรหัสผ่านในการเข้าสู่ระบบ';
       } else if (role === 'teacher') {
         label.innerHTML = 'ชื่อผู้ใช้งานครู หรือ รหัสครู <span class="text-red-500">*</span>';
         input.placeholder = 'เช่น teacher01 หรือ T001';
+        pwdInput.placeholder = 'กรอกรหัสผ่านของคุณ';
+        if (tipText) tipText.innerHTML = '<strong>สำหรับครูผู้สอน:</strong> เข้าสู่ระบบเพื่อตรวจสอบ มอบหมายงาน และอนุมัติผลการเรียน';
       } else if (role === 'admin') {
         label.innerHTML = 'ชื่อผู้ใช้งานผู้ดูแลระบบ (Admin) <span class="text-red-500">*</span>';
         input.placeholder = 'เช่น admin';
+        pwdInput.placeholder = 'กรอกรหัสผ่านผู้ดูแลระบบ';
+        if (tipText) tipText.innerHTML = '<strong>สำหรับผู้ดูแลระบบ:</strong> จัดการข้อมูลทะเบียนนักเรียน ทำเนียบครู และสิทธิ์ผู้ใช้งาน';
       }
       input.focus();
     }
