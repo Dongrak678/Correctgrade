@@ -6,24 +6,131 @@
 class StudentsService {
   constructor() {
     this.searchQuery = '';
-    this.filterGradeLevel = 'all';
+    this.selectedClassFilter = 'all';
     this.currentPage = 1;
     this.pageSize = 15;
   }
 
   init() {
+    this.populateClassDropdown();
     this.renderStudentsTable();
 
     db.subscribe('students', () => {
+      this.populateClassDropdown();
       this.renderStudentsTable();
     });
+  }
+
+  /**
+   * ดึงข้อมูลห้องเรียนทั้งหมดที่มีอยู่ในระบบ และสร้างตัวเลือกใน Dropdown อัตโนมัติ
+   */
+  populateClassDropdown() {
+    const select = document.getElementById('students-class-filter');
+    if (!select) return;
+
+    const allStudents = db.get('students') || [];
+    const currentVal = this.selectedClassFilter;
+
+    // รวบรวมข้อมูลห้องเรียนและนับจำนวนนักเรียนในแต่ละห้อง
+    const gradeGroups = {};
+
+    allStudents.forEach(s => {
+      let grade = s.gradeLevel || 'ไม่ระบุชั้น';
+      let room = s.room ? String(s.room).trim() : '';
+
+      // กรณี gradeLevel เก็บเป็น "ม.1/1"
+      if (grade.includes('/')) {
+        const parts = grade.split('/');
+        grade = parts[0].trim();
+        if (!room) room = parts[1].trim();
+      }
+
+      const fullClass = room ? `${grade}/${room}` : grade;
+
+      if (!gradeGroups[grade]) {
+        gradeGroups[grade] = { count: 0, rooms: {} };
+      }
+      gradeGroups[grade].count++;
+      gradeGroups[grade].rooms[fullClass] = (gradeGroups[grade].rooms[fullClass] || 0) + 1;
+    });
+
+    const sortedGrades = Object.keys(gradeGroups).sort((a, b) => a.localeCompare(b, 'th', { numeric: true }));
+
+    let html = `<option value="all">-- ทุกระดับชั้น / ทุกห้องเรียน (${allStudents.length} คน) --</option>`;
+
+    sortedGrades.forEach(grade => {
+      const gData = gradeGroups[grade];
+      const roomKeys = Object.keys(gData.rooms).sort((a, b) => a.localeCompare(b, 'th', { numeric: true }));
+
+      let gradeLabel = grade;
+      if (grade === 'ม.1') gradeLabel = 'มัธยมศึกษาปีที่ 1 (ม.1)';
+      else if (grade === 'ม.2') gradeLabel = 'มัธยมศึกษาปีที่ 2 (ม.2)';
+      else if (grade === 'ม.3') gradeLabel = 'มัธยมศึกษาปีที่ 3 (ม.3)';
+      else if (grade === 'ม.4') gradeLabel = 'มัธยมศึกษาปีที่ 4 (ม.4)';
+      else if (grade === 'ม.5') gradeLabel = 'มัธยมศึกษาปีที่ 5 (ม.5)';
+      else if (grade === 'ม.6') gradeLabel = 'มัธยมศึกษาปีที่ 6 (ม.6)';
+
+      html += `<optgroup label="${gradeLabel} [รวม ${gData.count} คน]">`;
+      html += `  <option value="grade:${grade}">ดูทุกห้องของ ${grade} (${gData.count} คน)</option>`;
+
+      roomKeys.forEach(rKey => {
+        html += `  <option value="room:${rKey}">ห้อง ${rKey} (${gData.rooms[rKey]} คน)</option>`;
+      });
+
+      html += `</optgroup>`;
+    });
+
+    select.innerHTML = html;
+
+    const optionExists = Array.from(select.options).some(opt => opt.value === currentVal);
+    if (optionExists) {
+      select.value = currentVal;
+    } else {
+      select.value = 'all';
+      this.selectedClassFilter = 'all';
+    }
+  }
+
+  setClassFilter(val) {
+    this.selectedClassFilter = val;
+    this.currentPage = 1;
+    this.renderStudentsTable();
+  }
+
+  setGradeLevelFilter(level) {
+    this.setClassFilter(level === 'all' ? 'all' : `grade:${level}`);
   }
 
   getFilteredStudents() {
     let students = [...(db.get('students') || [])];
 
-    if (this.filterGradeLevel !== 'all') {
-      students = students.filter(s => (s.gradeLevel || '').startsWith(this.filterGradeLevel));
+    // ตัวกรองตามระดับชั้น หรือ รายห้อง (ม.1/1, ม.1/2)
+    if (this.selectedClassFilter && this.selectedClassFilter !== 'all') {
+      if (this.selectedClassFilter.startsWith('grade:')) {
+        const targetGrade = this.selectedClassFilter.replace('grade:', '');
+        students = students.filter(s => {
+          const gl = s.gradeLevel || '';
+          return gl === targetGrade || gl.startsWith(targetGrade);
+        });
+      } else if (this.selectedClassFilter.startsWith('room:')) {
+        const targetRoom = this.selectedClassFilter.replace('room:', '');
+        students = students.filter(s => {
+          let grade = s.gradeLevel || '';
+          let room = s.room ? String(s.room).trim() : '';
+          if (grade.includes('/')) {
+            const parts = grade.split('/');
+            grade = parts[0].trim();
+            if (!room) room = parts[1].trim();
+          }
+          const fullClass = room ? `${grade}/${room}` : grade;
+          return fullClass === targetRoom || grade === targetRoom;
+        });
+      } else {
+        students = students.filter(s => {
+          const fullClass = s.room ? `${s.gradeLevel}/${s.room}` : (s.gradeLevel || '');
+          return fullClass === this.selectedClassFilter || (s.gradeLevel || '').startsWith(this.selectedClassFilter);
+        });
+      }
     }
 
     if (this.searchQuery && this.searchQuery.trim()) {
@@ -32,7 +139,8 @@ class StudentsService {
         (s.studentId && s.studentId.toLowerCase().includes(q)) ||
         (s.name && s.name.toLowerCase().includes(q)) ||
         (s.advisor && s.advisor.toLowerCase().includes(q)) ||
-        (s.gradeLevel && s.gradeLevel.toLowerCase().includes(q))
+        (s.gradeLevel && s.gradeLevel.toLowerCase().includes(q)) ||
+        (s.room && String(s.room).toLowerCase().includes(q))
       );
     }
 
@@ -81,7 +189,7 @@ class StudentsService {
             <div class="empty-state-card">
               <i class="fas fa-user-graduate text-4xl mb-2 text-gray-300"></i>
               <p class="font-semibold">ไม่พบข้อมูลนักเรียน</p>
-              <span class="text-xs text-gray-400">ลองเปลี่ยนตัวกรองระดับชั้น หรือกดเพิ่มข้อมูลนักเรียน</span>
+              <span class="text-xs text-gray-400">ลองเปลี่ยนตัวกรองระดับชั้น/ห้องเรียน หรือกดเพิ่มข้อมูลนักเรียน</span>
             </div>
           </td>
         </tr>
@@ -171,12 +279,6 @@ class StudentsService {
 
   changePage(page) {
     this.currentPage = page;
-    this.renderStudentsTable();
-  }
-
-  setGradeLevelFilter(level) {
-    this.filterGradeLevel = level;
-    this.currentPage = 1;
     this.renderStudentsTable();
   }
 

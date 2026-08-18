@@ -567,15 +567,8 @@
                 <input type="text" class="form-control" placeholder="ค้นหาชื่อ, รหัสประจำตัว, ครูที่ปรึกษา..." oninput="studentsService.setSearchQuery(this.value)">
               </div>
 
-              <select class="form-control" style="width: auto;" onchange="studentsService.setGradeLevelFilter(this.value)">
-                <option value="all">-- ทุกระดับชั้น (ม.1-ม.6, ปวช.) --</option>
-                <option value="ม.1">มัธยมศึกษาปีที่ 1</option>
-                <option value="ม.2">มัธยมศึกษาปีที่ 2</option>
-                <option value="ม.3">มัธยมศึกษาปีที่ 3</option>
-                <option value="ม.4">มัธยมศึกษาปีที่ 4</option>
-                <option value="ม.5">มัธยมศึกษาปีที่ 5</option>
-                <option value="ม.6">มัธยมศึกษาปีที่ 6</option>
-                <option value="ปวช.">ระดับ ปวช.</option>
+              <select id="students-class-filter" class="form-control" style="width: auto; min-width: 220px;" onchange="studentsService.setClassFilter(this.value)">
+                <option value="all">-- กำลังโหลดห้องเรียน... --</option>
               </select>
             </div>
 
