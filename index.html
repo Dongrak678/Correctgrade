@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบติดตามแก้ไขผลการเรียน (0, ร, มส) - โรงเรียนดงรักวิทยา</title>
+  
+  <!-- Google Fonts: Prompt, Kanit, Sarabun, Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Prompt:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Chart.js CDN for Visual Analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  
+  <!-- SheetJS (XLSX) for Excel Export -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+  <!-- Application Stylesheets (with cache busting) -->
+  <link rel="stylesheet" href="css/main.css?v=1.0.0">
+  <link rel="stylesheet" href="css/components.css?v=1.0.0">
+</head>
+<body>
+
+  <!-- App Preloader / Splash Screen -->
+  <div id="app-preloader" class="preloader">
+    <div class="preloader-spinner"></div>
+    <div class="preloader-text">กำลังโหลดระบบติดตามแก้ไขผลการเรียน...</div>
+  </div>
+
+  <!-- =========================================================================
+       1. LOGIN VIEW (Smart Universal Account Login)
+       ========================================================================= -->
+  <div id="view-login" class="login-view-wrapper" style="display: none;">
+    <div class="login-glass-card">
+      <div class="login-card-header">
+        <div class="login-brand-icon">
+          <i class="fas fa-graduation-cap"></i>
+        </div>
+        <h2>ระบบติดตามแก้ไขผลการเรียน</h2>
+        <p class="school-name-text">โรงเรียนดงรักวิทยา</p>
+      </div>
+
+      <!-- Quick Role Switch Tabs -->
+      <div class="login-role-tabs">
+        <button type="button" class="login-tab-btn active" onclick="setLoginRoleTab('student', this)">
+          <i class="fas fa-user-graduate"></i> นักเรียน
+        </button>
+        <button type="button" class="login-tab-btn" onclick="setLoginRoleTab('teacher', this)">
+          <i class="fas fa-chalkboard-teacher"></i> ครูผู้สอน
+        </button>
+        <button type="button" class="login-tab-btn" onclick="setLoginRoleTab('admin', this)">
+          <i class="fas fa-crown"></i> ผู้ดูแลระบบ
+        </button>
+      </div>
+
+      <div class="login-card-body">
+        <div class="smart-detection-tip">
+          <i class="fas fa-magic"></i>
+          <span><strong>Smart Universal Login:</strong> กรอกชื่อผู้ใช้หรือรหัสประจำตัว ระบบจะนำเข้าสู่สิทธิ์ที่ถูกต้องให้อัตโนมัติ</span>
+        </div>
+
+        <form id="main-login-form">
+          <div class="form-group">
+            <label for="login-username" id="label-login-username">ชื่อผู้ใช้งาน หรือ รหัสประจำตัวนักเรียน <span class="text-red-500">*</span></label>
+            <div class="search-input-box" style="min-width: 100%;">
+              <i class="fas fa-user"></i>
+              <input type="text" id="login-username" class="form-control" placeholder="เช่น 50101, teacher01, admin" required autofocus autocomplete="username">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="login-password">รหัสผ่าน (Password) <span class="text-red-500">*</span></label>
+            <div class="password-input-wrap">
+              <input type="password" id="login-password" class="form-control" placeholder="กรอกรหัสผ่าน" required autocomplete="current-password">
+              <button type="button" class="btn-toggle-pwd" onclick="authService.togglePasswordVisibility('login-password', 'login-pwd-icon')">
+                <i id="login-pwd-icon" class="fas fa-eye" title="แสดง/ซ่อนรหัสผ่าน"></i>
+              </button>
+            </div>
+          </div>
+
+          <button type="submit" id="btn-submit-login" class="btn btn-primary" style="width: 100%; padding: 12px; margin-top: 10px; font-size: 15px;">
+            <i class="fas fa-sign-in-alt"></i> เข้าสู่ระบบ
+          </button>
+        </form>
+
+        <!-- Quick Demo Switcher Buttons -->
+        <div class="demo-accounts-box">
+          <span><i class="fas fa-bolt text-amber-500 mr-1"></i> คลิกเข้าสู่ระบบตัวอย่างด่วน (Quick Demo):</span>
+          <div class="demo-btn-grid">
+            <button type="button" class="btn-demo-quick" onclick="app.quickLoginAs('student')">
+              🎓 นักเรียน (std001)
+            </button>
+            <button type="button" class="btn-demo-quick" onclick="app.quickLoginAs('teacher')">
+              👨‍🏫 ครู (teacher01)
+            </button>
+            <button type="button" class="btn-demo-quick" onclick="app.quickLoginAs('admin')">
+              👑 แอดมิน (admin)
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       2. MAIN APP SHELL
+       ========================================================================= -->
+  <div id="view-main-app" class="app-container" style="display: none;">
+    
+    <!-- Mobile Sidebar Backdrop -->
+    <div id="sidebar-backdrop" class="sidebar-backdrop" onclick="app.closeMobileSidebar()"></div>
+
+    <!-- Sidebar Navigation -->
+    <aside id="app-sidebar" class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <i class="fas fa-graduation-cap"></i>
+        </div>
+        <div class="sidebar-brand">
+          <h2>ระบบติดตามผลการเรียน</h2>
+          <p class="school-name-text">โรงเรียนดงรักวิทยา</p>
+        </div>
+      </div>
+
+      <nav class="sidebar-menu">
+        <span class="menu-category">ภาพรวมและข้อมูล</span>
+        
+        <div class="nav-item active" data-view="dashboard" onclick="app.switchView('dashboard')">
+          <i class="fas fa-chart-pie"></i>
+          <span>แดชบอร์ดสรุปภาพรวม</span>
+        </div>
+
+        <div class="nav-item" data-view="records" onclick="app.switchView('records')">
+          <i class="fas fa-clipboard-list"></i>
+          <span>จัดการผลการเรียน 0/ร/มส</span>
+        </div>
+
+        <div class="nav-item" data-view="audit" onclick="app.switchView('audit')">
+          <i class="fas fa-balance-scale"></i>
+          <span>ตารางเปรียบเทียบก่อน-หลัง</span>
+        </div>
+
+        <span class="menu-category">ทำเนียบและทะเบียน</span>
+
+        <div class="nav-item nav-teacher-only" data-view="teachers" onclick="app.switchView('teachers')">
+          <i class="fas fa-chalkboard-teacher"></i>
+          <span>ข้อมูลครูผู้สอน</span>
+        </div>
+
+        <div class="nav-item nav-admin-only" data-view="students" onclick="app.switchView('students')">
+          <i class="fas fa-user-graduate"></i>
+          <span>ทะเบียนนักเรียน</span>
+        </div>
+
+        <span class="menu-category nav-admin-only">ระบบและความปลอดภัย</span>
+
+        <div class="nav-item nav-admin-only" data-view="users" onclick="app.switchView('users')">
+          <i class="fas fa-users-cog"></i>
+          <span>จัดการผู้ใช้งานระบบ</span>
+        </div>
+
+        <div class="nav-item" data-view="reports" onclick="app.switchView('reports')">
+          <i class="fas fa-file-export"></i>
+          <span>รายงานและการส่งออก</span>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="school-info-badge">
+          <i class="fas fa-calendar-alt text-amber-400"></i>
+          <span class="current-year-text">ปีการศึกษา 2569</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Panel Area -->
+    <div class="main-content">
+      
+      <!-- Top Navigation Bar -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button type="button" class="btn-sidebar-toggle" onclick="app.toggleMobileSidebar()">
+            <i class="fas fa-bars"></i>
+          </button>
+          <div class="topbar-title">
+            <h3 id="page-current-title">ระบบติดตามแก้ไขผลการเรียน</h3>
+            <p class="current-year-text">ปีการศึกษา 2569 ภาคเรียนที่ 1</p>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <!-- Realtime Database Status Badge -->
+          <div class="db-status-chip" title="สถานะการเชื่อมต่อฐานข้อมูล Firebase Realtime Database">
+            <span id="db-status-badge" class="status-dot dot-online"></span>
+            <span id="db-status-text">Realtime DB Live</span>
+          </div>
+
+          <!-- User Profile Chip -->
+          <div class="user-profile-chip" onclick="app.openProfileModal()" title="ดูโปรไฟล์และเปลี่ยนรหัสผ่าน">
+            <div class="user-avatar-circle" id="current-user-avatar">
+              <i class="fas fa-user"></i>
+            </div>
+            <div class="user-meta-text">
+              <span class="user-display-name" id="current-user-name">กำลังโหลด...</span>
+              <span class="user-display-role" id="current-user-role">ผู้ใช้งาน</span>
+            </div>
+          </div>
+
+          <!-- Logout Button -->
+          <button type="button" class="btn-logout" onclick="authService.logout()" title="ออกจากระบบ">
+            <i class="fas fa-sign-out-alt"></i> ออกจากระบบ
+          </button>
+        </div>
+      </header>
+
+      <!-- Page Body Area -->
+      <main class="page-body">
+
+        <!-- ===================================================================
+             VIEW 1: EXECUTIVE DASHBOARD
+             =================================================================== -->
+        <section id="view-dashboard" class="app-view-panel active">
+          <div class="page-header-banner">
+            <div class="page-title-group">
+              <h2><i class="fas fa-tachometer-alt text-indigo-600"></i> แดชบอร์ดสรุปภาพรวม (Executive Dashboard)</h2>
+              <p>สถิติการติด 0, ร, มส และความคืบหน้าการแก้ผลการเรียนแบบเรียลไทม์</p>
+            </div>
+            <div class="page-action-group">
+              <button type="button" class="btn btn-outline" onclick="dashboardService.init()">
+                <i class="fas fa-sync-alt"></i> รีเฟรชสถิติ
+              </button>
+              <button type="button" class="btn btn-primary" onclick="exportEngine.openPrintReport()">
+                <i class="fas fa-print"></i> พิมพ์รายงานสรุป
+              </button>
+            </div>
+          </div>
+
+          <!-- KPI Cards Grid -->
+          <div class="kpi-grid">
+            <div class="kpi-card kpi-red">
+              <div class="kpi-icon-box">
+                <i class="fas fa-times-circle"></i>
+              </div>
+              <div class="kpi-details">
+                <span class="kpi-title">ติดผลการเรียน '0'</span>
+                <span class="kpi-number" id="kpi-count-0">0</span>
+                <span class="kpi-subtitle">รายการทั้งหมด</span>
+              </div>
+            </div>
+
+            <div class="kpi-card kpi-amber">
+              <div class="kpi-icon-box">
+                <i class="fas fa-exclamation-circle"></i>
+              </div>
+              <div class="kpi-details">
+                <span class="kpi-title">ติดผลการเรียน 'ร'</span>
+                <span class="kpi-number" id="kpi-count-r">0</span>
+                <span class="kpi-subtitle">รอการตัดสิน</span>
+              </div>
+            </div>
+
+            <div class="kpi-card kpi-purple">
+              <div class="kpi-icon-box">
+                <i class="fas fa-user-clock"></i>
+              </div>
+              <div class="kpi-details">
+                <span class="kpi-title">ติดผลการเรียน 'มส'</span>
+                <span class="kpi-number" id="kpi-count-ms">0</span>
+                <span class="kpi-subtitle">หมดสิทธิ์สอบ</span>
+              </div>
+            </div>
+
+            <div class="kpi-card kpi-blue">
+              <div class="kpi-icon-box">
+                <i class="fas fa-layer-group"></i>
+              </div>
+              <div class="kpi-details">
+                <span class="kpi-title">ยอดรวมคำร้องทั้งหมด</span>
+                <span class="kpi-number" id="kpi-count-total">0</span>
+                <span class="kpi-subtitle">รายการทุกระดับชั้น</span>
+              </div>
+            </div>
+
+            <div class="kpi-card kpi-emerald">
+              <div class="kpi-icon-box">
+                <i class="fas fa-check-circle"></i>
+              </div>
+              <div class="kpi-details">
+                <span class="kpi-title">แก้ไขผ่านแล้ว (สำเร็จ)</span>
+                <span class="kpi-number" id="kpi-count-approved">0</span>
+                <span class="kpi-subtitle">คิดเป็น <strong id="kpi-pass-rate">0%</strong></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts & Feed Grid -->
+          <div class="charts-grid">
+            <!-- Left Chart: Bar Chart by Grade Level -->
+            <div class="dashboard-card">
+              <div class="card-header-flex">
+                <div class="card-title-group">
+                  <h3><i class="fas fa-chart-bar text-indigo-600"></i> สรุปจำนวนนักเรียนที่ติดเงื่อนไขแยกตามระดับชั้น</h3>
+                  <p>จำนวนติด 0, ร, มส แยกตามระดับชั้น ม.1 - ม.6 และ ปวช.</p>
+                </div>
+              </div>
+              <div class="chart-container-rel">
+                <canvas id="dashboard-bar-chart"></canvas>
+              </div>
+            </div>
+
+            <!-- Right Chart: Donut Chart Status -->
+            <div class="dashboard-card">
+              <div class="card-header-flex">
+                <div class="card-title-group">
+                  <h3><i class="fas fa-chart-pie text-emerald-600"></i> สัดส่วนสถานะการแก้ไข</h3>
+                  <p>ความคืบหน้าตามขั้นตอน Workflow</p>
+                </div>
+              </div>
+              <div class="chart-container-rel">
+                <canvas id="dashboard-donut-chart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Live Activity Feed Stream -->
+          <div class="dashboard-card mt-4">
+            <div class="card-header-flex">
+              <div class="card-title-group">
+                <h3><i class="fas fa-rss text-purple-600"></i> Live Feed Activity Logs</h3>
+                <p>ประวัติกิจกรรมและการดำเนินงานในระบบแบบสด</p>
+              </div>
+            </div>
+            <div id="dashboard-activity-feed" class="activity-feed-list">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================================
+             VIEW 2: REMEDIATION RECORDS MANAGEMENT (0/ร/มส)
+             =================================================================== -->
+        <section id="view-records" class="app-view-panel">
+          <div class="page-header-banner">
+            <div class="page-title-group">
+              <h2><i class="fas fa-clipboard-check text-indigo-600"></i> การจัดการข้อมูลผลการเรียน (0 / ร / มส)</h2>
+              <p>บันทึก ติดตามกระบวนการยื่นคำร้อง 4 ขั้นตอน และตรวจสอบสถานะ</p>
+            </div>
+            <div class="page-action-group">
+              <button type="button" class="btn btn-outline text-indigo-600 nav-admin-only" onclick="recordsService.openBulkImportModal()">
+                <i class="fas fa-file-csv"></i> นำเข้าไฟล์ CSV
+              </button>
+              <button type="button" class="btn btn-outline text-red-600 nav-admin-only" onclick="recordsService.clearAllRecordsPrompt()">
+                <i class="fas fa-trash-alt"></i> ล้างประวัติทั้งหมด
+              </button>
+              <button type="button" class="btn btn-primary nav-teacher-only" onclick="recordsService.openAddRecordModal()">
+                <i class="fas fa-plus"></i> บันทึกข้อมูล 0/ร/มส
+              </button>
+            </div>
+          </div>
+
+          <!-- Filter & Search Bar -->
+          <div class="filter-card-bar">
+            <div class="filter-left-group">
+              <div class="search-input-box">
+                <i class="fas fa-search"></i>
+                <input type="text" class="form-control" placeholder="ค้นหาชื่อ, รหัสนักเรียน, รหัสวิชา, ครู..." oninput="recordsService.setSearchQuery(this.value)">
+              </div>
+
+              <!-- Grade Type Filter Pills -->
+              <div class="filter-pills-row">
+                <button type="button" class="filter-pill-grade active" data-grade="all" onclick="recordsService.setGradeFilter('all')">ทั้งหมด</button>
+                <button type="button" class="filter-pill-grade" data-grade="0" onclick="recordsService.setGradeFilter('0')">ติด 0</button>
+                <button type="button" class="filter-pill-grade" data-grade="ร" onclick="recordsService.setGradeFilter('ร')">ติด ร</button>
+                <button type="button" class="filter-pill-grade" data-grade="มส" onclick="recordsService.setGradeFilter('มส')">ติด มส</button>
+              </div>
+
+              <!-- Status Dropdown -->
+              <select class="form-control" style="width: auto;" onchange="recordsService.setStatusFilter(this.value)">
+                <option value="all">-- ทุกสถานะการแก้ไข --</option>
+                <option value="pending_request">ยังไม่ยื่นคำร้อง</option>
+                <option value="requested">ยื่นคำร้องแล้ว</option>
+                <option value="assigned">ครูมอบหมายงานแล้ว</option>
+                <option value="submitted">นักเรียนส่งงานแล้ว (รอตรวจ)</option>
+                <option value="approved">ผ่านการแก้ไขแล้ว</option>
+                <option value="rejected">ส่งคืนให้แก้ไขเพิ่มเติม</option>
+              </select>
+
+              <!-- Level Dropdown -->
+              <select class="form-control" style="width: auto;" onchange="recordsService.setGradeLevelFilter(this.value)">
+                <option value="all">-- ทุกระดับชั้น --</option>
+                <option value="ม.1">มัธยมศึกษาปีที่ 1</option>
+                <option value="ม.2">มัธยมศึกษาปีที่ 2</option>
+                <option value="ม.3">มัธยมศึกษาปีที่ 3</option>
+                <option value="ม.4">มัธยมศึกษาปีที่ 4</option>
+                <option value="ม.5">มัธยมศึกษาปีที่ 5</option>
+                <option value="ม.6">มัธยมศึกษาปีที่ 6</option>
+                <option value="ปวช.">ระดับ ปวช.</option>
+              </select>
+            </div>
+
+            <div class="filter-right-group">
+              <span id="records-count-badge" class="badge-level font-semibold">0 รายการ</span>
+            </div>
+          </div>
+
+          <!-- Records Table -->
+          <div class="table-card-container">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th style="width: 5%;" class="text-center">#</th>
+                    <th style="width: 20%;">นักเรียน</th>
+                    <th style="width: 18%;">รายวิชา</th>
+                    <th style="width: 8%;" class="text-center">เงื่อนไข</th>
+                    <th style="width: 16%;">ครูผู้สอน</th>
+                    <th style="width: 15%;" class="text-center">สถานะการแก้ไข</th>
+                    <th style="width: 8%;" class="text-center">เกรดใหม่</th>
+                    <th style="width: 10%;" class="text-right">จัดการ</th>
+                  </tr>
+                </thead>
+                <tbody id="records-table-body">
+                  <!-- Rendered by JS -->
+                </tbody>
+              </table>
+            </div>
+            <div id="records-pagination"></div>
+          </div>
+        </section>
+
+        <!-- ===================================================================
+             VIEW 3: AUDIT LOG (BEFORE ➔ AFTER COMPARISON)
+             =================================================================== -->
+        <section id="view-audit" class="app-view-panel">
+          <div class="page-header-banner">
+            <div class="page-title-group">
+              <h2><i class="fas fa-balance-scale text-indigo-600"></i> ตารางเปรียบเทียบผลการเรียนก่อน-หลัง (Audit Log)</h2>
+              <p>บันทึกประวัติการอนุมัติปรับผลการเรียนอัตโนมัติ (Audit Trail) พร้อมหมายเหตุการตัดสิน</p>
+            </div>
+            <div class="page-action-group">
+              <button type="button" class="btn btn-outline text-indigo-600" onclick="exportEngine.exportRecordsCSV()">
+                <i class="fas fa-file-csv"></i> ส่งออก Audit CSV
+              </button>
+              <button type="button" class="btn btn-outline text-red-600 nav-admin-only" onclick="auditService.clearAllAuditPrompt()">
+                <i class="fas fa-trash-alt"></i> ล้างประวัติทั้งหมด
+              </button>
+            </div>
+          </div>
+
+          <!-- Search & Counter -->
+          <div class="filter-card-bar">
+            <div class="search-input-box">
+              <i class="fas fa-search"></i>
+              <input type="text" class="form-control" placeholder="ค้นหาชื่อนักเรียน, รหัสวิชา, ครูผู้อนุมัติ..." oninput="auditService.setSearchQuery(this.value)">
+            </div>
+            <span id="audit-count-badge" class="badge-level font-semibold">0 รายการ</span>
+          </div>
+
+          <div class="table-card-container">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th style="width: 5%;" class="text-center">#</th>
+                    <th style="width: 20%;">นักเรียน</th>
+                    <th style="width: 18%;">รายวิชา</th>
+                    <th style="width: 14%;" class="text-center">เกรดเดิม ➔ เกรดใหม่</th>
+                    <th style="width: 15%;">ครูผู้อนุมัติ</th>
+                    <th style="width: 14%;">วัน-เวลาอนุมัติ</th>
+                    <th style="width: 14%;">หมายเหตุ</th>
+                    <th style="width: 5%;" class="text-right">ลบ</th>
+                  </tr>
+                </thead>
+                <tbody id="audit-table-body">
+                  <!-- Rendered by JS -->
+                </tbody>
+              </table>
+            </div>
+            <div id="audit-pagination"></div>
+          </div>
+        </section>
+
+        <!-- ===================================================================
+             VIEW 4: TEACHERS DIRECTORY
+             =================================================================== -->
+        <section id="view-teachers" class="app-view-panel">
+          <div class="page-header-banner">
+            <div class="page-title-group">
+              <h2><i class="fas fa-chalkboard-teacher text-indigo-600"></i> ทำเนียบและข้อมูลครูผู้สอน (Teachers Directory)</h2>
+              <p>จัดการข้อมูลครู 9 กลุ่มสาระการเรียนรู้ และรายวิชาที่รับผิดชอบ</p>
+            </div>
+            <div class="page-action-group">
+              <button type="button" class="btn btn-outline text-indigo-600 nav-admin-only" onclick="teachersService.openBulkImportModal()">
+                <i class="fas fa-file-csv"></i> นำเข้าครูด้วย CSV
+              </button>
+              <button type="button" class="btn btn-primary nav-admin-only" onclick="teachersService.openAddTeacherModal()">
+                <i class="fas fa-user-plus"></i> เพิ่มข้อมูลครู
+              </button>
+            </div>
+          </div>
+
+          <!-- Filters -->
+          <div class="filter-card-bar">
+            <div class="filter-left-group">
+              <div class="search-input-box">
+                <i class="fas fa-search"></i>
+                <input type="text" class="form-control" placeholder="ค้นหาชื่อครู, รหัส, วิชาที่สอน..." oninput="teachersService.setSearchQuery(this.value)">
+              </div>
+
+              <select class="form-control" style="width: auto;" onchange="teachersService.setLearningAreaFilter(this.value)">
+                <option value="all">-- ทุกกลุ่มสาระการเรียนรู้ (9 กลุ่ม) --</option>
+                <option value="กลุ่มสาระการเรียนรู้ภาษาไทย">กลุ่มสาระฯ ภาษาไทย</option>
+                <option value="กลุ่มสาระการเรียนรู้คณิตศาสตร์">กลุ่มสาระฯ คณิตศาสตร์</option>
+                <option value="กลุ่มสาระการเรียนรู้วิทยาศาสตร์และเทคโนโลยี">กลุ่มสาระฯ วิทยาศาสตร์และเทคโนโลยี</option>
+                <option value="กลุ่มสาระการเรียนรู้สังคมศึกษา ศาสนา และวัฒนธรรม">กลุ่มสาระฯ สังคมศึกษาฯ</option>
+                <option value="กลุ่มสาระการเรียนรู้สุขศึกษาและพลศึกษา">กลุ่มสาระฯ สุขศึกษาและพลศึกษา</option>
+                <option value="กลุ่มสาระการเรียนรู้ศิลปะ">กลุ่มสาระฯ ศิลปะ</option>
+                <option value="กลุ่มสาระการเรียนรู้การงานอาชีพ">กลุ่มสาระฯ การงานอาชีพ</option>
+                <option value="กลุ่มสาระการเรียนรู้ภาษาต่างประเทศ">กลุ่มสาระฯ ภาษาต่างประเทศ</option>
+                <option value="หลักสูตรประกาศนียบัตรวิชาชีพ (ปวช.)">หลักสูตร ปวช.</option>
+              </select>
+            </div>
+
+            <span id="teachers-count-badge" class="badge-level font-semibold">0 ท่าน</span>
+          </div>
+
+          <!-- Teachers Grid -->
+          <div id="teachers-grid-container" class="teachers-grid">
+            <!-- Rendered by JS -->
+          </div>
+        </section>
+
+        <!-- ===================================================================
+             VIEW 5: STUDENT MASTER DIRECTORY
+             =================================================================== -->
+        <section id="view-students" class="app-view-panel">
+          <div class="page-header-banner">
+            <div class="page-title-group">
+              <h2><i class="fas fa-user-graduate text-indigo-600"></i> ทะเบียนนักเรียน (Student Master Directory)</h2>
+              <p>ฐานข้อมูลนักเรียน เลขประจำตัว ระดับชั้น ห้อง และครูที่ปรึกษา</p>
+            </div>
+            <div class="page-action-group">
+              <button type="button" class="btn btn-outline text-indigo-600" onclick="studentsService.openBulkImportModal()">
+                <i class="fas fa-file-csv"></i> นำเข้านักเรียนด้วย CSV
+              </button>
+              <button type="button" class="btn btn-primary" onclick="studentsService.openAddStudentModal()">
+                <i class="fas fa-user-plus"></i> เพิ่มข้อมูลนักเรียน
+              </button>
+            </div>
+          </div>
+
+          <!-- Filters -->
+          <div class="filter-card-bar">
+            <div class="filter-left-group">
+              <div class="search-input-box">
+                <i class="fas fa-search"></i>
+                <input type="text" class="form-control" placeholder="ค้นหาชื่อ, รหัสประจำตัว, ครูที่ปรึกษา..." oninput="studentsService.setSearchQuery(this.value)">
+              </div>
+
+              <select class="form-control" style="width: auto;" onchange="studentsService.setGradeLevelFilter(this.value)">
+                <option value="all">-- ทุกระดับชั้น (ม.1-ม.6, ปวช.) --</option>
+                <option value="ม.1">มัธยมศึกษาปีที่ 1</option>
+                <option value="ม.2">มัธยมศึกษาปีที่ 2</option>
+                <option value="ม.3">มัธยมศึกษาปีที่ 3</option>
+                <option value="ม.4">มัธยมศึกษาปีที่ 4</option>
+                <option value="ม.5">มัธยมศึกษาปีที่ 5</option>
+                <option value="ม.6">มัธยมศึกษาปีที่ 6</option>
+                <option value="ปวช.">ระดับ ปวช.</option>
+              </select>
+            </div>
+
+            <span id="students-count-badge" class="badge-level font-semibold">0 คน</span>
+          </div>
+
+          <div class="table-card-container">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th style="width: 5%;" class="text-center">#</th>
+                    <th style="width: 15%;">รหัสประจำตัว</th>
+                    <th style="width: 25%;">ชื่อ - นามสกุล</th>
+                    <th style="width: 15%;" class="text-center">ระดับชั้น / ห้อง</th>
+                    <th style="width: 20%;">ครูที่ปรึกษา</th>
+                    <th style="width: 10%;">เบอร์โทร</th>
+                    <th style="width: 10%;" class="text-right">จัดการ</th>
+                  </tr>
+                </thead>
+                <tbody id="students-table-body">
+                  <!-- Rendered by JS -->
+                </tbody>
+              </table>
+            </div>
+            <div id="students-pagination"></div>
+          </div>
+        </section>
+
+        <!-- ===================================================================
+             VIEW 6: USER MANAGEMENT
+             =================================================================== -->
+        <section id="view-users" class="app-view-panel">
+          <div class="page-header-banner">
+            <div class="page-title-group">
+              <h2><i class="fas fa-users-cog text-indigo-600"></i> การจัดการผู้ใช้งานระบบ (User Management)</h2>
+              <p>จัดการบัญชี กำหนดสิทธิ์ (Admin / Teacher / Student) และรีเซ็ตรหัสผ่าน</p>
+            </div>
+            <div class="page-action-group">
+              <button type="button" class="btn btn-outline text-indigo-600" onclick="usersService.openBulkImportModal()">
+                <i class="fas fa-file-csv"></i> นำเข้าผู้ใช้ด้วย CSV
+              </button>
+              <button type="button" class="btn btn-primary" onclick="usersService.openAddUserModal()">
+                <i class="fas fa-user-plus"></i> เพิ่มผู้ใช้งานใหม่
+              </button>
+            </div>
+          </div>
+
+          <!-- Filters -->
+          <div class="filter-card-bar">
+            <div class="filter-left-group">
+              <div class="search-input-box">
+                <i class="fas fa-search"></i>
+                <input type="text" class="form-control" placeholder="ค้นหา Username, ชื่อ, อีเมล..." oninput="usersService.setSearchQuery(this.value)">
+              </div>
+
+              <select class="form-control" style="width: auto;" onchange="usersService.setRoleFilter(this.value)">
+                <option value="all">-- ทุกบทบาทการใช้งาน --</option>
+                <option value="admin">ผู้ดูแลระบบ (Admin)</option>
+                <option value="teacher">ครูผู้สอน (Teacher)</option>
+                <option value="student">นักเรียน (Student)</option>
+              </select>
+            </div>
+
+            <span id="users-count-badge" class="badge-level font-semibold">0 บัญชี</span>
+          </div>
+
+          <div class="table-card-container">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th style="width: 5%;" class="text-center">#</th>
+                    <th style="width: 18%;">Username</th>
+                    <th style="width: 25%;">ชื่อ - นามสกุล</th>
+                    <th style="width: 18%;" class="text-center">สิทธิ์การใช้งาน</th>
+                    <th style="width: 14%;">เบอร์โทรศัพท์</th>
+                    <th style="width: 10%;">สร้างเมื่อ</th>
+                    <th style="width: 10%;" class="text-right">จัดการ</th>
+                  </tr>
+                </thead>
+                <tbody id="users-table-body">
+                  <!-- Rendered by JS -->
+                </tbody>
+              </table>
+            </div>
+            <div id="users-pagination"></div>
+          </div>
+        </section>
+
+        <!-- ===================================================================
+             VIEW 7: REPORTS & EXPORT ENGINE
+             =================================================================== -->
+        <section id="view-reports" class="app-view-panel">
+          <div class="page-header-banner">
+            <div class="page-title-group">
+              <h2><i class="fas fa-file-export text-indigo-600"></i> รายงานสรุปและการส่งออกข้อมูล (Reports & Export Engine)</h2>
+              <p>ส่งออกข้อมูลเป็นไฟล์ Excel, CSV หรือพิมพ์เอกสารสรุปผลการแก้เกรดมาตรฐานสถานศึกษา</p>
+            </div>
+          </div>
+
+          <div class="teachers-grid">
+            <!-- Card 1: Official Print Document -->
+            <div class="teacher-card">
+              <div class="teacher-card-header">
+                <div class="teacher-avatar" style="background: #fee2e2; color: #dc2626;">
+                  <i class="fas fa-print"></i>
+                </div>
+                <div class="teacher-info">
+                  <h4 class="font-bold">พิมพ์รายงานสรุปผล (Print / PDF)</h4>
+                  <span class="text-xs text-gray-500">แบบฟอร์มมาตรฐานทะเบียนและวัดผลสถานศึกษา</span>
+                </div>
+              </div>
+              <p class="text-xs text-gray-600 mb-3">
+                ออกแบบตามมาตรฐานหนังสือราชการ มีสถิติสรุป รายการนักเรียน และช่องลงนาม 4 ฝ่าย (ครูผู้สอน, หน.กลุ่มสาระฯ, หน.งานวัดผล, ผอ.โรงเรียน)
+              </p>
+              <div class="form-group">
+                <label class="text-xs font-semibold">เลือกระดับชั้น:</label>
+                <select id="report-print-level" class="form-control text-xs">
+                  <option value="all">ทุกระดับชั้น (ม.1 - ม.6, ปวช.)</option>
+                  <option value="ม.1">มัธยมศึกษาปีที่ 1</option>
+                  <option value="ม.2">มัธยมศึกษาปีที่ 2</option>
+                  <option value="ม.3">มัธยมศึกษาปีที่ 3</option>
+                  <option value="ม.4">มัธยมศึกษาปีที่ 4</option>
+                  <option value="ม.5">มัธยมศึกษาปีที่ 5</option>
+                  <option value="ม.6">มัธยมศึกษาปีที่ 6</option>
+                  <option value="ปวช.">ระดับ ปวช.</option>
+                </select>
+              </div>
+              <button type="button" class="btn btn-primary" onclick="exportEngine.openPrintReport(document.getElementById('report-print-level').value)">
+                <i class="fas fa-external-link-alt"></i> เปิดหน้าพิมพ์รายงาน (Print Preview)
+              </button>
+            </div>
+
+            <!-- Card 2: Export Excel (.xlsx) -->
+            <div class="teacher-card">
+              <div class="teacher-card-header">
+                <div class="teacher-avatar" style="background: #d1fae5; color: #059669;">
+                  <i class="fas fa-file-excel"></i>
+                </div>
+                <div class="teacher-info">
+                  <h4 class="font-bold">ส่งออกไฟล์ Microsoft Excel (.xlsx)</h4>
+                  <span class="text-xs text-gray-500">ข้อมูลสรุปผลการแก้ผลการเรียนทั้งโรงเรียน</span>
+                </div>
+              </div>
+              <p class="text-xs text-gray-600 mb-3">
+                ดาวน์โหลดข้อมูลเป็นไฟล์ Excel (.xlsx) พร้อมจัดรูปแบบหัวตารางและความกว้างคอลัมน์ให้อย่างสวยงาม
+              </p>
+              <div class="flex gap-2 mt-auto">
+                <button type="button" class="btn btn-emerald" style="flex: 1;" onclick="exportEngine.exportRecordsExcel(false)">
+                  <i class="fas fa-download"></i> ส่งออก Excel ทั้งหมด
+                </button>
+              </div>
+            </div>
+
+            <!-- Card 3: Export CSV (UTF-8 BOM) -->
+            <div class="teacher-card">
+              <div class="teacher-card-header">
+                <div class="teacher-avatar" style="background: #e0f2fe; color: #0284c7;">
+                  <i class="fas fa-file-csv"></i>
+                </div>
+                <div class="teacher-info">
+                  <h4 class="font-bold">ส่งออกไฟล์ CSV (UTF-8 BOM)</h4>
+                  <span class="text-xs text-gray-500">รองรับภาษาไทยใน Microsoft Excel อย่างถูกต้อง</span>
+                </div>
+              </div>
+              <p class="text-xs text-gray-600 mb-3">
+                ไฟล์ CSV ที่มี Byte Order Mark (BOM) ทำให้เปิดใน Excel เวอร์ชันภาษาไทยได้โดยไม่เกิดปัญหาตัวอักษรต่างดาว
+              </p>
+              <button type="button" class="btn btn-secondary mt-auto" onclick="exportEngine.exportRecordsCSV(false)">
+                <i class="fas fa-file-csv"></i> ส่งออกไฟล์ CSV
+              </button>
+            </div>
+
+            <!-- Card 4: Download CSV Templates -->
+            <div class="teacher-card">
+              <div class="teacher-card-header">
+                <div class="teacher-avatar" style="background: #ede9fe; color: #7c3aed;">
+                  <i class="fas fa-download"></i>
+                </div>
+                <div class="teacher-info">
+                  <h4 class="font-bold">ดาวน์โหลดไฟล์ตัวอย่าง CSV (Templates)</h4>
+                  <span class="text-xs text-gray-500">แบบฟอร์มเปล่าสำหรับจัดเตรียมข้อมูลนำเข้า</span>
+                </div>
+              </div>
+              <p class="text-xs text-gray-600 mb-2">เลือกดาวน์โหลด Template แต่ละประเภท:</p>
+              <div class="flex flex-col gap-2">
+                <button type="button" class="btn-sm btn-outline text-indigo-600" onclick="exportEngine.downloadTemplate('records')">
+                  <i class="fas fa-download"></i> 1. Template ผลการเรียน 0/ร/มส
+                </button>
+                <button type="button" class="btn-sm btn-outline text-indigo-600" onclick="exportEngine.downloadTemplate('teachers')">
+                  <i class="fas fa-download"></i> 2. Template ข้อมูลครูผู้สอน
+                </button>
+                <button type="button" class="btn-sm btn-outline text-indigo-600" onclick="exportEngine.downloadTemplate('students')">
+                  <i class="fas fa-download"></i> 3. Template ทะเบียนนักเรียน
+                </button>
+                <button type="button" class="btn-sm btn-outline text-indigo-600" onclick="exportEngine.downloadTemplate('users')">
+                  <i class="fas fa-download"></i> 4. Template บัญชีผู้ใช้งาน
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       DYNAMIC MODAL CONTAINERS
+       ========================================================================= -->
+  <!-- 1. 4-Step Workflow Modal -->
+  <div id="workflow-action-modal" class="modal-wrapper"></div>
+
+  <!-- 2. Record Add/Edit Modal -->
+  <div id="record-form-modal" class="modal-wrapper"></div>
+
+  <!-- 3. Teacher Add/Edit Modal -->
+  <div id="teacher-form-modal" class="modal-wrapper"></div>
+
+  <!-- 4. Student Add/Edit Modal -->
+  <div id="student-form-modal" class="modal-wrapper"></div>
+
+  <!-- 5. User Add/Edit / Password Reset Modal -->
+  <div id="user-form-modal" class="modal-wrapper"></div>
+
+  <!-- 6. Universal CSV Bulk Import Modal -->
+  <div id="csv-import-modal" class="modal-wrapper"></div>
+
+  <!-- 7. User Profile & Password Change Modal -->
+  <div id="profile-modal" class="modal-wrapper"></div>
+
+  <!-- 8. Strict Auth Error Alert Pop-up Modal -->
+  <div id="auth-error-modal" class="modal-wrapper">
+    <div class="modal-backdrop" onclick="authService.closeLoginErrorModal()"></div>
+    <div class="modal-dialog" style="max-width: 440px;">
+      <div class="modal-header" style="background: #fff1f2; border-bottom: 1px solid #fecdd3;">
+        <div class="modal-title-wrap">
+          <span class="modal-badge badge-rose"><i class="fas fa-shield-alt"></i> แจ้งเตือนความปลอดภัย</span>
+          <h3 class="text-red-600">เข้าสู่ระบบไม่สำเร็จ</h3>
+        </div>
+        <button type="button" class="btn-close-modal" onclick="authService.closeLoginErrorModal()">&times;</button>
+      </div>
+      <div class="modal-body text-center py-6">
+        <div style="font-size: 48px; color: #f43f5e; margin-bottom: 12px;">
+          <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <p id="auth-error-msg" class="font-medium text-gray-800 text-sm whitespace-pre-line">
+          รหัสผ่านไม่ถูกต้อง กรุณาตรวจสอบและลองใหม่อีกครั้ง
+        </p>
+      </div>
+      <div class="modal-footer" style="justify-content: center;">
+        <button type="button" class="btn btn-rose" onclick="authService.closeLoginErrorModal()">
+          <i class="fas fa-redo-alt mr-1"></i> ลองใหม่อีกครั้ง
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9. Toast Notification Stack Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Application Scripts (Loaded with Cache Busting) -->
+  <script src="js/config.js?v=1.0.0"></script>
+  <script src="js/firebase-service.js?v=1.0.0"></script>
+  <script src="js/cloudinary-service.js?v=1.0.0"></script>
+  <script src="js/auth.js?v=1.0.0"></script>
+  <script src="js/dashboard.js?v=1.0.0"></script>
+  <script src="js/workflow.js?v=1.0.0"></script>
+  <script src="js/records.js?v=1.0.0"></script>
+  <script src="js/audit.js?v=1.0.0"></script>
+  <script src="js/teachers.js?v=1.0.0"></script>
+  <script src="js/students.js?v=1.0.0"></script>
+  <script src="js/users.js?v=1.0.0"></script>
+  <script src="js/export-engine.js?v=1.0.0"></script>
+  <script src="js/app.js?v=1.0.0"></script>
+
+  <script>
+    // Tab role switcher helper in login view
+    function setLoginRoleTab(role, btn) {
+      document.querySelectorAll('.login-tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      authService.selectedLoginRole = role;
+      
+      const label = document.getElementById('label-login-username');
+      const input = document.getElementById('login-username');
+      if (role === 'student') {
+        label.innerHTML = 'ชื่อผู้ใช้งาน หรือ รหัสประจำตัวนักเรียน <span class="text-red-500">*</span>';
+        input.placeholder = 'เช่น 50101 หรือ std001';
+      } else if (role === 'teacher') {
+        label.innerHTML = 'ชื่อผู้ใช้งานครู หรือ รหัสครู <span class="text-red-500">*</span>';
+        input.placeholder = 'เช่น teacher01 หรือ T001';
+      } else if (role === 'admin') {
+        label.innerHTML = 'ชื่อผู้ใช้งานผู้ดูแลระบบ (Admin) <span class="text-red-500">*</span>';
+        input.placeholder = 'เช่น admin';
+      }
+      input.focus();
+    }
+  </script>
+</body>
+</html>

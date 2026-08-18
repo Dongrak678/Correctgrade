@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แบบรายงานสรุปผลการแก้ไขผลการเรียน (0, ร, มส) - โรงเรียนดงรักวิทยา</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="css/print.css?v=1.0.0">
+</head>
+<body class="print-document-body">
+
+  <div class="print-control-bar">
+    <div style="font-weight: 600; color: #1e293b;">
+      <i class="fas fa-file-pdf text-red-500 mr-2"></i> เอกสารสรุปรายงานผลการแก้ไขผลการเรียน (แบบมาตรฐานสถานศึกษา)
+    </div>
+    <div style="display: flex; gap: 10px;">
+      <button type="button" onclick="window.print()" style="padding: 8px 16px; background: #2563eb; color: #fff; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">
+        <i class="fas fa-print"></i> พิมพ์เอกสาร (Print / PDF)
+      </button>
+      <button type="button" onclick="window.close()" style="padding: 8px 16px; background: #e2e8f0; color: #334155; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">
+        ปิดหน้าต่าง
+      </button>
+    </div>
+  </div>
+
+  <div class="document-sheet">
+    <div class="doc-header">
+      <div class="doc-emblem">
+        <i class="fas fa-graduation-cap"></i>
+      </div>
+      <h1 class="doc-title-main">โรงเรียนดงรักวิทยา</h1>
+      <h2 class="doc-title-sub">แบบรายงานสรุปผลการติดตามและแก้ไขผลการเรียนที่มีเงื่อนไข (0, ร, มส)</h2>
+      <div class="doc-meta-row" id="doc-meta-text">
+        ปีการศึกษา 2569 ภาคเรียนที่ 1 • งานทะเบียนและวัดผล กลุ่มบริหารวิชาการ
+      </div>
+    </div>
+
+    <!-- Statistics Summary Box -->
+    <div class="stats-summary-box">
+      <div class="stats-summary-grid">
+        <div class="stat-item">
+          <strong id="print-stat-0">0</strong>
+          <span>ติด 0</span>
+        </div>
+        <div class="stat-item">
+          <strong id="print-stat-r">0</strong>
+          <span>ติด ร</span>
+        </div>
+        <div class="stat-item">
+          <strong id="print-stat-ms">0</strong>
+          <span>ติด มส</span>
+        </div>
+        <div class="stat-item">
+          <strong id="print-stat-total">0</strong>
+          <span>ยอดรวมทั้งหมด</span>
+        </div>
+        <div class="stat-item">
+          <strong id="print-stat-passed" style="color: #059669;">0</strong>
+          <span>แก้ไขผ่านแล้ว</span>
+        </div>
+        <div class="stat-item">
+          <strong id="print-stat-pending" style="color: #d97706;">0</strong>
+          <span>คงเหลือ/ระหว่างแก้</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Data Table -->
+    <table class="print-table">
+      <thead>
+        <tr>
+          <th style="width: 5%;">ที่</th>
+          <th style="width: 12%;">รหัสนักเรียน</th>
+          <th style="width: 22%;">ชื่อ - นามสกุล</th>
+          <th style="width: 10%;">ระดับชั้น</th>
+          <th style="width: 10%;">รหัสวิชา</th>
+          <th style="width: 18%;">ชื่อรายวิชา</th>
+          <th style="width: 7%;">เดิม</th>
+          <th style="width: 8%;">เกรดใหม่</th>
+          <th style="width: 8%;">ผลประเมิน</th>
+        </tr>
+      </thead>
+      <tbody id="print-table-body">
+        <tr>
+          <td colspan="9" class="center">กำลังโหลดข้อมูล...</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Signature Section -->
+    <div class="signature-section">
+      <div class="signature-grid">
+        <div class="sig-box">
+          <div class="sig-line">ลงชื่อ............................................................</div>
+          <div class="sig-name">( ............................................................ )</div>
+          <div class="sig-position">ครูผู้สอน / ผู้ประเมิน</div>
+          <div style="font-size: 10pt; color: #666; margin-top: 4px;">วันที่ ........ / .................... / 2569</div>
+        </div>
+
+        <div class="sig-box">
+          <div class="sig-line">ลงชื่อ............................................................</div>
+          <div class="sig-name">( ............................................................ )</div>
+          <div class="sig-position">หัวหน้ากลุ่มสาระการเรียนรู้</div>
+          <div style="font-size: 10pt; color: #666; margin-top: 4px;">วันที่ ........ / .................... / 2569</div>
+        </div>
+
+        <div class="sig-box">
+          <div class="sig-line">ลงชื่อ............................................................</div>
+          <div class="sig-name">( ............................................................ )</div>
+          <div class="sig-position">หัวหน้างานวัดและประเมินผลการเรียน</div>
+          <div style="font-size: 10pt; color: #666; margin-top: 4px;">วันที่ ........ / .................... / 2569</div>
+        </div>
+
+        <div class="sig-box">
+          <div class="sig-line">ลงชื่อ............................................................</div>
+          <div class="sig-name">( ............................................................ )</div>
+          <div class="sig-position">ผู้อำนวยการโรงเรียนดงรักวิทยา</div>
+          <div style="font-size: 10pt; color: #666; margin-top: 4px;">วันที่ ........ / .................... / 2569</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/config.js?v=1.0.0"></script>
+  <script src="js/firebase-service.js?v=1.0.0"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      // ดึงข้อมูลจากฐานข้อมูล
+      await db.init();
+      
+      const params = new URLSearchParams(window.location.search);
+      const levelFilter = params.get('level') || 'all';
+      const statusFilter = params.get('status') || 'all';
+
+      let records = db.get('records') || [];
+
+      if (levelFilter !== 'all') {
+        records = records.filter(r => (r.gradeLevel || '').startsWith(levelFilter));
+      }
+      if (statusFilter !== 'all') {
+        records = records.filter(r => r.status === statusFilter);
+      }
+
+      // คำนวณสถิติ
+      let c0 = 0, cR = 0, cMS = 0, cPassed = 0, cPending = 0;
+      records.forEach(r => {
+        if (r.conditionType === '0') c0++;
+        else if (r.conditionType === 'ร') cR++;
+        else if (r.conditionType === 'มส') cMS++;
+
+        if (r.status === 'approved') cPassed++;
+        else cPending++;
+      });
+
+      document.getElementById('print-stat-0').innerText = c0;
+      document.getElementById('print-stat-r').innerText = cR;
+      document.getElementById('print-stat-ms').innerText = cMS;
+      document.getElementById('print-stat-total').innerText = records.length;
+      document.getElementById('print-stat-passed').innerText = cPassed;
+      document.getElementById('print-stat-pending').innerText = cPending;
+
+      const tbody = document.getElementById('print-table-body');
+      if (records.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" class="center">ไม่พบรายการข้อมูลตามเงื่อนไขที่เลือก</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = records.map((r, idx) => `
+        <tr>
+          <td class="center">${idx + 1}</td>
+          <td class="center font-mono">${r.studentId}</td>
+          <td>${r.studentName}</td>
+          <td class="center">${r.gradeLevel}/${r.room || '1'}</td>
+          <td class="center font-bold">${r.subjectCode}</td>
+          <td>${r.subjectName}</td>
+          <td class="center font-bold">${r.conditionType}</td>
+          <td class="center font-bold" style="color: ${r.newGrade ? '#059669' : '#000'}">${r.newGrade || '-'}</td>
+          <td class="center">${r.status === 'approved' ? 'ผ่าน' : 'อยู่ระหว่างดำเนินการ'}</td>
+        </tr>
+      `).join('');
+    });
+  </script>
+</body>
+</html>
