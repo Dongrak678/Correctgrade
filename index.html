@@ -562,13 +562,20 @@
           <!-- Filters -->
           <div class="filter-card-bar">
             <div class="filter-left-group">
+              <!-- 1. แถบค้นหา -->
               <div class="search-input-box">
                 <i class="fas fa-search"></i>
                 <input type="text" class="form-control" placeholder="ค้นหาชื่อ, รหัสประจำตัว, ครูที่ปรึกษา..." oninput="studentsService.setSearchQuery(this.value)">
               </div>
 
-              <select id="students-class-filter" class="form-control" style="width: auto; min-width: 220px;" onchange="studentsService.setClassFilter(this.value)">
-                <option value="all">-- กำลังโหลดห้องเรียน... --</option>
+              <!-- 2. แถบเลือกชั้น -->
+              <select id="students-grade-filter" class="form-control" style="width: auto; min-width: 175px;" onchange="studentsService.onGradeChange(this.value)">
+                <option value="all">-- ทุกระดับชั้น --</option>
+              </select>
+
+              <!-- 3. แถบเลือกห้อง -->
+              <select id="students-room-filter" class="form-control" style="width: auto; min-width: 155px;" onchange="studentsService.onRoomChange(this.value)">
+                <option value="all">-- ทุกห้อง --</option>
               </select>
             </div>
 
