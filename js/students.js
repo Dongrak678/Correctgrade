@@ -12,7 +12,8 @@ class StudentsService {
     this.pageSize = 15;
   }
 
-  init() {
+  async init() {
+    await this.cleanupGhostStudents();
     this.populateFilterDropdowns();
     this.renderStudentsTable();
 
@@ -20,6 +21,20 @@ class StudentsService {
       this.populateFilterDropdowns();
       this.renderStudentsTable();
     });
+  }
+
+  /**
+   * ล้างแถวว่าง หรือข้อมูลนักเรียนที่ไม่มีชื่อออกจากฐานข้อมูลโดยอัตโนมัติ
+   */
+  async cleanupGhostStudents() {
+    const students = db.get('students') || [];
+    const invalidStudents = students.filter(s => !s.name || s.name.trim() === '');
+    if (invalidStudents.length > 0) {
+      console.log(`🧹 ตรวจพบแถวว่างไม่มีชื่อ ${invalidStudents.length} รายการ กำลังล้างข้อมูลขยะอัตโนมัติ...`);
+      for (const inv of invalidStudents) {
+        await db.deleteItem('students', inv.id);
+      }
+    }
   }
 
   populateFilterDropdowns() {
@@ -553,7 +568,7 @@ class StudentsService {
     for (let i = 1; i < lines.length; i++) {
       const line = lines[i];
       const values = line.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g) || line.split(',');
-      if (values.length === 0) continue;
+      if (!values || values.length === 0) continue;
 
       const cleanValues = values.map(v => v ? v.trim().replace(/^["']|["']$/g, '') : '');
       const row = {};
@@ -561,14 +576,20 @@ class StudentsService {
         row[h] = cleanValues[idx] || '';
       });
 
-      // Match flexibly by exact Thai names or common aliases
-      const number = row['เลขที่'] || row['number'] || row['no'] || `${i}`;
-      const studentId = row['รหัสประจำตัว'] || row['รหัสประจำ'] || row['รหัสนักเรียน'] || row['student_id'] || row['id'] || `501${i.toString().padStart(2, '0')}`;
+      // ชื่อ-สกุล
       const name = row['ชื่อ-สกุล'] || row['ชื่อ - สกุล'] || row['ชื่อ_สกุล'] || row['ชื่อ'] || row['name'] || '';
-      const levelRaw = row['ระดับชั้น'] || row['ระดับชั้น/ห้อง'] || row['ชั้น'] || row['grade_level'] || 'ม.4/1';
+      const studentId = row['รหัสประจำตัว'] || row['รหัสประจำ'] || row['รหัสนักเรียน'] || row['student_id'] || row['id'] || '';
+
+      // สำคัญมาก: หากไม่มีชื่อ-สกุล (เป็นแถวว่างท้ายตาราง Excel) ให้ข้ามทันที ไม่สร้างข้อมูลขยะ
+      if (!name || name.trim() === '') {
+        continue;
+      }
+
+      const number = row['เลขที่'] || row['number'] || row['no'] || `${result.length + 1}`;
+      const levelRaw = row['ระดับชั้น'] || row['ระดับชั้น/ห้อง'] || row['ชั้น'] || row['grade_level'] || '';
       const advisor = row['ครูที่ปรึกษา'] || row['ที่ปรึกษา'] || row['advisor'] || '';
 
-      // Parse gradeLevel and room
+      // แยกชั้นและห้อง
       let gradeLevel = levelRaw;
       let room = "1";
       if (levelRaw.includes('/')) {
@@ -578,14 +599,14 @@ class StudentsService {
       }
 
       result.push({
-        id: `s_${Date.now()}_${i}`,
-        studentId: studentId,
-        number: number,
+        id: `s_${Date.now()}_${i}_${Math.random().toString(36).substr(2, 4)}`,
+        studentId: studentId ? studentId.trim() : `STD${i}`,
+        number: number.trim(),
         prefix: "",
-        name: name,
-        gradeLevel: gradeLevel,
-        room: room,
-        advisor: advisor,
+        name: name.trim(),
+        gradeLevel: gradeLevel.trim(),
+        room: room.trim(),
+        advisor: advisor.trim(),
         phone: ""
       });
     }

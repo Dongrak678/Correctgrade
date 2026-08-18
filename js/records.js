@@ -630,14 +630,18 @@ class RecordsService {
         row[h] = cleanValues[idx] || '';
       });
 
+      const studentName = row.student_name || row['ชื่อ-สกุล'] || row['ชื่อ'] || '';
+      const subjectCode = row.subject_code || row['รหัสวิชา'] || '';
+      if (!studentName && !subjectCode) continue;
+
       result.push({
-        id: `rec_${Date.now()}_${i}`,
+        id: `rec_${Date.now()}_${i}_${Math.random().toString(36).substr(2, 4)}`,
         studentId: row.student_id || row['รหัสนักเรียน'] || '',
-        studentName: row.student_name || row['ชื่อ-สกุล'] || row['ชื่อ'] || '',
+        studentName: studentName.trim(),
         gradeLevel: row.grade_level || row['ระดับชั้น'] || 'ม.4',
         room: row.room || row['ห้อง'] || '1',
-        subjectCode: row.subject_code || row['รหัสวิชา'] || '',
-        subjectName: row.subject_name || row['ชื่อวิชา'] || '',
+        subjectCode: subjectCode.trim(),
+        subjectName: (row.subject_name || row['ชื่อวิชา'] || '').trim(),
         conditionType: (row.condition_type || row['เกรด'] || '0').toUpperCase().replace('O', '0'),
         teacherName: row.teacher_name || row['ครูผู้สอน'] || 'ครูผู้สอน',
         learningArea: row.learning_area || row['กลุ่มสาระ'] || APP_CONFIG.LEARNING_AREAS[0],

@@ -427,6 +427,9 @@ class TeachersService {
         row[h] = cleanValues[idx] || '';
       });
 
+      const name = row.name || row['ชื่อ-สกุล'] || row['ชื่อ'] || '';
+      if (!name || name.trim() === '') continue;
+
       // parse subjects
       const subjectsStr = row.subjects || row['รายวิชา'] || '';
       const subjects = subjectsStr.split(';').filter(Boolean).map(s => {
@@ -435,9 +438,9 @@ class TeachersService {
       });
 
       result.push({
-        id: `t_${Date.now()}_${i}`,
+        id: `t_${Date.now()}_${i}_${Math.random().toString(36).substr(2, 4)}`,
         teacherId: row.teacher_id || row['รหัสครู'] || `T${100 + i}`,
-        name: row.name || row['ชื่อ-สกุล'] || row['ชื่อ'] || '',
+        name: name.trim(),
         learningArea: row.learning_area || row['กลุ่มสาระ'] || APP_CONFIG.LEARNING_AREAS[0],
         phone: row.phone || row['เบอร์โทร'] || '',
         email: row.email || row['อีเมล'] || '',
