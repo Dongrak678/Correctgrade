@@ -20,8 +20,8 @@
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
   <!-- Application Stylesheets (with cache busting) -->
-  <link rel="stylesheet" href="css/main.css?v=2.1.0">
-  <link rel="stylesheet" href="css/components.css?v=2.1.0">
+  <link rel="stylesheet" href="css/main.css?v=2.2.0">
+  <link rel="stylesheet" href="css/components.css?v=2.2.0">
 </head>
 <body>
 
@@ -258,11 +258,11 @@
              =================================================================== -->
         <section id="view-dashboard" class="app-view-panel active">
           
-          <!-- Executive Welcome & Live Status Hero Header -->
+          <!-- 1. Executive Welcome & Live Status Hero Header -->
           <div class="dashboard-hero-card">
             <div class="hero-left">
               <div class="hero-avatar-icon">
-                <i class="fas fa-chart-line"></i>
+                <i class="fas fa-chart-pie"></i>
               </div>
               <div class="hero-text-group">
                 <div class="hero-badge-row">
@@ -272,6 +272,9 @@
                   <span class="hero-academic-pill" id="dashboard-hero-term">ปีการศึกษา 2569 ภาคเรียนที่ 1</span>
                   <span class="hero-date-pill" id="dashboard-hero-date">
                     <i class="far fa-calendar-alt"></i> วันนี้
+                  </span>
+                  <span class="hero-clock-pill" id="dashboard-hero-clock">
+                    <i class="far fa-clock"></i> 00:00:00
                   </span>
                 </div>
                 <h2 id="dashboard-welcome-heading">ศูนย์ติดตามและวิเคราะห์ผลการเรียน</h2>
@@ -291,7 +294,26 @@
             </div>
           </div>
 
-          <!-- 6 High-Impact KPI Metric Cards Grid -->
+          <!-- 2. Smart Executive Insights & Quick Stats Banner -->
+          <div id="dashboard-smart-insights" class="dashboard-insights-card">
+            <div class="insights-icon">
+              <i class="fas fa-lightbulb"></i>
+            </div>
+            <div class="insights-content">
+              <div class="insights-title">
+                <strong>บทวิเคราะห์และข้อเสนอแนะเชิงบริหาร (Executive Insights):</strong>
+              </div>
+              <p id="dashboard-insights-text" class="insights-text">
+                กำลังวิเคราะห์ข้อมูลผลการเรียนล่าสุด...
+              </p>
+            </div>
+            <div class="insights-metric-chip" id="dashboard-insights-chip">
+              <span class="chip-label">ความคืบหน้ารวม</span>
+              <strong id="dashboard-insights-rate" class="chip-val">0%</strong>
+            </div>
+          </div>
+
+          <!-- 3. 6 High-Impact KPI Metric Cards Grid -->
           <div class="kpi-grid">
             <!-- Card 1: ติด 0 -->
             <div class="kpi-card kpi-red" onclick="dashboardService.filterToRecords('0')" title="คลิกเพื่อดูรายการติด 0 ทั้งหมด">
@@ -390,7 +412,7 @@
             </div>
           </div>
 
-          <!-- Workflow Progression Funnel Section -->
+          <!-- 4. Workflow Progression Funnel Section -->
           <div class="workflow-funnel-card">
             <div class="funnel-header">
               <div class="funnel-title-group">
@@ -445,7 +467,7 @@
             </div>
           </div>
 
-          <!-- Charts Grid -->
+          <!-- 5. Charts Grid -->
           <div class="charts-grid">
             <!-- Left Chart: Bar Chart by Grade Level -->
             <div class="dashboard-card">
@@ -490,7 +512,7 @@
             </div>
           </div>
 
-          <!-- Analytical Breakdown & Live Activity Row (Side by Side) -->
+          <!-- 6. Analytical Breakdown & Live Activity Row (Side by Side) -->
           <div class="dashboard-bottom-grid">
             <!-- Left Card: Top 5 Condition Subjects -->
             <div class="dashboard-card">
@@ -529,6 +551,7 @@
           </div>
 
         </section>
+
 
 
         <!-- ===================================================================
@@ -1029,19 +1052,19 @@
   <div id="toast-container" class="toast-container"></div>
 
   <!-- Application Scripts (Loaded with Cache Busting) -->
-  <script src="js/config.js?v=2.0.0"></script>
-  <script src="js/firebase-service.js?v=2.0.0"></script>
-  <script src="js/cloudinary-service.js?v=2.0.0"></script>
-  <script src="js/auth.js?v=2.0.0"></script>
-  <script src="js/dashboard.js?v=2.1.0"></script>
-  <script src="js/workflow.js?v=2.0.0"></script>
-  <script src="js/records.js?v=2.0.0"></script>
-  <script src="js/audit.js?v=2.0.0"></script>
-  <script src="js/teachers.js?v=2.0.0"></script>
-  <script src="js/students.js?v=2.0.0"></script>
-  <script src="js/users.js?v=2.0.0"></script>
-  <script src="js/export-engine.js?v=2.0.0"></script>
-  <script src="js/app.js?v=2.0.0"></script>
+  <script src="js/config.js?v=2.2.0"></script>
+  <script src="js/firebase-service.js?v=2.2.0"></script>
+  <script src="js/cloudinary-service.js?v=2.2.0"></script>
+  <script src="js/auth.js?v=2.2.0"></script>
+  <script src="js/dashboard.js?v=2.2.0"></script>
+  <script src="js/workflow.js?v=2.2.0"></script>
+  <script src="js/records.js?v=2.2.0"></script>
+  <script src="js/audit.js?v=2.2.0"></script>
+  <script src="js/teachers.js?v=2.2.0"></script>
+  <script src="js/students.js?v=2.2.0"></script>
+  <script src="js/users.js?v=2.2.0"></script>
+  <script src="js/export-engine.js?v=2.2.0"></script>
+  <script src="js/app.js?v=2.2.0"></script>
 
   <script>
     // Tab role switcher helper in login view

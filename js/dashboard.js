@@ -9,11 +9,14 @@ class DashboardService {
     this.donutChartInstance = null;
     this.chartLevelGroup = 'all'; // 'all', 'lower', 'upper'
     this.activityFilter = 'all';   // 'all', 'approval', 'submission', 'request'
+    this.clockInterval = null;
   }
 
   init(isManualRefresh = false) {
+    this.startLiveClock();
     this.renderHero();
     this.renderKPIs();
+    this.renderInsights();
     this.renderFunnel();
     this.renderCharts();
     this.renderTopSubjects();
@@ -23,6 +26,7 @@ class DashboardService {
     if (!this._subscribed) {
       db.subscribe('records', () => {
         this.renderKPIs();
+        this.renderInsights();
         this.renderFunnel();
         this.renderCharts();
         this.renderTopSubjects();
@@ -37,6 +41,26 @@ class DashboardService {
     if (isManualRefresh && typeof app !== 'undefined' && app.showToast) {
       app.showToast('อัปเดตสถิติแดชบอร์ดล่าสุดสำเร็จ', 'success');
     }
+  }
+
+  /**
+   * นาฬิกาแสดงเวลาจริงแบบเรียลไทม์ (Live Clock)
+   */
+  startLiveClock() {
+    if (this.clockInterval) clearInterval(this.clockInterval);
+
+    const updateClock = () => {
+      const clockEl = document.getElementById('dashboard-hero-clock');
+      if (!clockEl) return;
+      const now = new Date();
+      const hh = String(now.getHours()).padStart(2, '0');
+      const mm = String(now.getMinutes()).padStart(2, '0');
+      const ss = String(now.getSeconds()).padStart(2, '0');
+      clockEl.innerHTML = `<i class="far fa-clock"></i> ${hh}:${mm}:${ss} น.`;
+    };
+
+    updateClock();
+    this.clockInterval = setInterval(updateClock, 1000);
   }
 
   /**
@@ -78,14 +102,20 @@ class DashboardService {
     }
 
     if (currentUser && headingEl) {
+      const hour = new Date().getHours();
+      let timeGreeting = 'สวัสดี';
+      if (hour < 12) timeGreeting = 'อรุณสวัสดิ์';
+      else if (hour < 17) timeGreeting = 'สวัสดีตอนบ่าย';
+      else timeGreeting = 'สวัสดีตอนเย็น';
+
       if (currentUser.role === APP_CONFIG.ROLES.STUDENT) {
-        headingEl.innerHTML = `ยินดีต้อนรับ, ${this.escapeHtml(currentUser.name)} 🎓`;
+        headingEl.innerHTML = `${timeGreeting}, ${this.escapeHtml(currentUser.name)} 🎓`;
         if (subEl) subEl.innerText = `ติดตามผลการเรียน 0, ร, มส และยื่นคำร้องขอแก้ไขผลการเรียนของตนเอง`;
       } else if (currentUser.role === APP_CONFIG.ROLES.TEACHER) {
-        headingEl.innerHTML = `ยินดีต้อนรับ, ${this.escapeHtml(currentUser.name)} 👨‍🏫`;
+        headingEl.innerHTML = `${timeGreeting}, ${this.escapeHtml(currentUser.name)} 👨‍🏫`;
         if (subEl) subEl.innerText = `ภาพรวมนักเรียนที่ติดเงื่อนไขในรายวิชาที่สอน และความคืบหน้าการส่งงาน`;
       } else {
-        headingEl.innerHTML = `ศูนย์บัญชาการและวิเคราะห์ผลการเรียน 👑`;
+        headingEl.innerHTML = `${timeGreeting}, ศูนย์บัญชาการและวิเคราะห์ผลการเรียน 👑`;
         if (subEl) subEl.innerText = `สรุปภาพรวมสถิตินักเรียนติด 0, ร, มส และติดตามกระบวนการแก้ผลการเรียนทั้งระบบ`;
       }
     }
@@ -109,6 +139,78 @@ class DashboardService {
       }
     }
     return records;
+  }
+
+  /**
+   * ประมวลผลและแสดง Smart Executive Insights Card
+   */
+  renderInsights() {
+    const textEl = document.getElementById('dashboard-insights-text');
+    const rateEl = document.getElementById('dashboard-insights-rate');
+    if (!textEl) return;
+
+    const records = this.getDashboardRecords();
+    const total = records.length;
+
+    if (total === 0) {
+      textEl.innerHTML = `🌟 <strong>ยอดเยี่ยมมาก!</strong> ขณะนี้ไม่มีรายการผลการเรียนที่ติดเงื่อนไข 0, ร, มส ในระบบ`;
+      if (rateEl) rateEl.innerText = '100%';
+      return;
+    }
+
+    let countApproved = 0;
+    let countPending = 0;
+    let countInReview = 0;
+    const gradeLevelMap = {};
+    const subjectMap = {};
+
+    records.forEach(r => {
+      if (r.status === 'approved') countApproved++;
+      else if (r.status === 'pending_request' || !r.status) countPending++;
+      else countInReview++;
+
+      const lvl = (r.gradeLevel || 'ไม่ระบุ').trim();
+      gradeLevelMap[lvl] = (gradeLevelMap[lvl] || 0) + 1;
+
+      const sub = (r.subjectCode || '').trim();
+      if (sub) subjectMap[sub] = (subjectMap[sub] || 0) + 1;
+    });
+
+    const passRate = Math.round((countApproved / total) * 100);
+    if (rateEl) rateEl.innerText = `${passRate}%`;
+
+    // หาชั้นที่มีจำนวนติดสูงสุด
+    let topLevel = '-';
+    let topLevelCount = 0;
+    Object.entries(gradeLevelMap).forEach(([lvl, count]) => {
+      if (count > topLevelCount) {
+        topLevelCount = count;
+        topLevel = lvl;
+      }
+    });
+
+    // หาวิชาที่ติดสูงสุด
+    let topSubject = '-';
+    let topSubCount = 0;
+    Object.entries(subjectMap).forEach(([sub, count]) => {
+      if (count > topSubCount) {
+        topSubCount = count;
+        topSubject = sub;
+      }
+    });
+
+    let insightHTML = `📌 <strong>สถานะปัจจุบัน:</strong> แก้ไขผ่านแล้ว <b>${countApproved}/${total} รายการ (${passRate}%)</b>`;
+    if (countPending > 0) {
+      insightHTML += ` · มีรายการ <span class="text-red-600 font-bold">รอยื่นคำร้อง ${countPending} รายการ</span> (ระดับชั้น ${topLevel})`;
+    }
+    if (countInReview > 0) {
+      insightHTML += ` · อยู่ระหว่างส่งตรวจ/มอบหมาย <b>${countInReview} รายการ</b>`;
+    }
+    if (topSubject !== '-') {
+      insightHTML += ` · รายวิชาที่ติดเงื่อนไขสูงสุดคือ <b>${topSubject}</b> (${topSubCount} คน)`;
+    }
+
+    textEl.innerHTML = insightHTML;
   }
 
   /**
@@ -279,11 +381,11 @@ class DashboardService {
     const levelDataMS = levels.map(lvl => records.filter(r => (r.gradeLevel || '').startsWith(lvl) && r.conditionType === 'มส').length);
 
     // วาด Bar Chart
-    const barCtx = document.getElementById('dashboard-bar-chart');
-    if (barCtx) {
+    const barCanvas = document.getElementById('dashboard-bar-chart');
+    if (barCanvas) {
       if (this.barChartInstance) this.barChartInstance.destroy();
 
-      this.barChartInstance = new Chart(barCtx, {
+      this.barChartInstance = new Chart(barCanvas, {
         type: 'bar',
         data: {
           labels: levels,
@@ -414,11 +516,11 @@ class DashboardService {
       `;
     }
 
-    const donutCtx = document.getElementById('dashboard-donut-chart');
-    if (donutCtx) {
+    const donutCanvas = document.getElementById('dashboard-donut-chart');
+    if (donutCanvas) {
       if (this.donutChartInstance) this.donutChartInstance.destroy();
 
-      this.donutChartInstance = new Chart(donutCtx, {
+      this.donutChartInstance = new Chart(donutCanvas, {
         type: 'doughnut',
         data: {
           labels: ['ยังไม่ยื่นคำร้อง', 'อยู่ระหว่างดำเนินการ / รอตรวจ', 'ผ่านการแก้ไขแล้ว'],
