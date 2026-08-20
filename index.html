@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ระบบติดตามแก้ไขผลการเรียน (0, ร, มส) - โรงเรียนดงรักวิทยา</title>
   
+  <!-- Website Favicon -->
+  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="apple-touch-icon" href="logo.png">
+
   <!-- Google Fonts: TH Sarabun -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,8 +24,8 @@
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
   <!-- Application Stylesheets (with cache busting) -->
-  <link rel="stylesheet" href="css/main.css?v=2.3.1">
-  <link rel="stylesheet" href="css/components.css?v=2.3.1">
+  <link rel="stylesheet" href="css/main.css?v=2.4.0">
+  <link rel="stylesheet" href="css/components.css?v=2.4.0">
 </head>
 <body>
 
@@ -32,39 +36,51 @@
   </div>
 
   <!-- =========================================================================
-       1. LOGIN VIEW — Modern Split-Screen Design
+       1. LOGIN VIEW — Modern Futuristic Split-Screen Design with Light Beams
        ========================================================================= -->
   <div id="view-login" class="login-view-wrapper" style="display: none;">
 
-    <!-- Left Brand Panel -->
+    <!-- Left Brand Panel with Sweeping Light Beam -->
     <div class="login-brand-panel">
+      <!-- Animated Sweeping Light Laser Beam -->
+      <div class="light-beam-sweep"></div>
+
       <div class="login-brand-content">
-        <div class="login-brand-icon-wrap">
-          <i class="fas fa-graduation-cap" style="color:#ffffff;"></i>
+        <!-- Floating Logo with Radiant Glow Aura -->
+        <div class="login-brand-logo-card">
+          <div class="logo-glow-aura"></div>
+          <img src="logo.png" alt="โลโก้โรงเรียนดงรักวิทยา" class="login-brand-logo-img">
         </div>
+
         <h1>ระบบติดตามแก้ไขผลการเรียน</h1>
-        <p class="login-brand-subtitle">โรงเรียนดงรักวิทยา · ปีการศึกษา 2569</p>
+        <div class="login-brand-badge">
+          <i class="fas fa-school"></i>
+          <span>โรงเรียนดงรักวิทยา · ปีการศึกษา 2569</span>
+        </div>
 
         <ul class="login-brand-feature-list">
           <li>
             <i class="fas fa-tasks"></i>
-            <span>ติดตามผลการเรียน 0 / ร / มส แบบเรียลไทม์</span>
+            <span>ติดตามผลการเรียน 0 / ร / มส ครบวงจร 4 ขั้นตอน</span>
           </li>
           <li>
             <i class="fas fa-paper-plane"></i>
-            <span>นักเรียนยื่นคำร้องออนไลน์ได้ทุกที่ทุกเวลา</span>
+            <span>นักเรียนยื่นคำร้องออนไลน์ สะดวก รวดเร็ว ทุกที่ทุกเวลา</span>
           </li>
           <li>
             <i class="fas fa-chalkboard-teacher"></i>
-            <span>ครูผู้สอนมอบหมายงานและตรวจชิ้นงานออนไลน์</span>
+            <span>ครูผู้สอนมอบหมายงานและตรวจประเมินผลออนไลน์</span>
           </li>
           <li>
             <i class="fas fa-shield-alt"></i>
-            <span>ระบบล็อกอินแยกสิทธิ์ตามบทบาทผู้ใช้งาน</span>
+            <span>ระบบล็อกอินแยกสิทธิ์ผู้ใช้งาน (Student / Teacher / Admin)</span>
           </li>
         </ul>
 
-        <p class="login-brand-footer-text">ขับเคลื่อนด้วย Firebase Realtime Database · Cloudinary CDN</p>
+        <div class="login-tech-badge">
+          <i class="fas fa-check-circle text-emerald-400"></i>
+          <span>ระบบฐานข้อมูลเรียลไทม์ Realtime Database · ความปลอดภัยสูง</span>
+        </div>
       </div>
     </div>
 
@@ -72,9 +88,13 @@
     <div class="login-form-panel">
       <div class="login-form-inner">
 
-        <div class="login-form-logo">
-          <h2>เข้าสู่ระบบ</h2>
-          <p>เลือกประเภทผู้ใช้งานแล้วกรอกข้อมูลเพื่อเข้าสู่ระบบ</p>
+        <!-- Form Header with Mini Logo Emblem -->
+        <div class="login-form-header-badge">
+          <img src="logo.png" alt="Logo" class="login-form-mini-logo">
+          <div class="login-header-text">
+            <h2>เข้าสู่ระบบ</h2>
+            <p>ระบบติดตามแก้ไขผลการเรียน (0, ร, มส)</p>
+          </div>
         </div>
 
         <!-- Quick Role Switch Tabs -->
@@ -114,7 +134,7 @@
             </div>
           </div>
 
-          <button type="submit" id="btn-submit-login" class="btn btn-primary" style="width: 100%; padding: 11px; margin-top: 6px; font-size: 15px; border-radius: 8px;">
+          <button type="submit" id="btn-submit-login" class="btn-login-shine">
             <i class="fas fa-sign-in-alt"></i> เข้าสู่ระบบ
           </button>
         </form>
@@ -151,7 +171,7 @@
     <aside id="app-sidebar" class="sidebar">
       <div class="sidebar-header">
         <div class="sidebar-logo">
-          <i class="fas fa-graduation-cap"></i>
+          <img src="logo.png" alt="โลโก้โรงเรียนดงรักวิทยา" class="sidebar-logo-img">
         </div>
         <div class="sidebar-brand">
           <h2>ระบบติดตามผลการเรียน</h2>
@@ -1092,19 +1112,19 @@
   <div id="toast-container" class="toast-container"></div>
 
   <!-- Application Scripts (Loaded with Cache Busting) -->
-  <script src="js/config.js?v=2.3.1"></script>
-  <script src="js/firebase-service.js?v=2.3.1"></script>
-  <script src="js/cloudinary-service.js?v=2.3.1"></script>
-  <script src="js/auth.js?v=2.3.1"></script>
-  <script src="js/dashboard.js?v=2.3.1"></script>
-  <script src="js/workflow.js?v=2.3.1"></script>
-  <script src="js/records.js?v=2.3.1"></script>
-  <script src="js/audit.js?v=2.3.1"></script>
-  <script src="js/teachers.js?v=2.3.1"></script>
-  <script src="js/students.js?v=2.3.1"></script>
-  <script src="js/users.js?v=2.3.1"></script>
-  <script src="js/export-engine.js?v=2.3.1"></script>
-  <script src="js/app.js?v=2.3.1"></script>
+  <script src="js/config.js?v=2.4.0"></script>
+  <script src="js/firebase-service.js?v=2.4.0"></script>
+  <script src="js/cloudinary-service.js?v=2.4.0"></script>
+  <script src="js/auth.js?v=2.4.0"></script>
+  <script src="js/dashboard.js?v=2.4.0"></script>
+  <script src="js/workflow.js?v=2.4.0"></script>
+  <script src="js/records.js?v=2.4.0"></script>
+  <script src="js/audit.js?v=2.4.0"></script>
+  <script src="js/teachers.js?v=2.4.0"></script>
+  <script src="js/students.js?v=2.4.0"></script>
+  <script src="js/users.js?v=2.4.0"></script>
+  <script src="js/export-engine.js?v=2.4.0"></script>
+  <script src="js/app.js?v=2.4.0"></script>
 
   <script>
     // Tab role switcher helper in login view
