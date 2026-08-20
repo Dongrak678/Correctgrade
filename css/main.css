@@ -619,107 +619,163 @@ a:hover { color: var(--primary-dark); }
   100% { left: 220%; opacity: 0; }
 }
 
-/* --- Left Hero Brand Panel (Concept B) --- */
+/* --- Left Hero Brand Panel (Massive Logo & Academic Elegance) --- */
 .login-hero-left {
   flex: 1;
-  max-width: 480px;
+  max-width: 580px;
   position: relative;
   z-index: 10;
-  padding-right: 20px;
-  margin-top: -30px; /* Aligns neatly above 3D books & diploma */
+  padding-right: 30px;
+  margin-top: -20px;
+}
+
+.brand-hero-header-row {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  margin-bottom: 16px;
+}
+
+/* Massive Glowing 3D Emblem Halo Ring */
+.brand-emblem-glow-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.emblem-halo-ring {
+  position: relative;
+  width: 145px;
+  height: 145px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.98) 0%, rgba(224, 242, 254, 0.85) 60%, rgba(56, 189, 248, 0.35) 100%);
+  box-shadow: 
+    0 0 45px rgba(56, 189, 248, 0.6),
+    0 12px 28px rgba(14, 60, 140, 0.18),
+    inset 0 0 20px rgba(255, 255, 255, 1);
+  border: 3px solid rgba(255, 255, 255, 1);
+  animation: floatEmblem3D 4s ease-in-out infinite alternate;
+}
+
+@keyframes floatEmblem3D {
+  0% { transform: translateY(0) scale(1); }
+  100% { transform: translateY(-6px) scale(1.02); }
+}
+
+.brand-logo-emblem-b {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.15));
 }
 
 .brand-title-group-concept-b {
-  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
 }
 
 .brand-title-main {
-  font-size: 26px;
+  font-size: 28px;
   font-weight: 800;
-  color: #0b2565;
+  color: #082366;
   letter-spacing: -0.5px;
   margin: 0;
   line-height: 1.2;
-  text-shadow: 0 1px 4px rgba(255, 255, 255, 0.9);
+  text-shadow: 0 2px 10px rgba(255, 255, 255, 0.95);
 }
 
 .brand-school-name {
-  font-size: 22px;
+  font-size: 23px;
   font-weight: 800;
   color: #1d4ed8;
-  margin: 4px 0 0 0;
+  margin: 4px 0 6px 0;
   letter-spacing: -0.3px;
-  text-shadow: 0 1px 3px rgba(255, 255, 255, 0.8);
+  text-shadow: 0 1px 4px rgba(255, 255, 255, 0.85);
 }
 
-/* 4 Feature Badges Grid */
+.brand-tagline-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #1e3a8a;
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(8px);
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.08);
+}
+
+/* 4 Feature Glass Badges (2x2 Grid) */
 .brand-badges-grid-concept-b {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: 14px 0 18px 0;
-  max-width: 440px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 12px;
+  max-width: 520px;
 }
 
 .feature-badge-item {
   display: flex;
   align-items: center;
-  gap: 7px;
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 12.5px;
-  font-weight: 700;
-  color: #1e3a8a;
-  background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  gap: 10px;
+  padding: 9px 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.84);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   border: 1.5px solid rgba(255, 255, 255, 0.95);
-  box-shadow: 0 3px 10px rgba(37, 99, 235, 0.08);
-  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(15, 60, 140, 0.08);
+  transition: all 0.22s ease;
 }
 
 .feature-badge-item:hover {
   transform: translateY(-2px);
-  background: #ffffff;
-  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.16);
+  background: rgba(255, 255, 255, 0.96);
+  border-color: #ffffff;
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.16);
 }
 
-.feature-badge-item i {
-  color: #2563eb;
-  font-size: 14px;
-}
-
-/* Floating School Emblem with Glowing Cyan Halo Ring */
-.brand-emblem-glow-wrap {
-  display: flex;
-  align-items: center;
-  margin-top: 8px;
-}
-
-.emblem-halo-ring {
-  position: relative;
-  width: 140px;
-  height: 140px;
-  border-radius: 50%;
+.badge-icon-wrap {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%);
+  color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.95) 0%, rgba(186, 230, 253, 0.6) 65%, rgba(56, 189, 248, 0.2) 100%);
-  box-shadow: 0 0 35px rgba(56, 189, 248, 0.45), inset 0 0 15px rgba(255, 255, 255, 0.9);
-  border: 2.5px solid rgba(255, 255, 255, 0.95);
-  animation: floatSubtle 4s ease-in-out infinite alternate;
+  font-size: 13px;
+  flex-shrink: 0;
+  box-shadow: 0 3px 8px rgba(37, 99, 235, 0.3);
 }
 
-@keyframes floatSubtle {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(-5px); }
+.badge-text-wrap {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 
-.brand-logo-emblem-b {
-  width: 100px;
-  height: 100px;
-  object-fit: contain;
-  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.12));
+.badge-text-wrap strong {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #0f2b7a;
+  line-height: 1.2;
+}
+
+.badge-text-wrap span {
+  font-size: 11px;
+  color: #4b6b94;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* --- Right Glassmorphism Card (Concept B Daylight Ethereal) --- */

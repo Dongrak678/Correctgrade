@@ -24,8 +24,8 @@
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
   <!-- Application Stylesheets (with cache busting) -->
-  <link rel="stylesheet" href="css/main.css?v=3.2.0">
-  <link rel="stylesheet" href="css/components.css?v=3.2.0">
+  <link rel="stylesheet" href="css/main.css?v=3.3.0">
+  <link rel="stylesheet" href="css/components.css?v=3.3.0">
 </head>
 <body>
 
@@ -38,46 +38,64 @@
   <!-- =========================================================================
        1. LOGIN VIEW — Concept B: Bright Royal Sky & Daylight Ethereal
        ========================================================================= -->
-  <div id="view-login" class="login-view-wrapper" style="display: none; background-image: url('login-bg.jpg?v=3.1.0'); background-size: cover; background-position: center center; background-repeat: no-repeat;">
+  <div id="view-login" class="login-view-wrapper" style="display: none; background-image: url('login-bg.jpg?v=3.3.0'); background-size: cover; background-position: center center; background-repeat: no-repeat;">
 
     <!-- Atmospheric Overlay & Sweep Light -->
     <div class="login-bg-mesh">
       <div class="light-beam-sweep"></div>
     </div>
 
-    <!-- Left Hero Brand Panel (Concept B) -->
+    <!-- Left Hero Brand Panel with Massive Logo Emblem -->
     <div class="login-hero-left">
       
-      <!-- Brand Titles in Deep Royal Navy -->
-      <div class="brand-title-group-concept-b">
-        <h1 class="brand-title-main">ระบบติดตามแก้ไขผลการเรียน</h1>
-        <h2 class="brand-school-name">โรงเรียนดงรักวิทยา</h2>
+      <!-- Brand Emblem & Title Header Row -->
+      <div class="brand-hero-header-row">
+        <!-- Floating School Emblem with Glowing Cyan Halo Ring (Massive Size) -->
+        <div class="brand-emblem-glow-wrap">
+          <div class="emblem-halo-ring">
+            <img src="logo.png?v=3.3.0" alt="โลโก้โรงเรียนดงรักวิทยา" class="brand-logo-emblem-b">
+          </div>
+        </div>
+
+        <!-- Brand Titles in Deep Royal Navy -->
+        <div class="brand-title-group-concept-b">
+          <h1 class="brand-title-main">ระบบติดตามแก้ไขผลการเรียน</h1>
+          <h2 class="brand-school-name">โรงเรียนดงรักวิทยา</h2>
+          <div class="brand-tagline-pill">
+            <i class="fas fa-sparkles text-amber-400"></i> ติดตามผลการเรียน แก้ไขให้ถูกต้อง เพื่ออนาคตทางการศึกษา
+          </div>
+        </div>
       </div>
 
-      <!-- Feature Badges Grid (4 Badges with Checkmarks) -->
+      <!-- Feature Badges Grid (4 Glassmorphic Cards) -->
       <div class="brand-badges-grid-concept-b">
         <div class="feature-badge-item">
-          <i class="fas fa-check-circle"></i>
-          <span>ติดตามผลการเรียน</span>
+          <div class="badge-icon-wrap"><i class="fas fa-chart-line"></i></div>
+          <div class="badge-text-wrap">
+            <strong>ติดตามผลการเรียน</strong>
+            <span>ตรวจสอบผลการเรียน สะดวก รวดเร็ว</span>
+          </div>
         </div>
         <div class="feature-badge-item">
-          <i class="fas fa-check-circle"></i>
-          <span>ยื่นขอแก้ไขผลการเรียน</span>
+          <div class="badge-icon-wrap"><i class="fas fa-edit"></i></div>
+          <div class="badge-text-wrap">
+            <strong>ยื่นขอแก้ผลการเรียน</strong>
+            <span>ยื่นคำร้อง 0 / ร / มส ออนไลน์</span>
+          </div>
         </div>
         <div class="feature-badge-item">
-          <i class="fas fa-check-circle"></i>
-          <span>แจ้งเตือนสถานะคำร้อง</span>
+          <div class="badge-icon-wrap"><i class="fas fa-bell"></i></div>
+          <div class="badge-text-wrap">
+            <strong>แจ้งเตือนสถานะ</strong>
+            <span>อัปเดตความคืบหน้าแบบเรียลไทม์</span>
+          </div>
         </div>
         <div class="feature-badge-item">
-          <i class="fas fa-check-circle"></i>
-          <span>ใช้งานสะดวก ปลอดภัย</span>
-        </div>
-      </div>
-
-      <!-- Floating School Emblem with Glowing Cyan Halo Ring -->
-      <div class="brand-emblem-glow-wrap">
-        <div class="emblem-halo-ring">
-          <img src="logo.png?v=3.1.0" alt="โลโก้โรงเรียนดงรักวิทยา" class="brand-logo-emblem-b">
+          <div class="badge-icon-wrap"><i class="fas fa-shield-alt"></i></div>
+          <div class="badge-text-wrap">
+            <strong>ความปลอดภัย 100%</strong>
+            <span>รักษาความลับข้อมูลนักเรียนทุกคน</span>
+          </div>
         </div>
       </div>
 
@@ -1170,19 +1188,19 @@
   <div id="toast-container" class="toast-container"></div>
 
   <!-- Application Scripts (Loaded with Cache Busting) -->
-  <script src="js/config.js?v=3.2.0"></script>
-  <script src="js/firebase-service.js?v=3.2.0"></script>
-  <script src="js/cloudinary-service.js?v=3.2.0"></script>
-  <script src="js/auth.js?v=3.2.0"></script>
-  <script src="js/dashboard.js?v=3.2.0"></script>
-  <script src="js/workflow.js?v=3.2.0"></script>
-  <script src="js/records.js?v=3.2.0"></script>
-  <script src="js/audit.js?v=3.2.0"></script>
-  <script src="js/teachers.js?v=3.2.0"></script>
-  <script src="js/students.js?v=3.2.0"></script>
-  <script src="js/users.js?v=3.2.0"></script>
-  <script src="js/export-engine.js?v=3.2.0"></script>
-  <script src="js/app.js?v=3.2.0"></script>
+  <script src="js/config.js?v=3.3.0"></script>
+  <script src="js/firebase-service.js?v=3.3.0"></script>
+  <script src="js/cloudinary-service.js?v=3.3.0"></script>
+  <script src="js/auth.js?v=3.3.0"></script>
+  <script src="js/dashboard.js?v=3.3.0"></script>
+  <script src="js/workflow.js?v=3.3.0"></script>
+  <script src="js/records.js?v=3.3.0"></script>
+  <script src="js/audit.js?v=3.3.0"></script>
+  <script src="js/teachers.js?v=3.3.0"></script>
+  <script src="js/students.js?v=3.3.0"></script>
+  <script src="js/users.js?v=3.3.0"></script>
+  <script src="js/export-engine.js?v=3.3.0"></script>
+  <script src="js/app.js?v=3.3.0"></script>
 
   <script>
     // Tab role switcher helper in login view
