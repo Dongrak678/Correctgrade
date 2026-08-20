@@ -561,7 +561,7 @@ a:hover { color: var(--primary-dark); }
 }
 
 /* ==========================================================================
-   LOGIN PAGE — Modern Academic Ethereal Glassmorphism (Fit Screen 100vh)
+   LOGIN PAGE — Concept B: Bright Royal Sky & Daylight Ethereal
    ========================================================================== */
 .login-view-wrapper {
   height: 100vh;
@@ -570,8 +570,8 @@ a:hover { color: var(--primary-dark); }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: #0c2b74;
-  background-image: url('../login-bg.jpg?v=2.9.0');
+  background-color: #dbeafe;
+  background-image: url('../login-bg.jpg?v=3.1.0');
   background-position: center center;
   background-size: cover;
   background-repeat: no-repeat;
@@ -588,7 +588,7 @@ a:hover { color: var(--primary-dark); }
   pointer-events: none;
   overflow: hidden;
   z-index: 1;
-  background: radial-gradient(circle at 75% 50%, rgba(255, 255, 255, 0.08) 0%, transparent 60%);
+  background: radial-gradient(circle at 75% 50%, rgba(255, 255, 255, 0.15) 0%, transparent 60%);
 }
 
 /* Light Laser Beam Sweep */
@@ -601,9 +601,9 @@ a:hover { color: var(--primary-dark); }
   background: linear-gradient(
     60deg,
     transparent 0%,
-    rgba(255, 255, 255, 0.02) 30%,
-    rgba(255, 255, 255, 0.3) 50%,
-    rgba(147, 197, 253, 0.18) 55%,
+    rgba(255, 255, 255, 0.05) 30%,
+    rgba(255, 255, 255, 0.4) 50%,
+    rgba(186, 230, 253, 0.25) 55%,
     transparent 70%
   );
   transform: rotate(25deg);
@@ -619,123 +619,110 @@ a:hover { color: var(--primary-dark); }
   100% { left: 220%; opacity: 0; }
 }
 
-/* --- Left Hero Brand Panel --- */
+/* --- Left Hero Brand Panel (Concept B) --- */
 .login-hero-left {
   flex: 1;
   max-width: 480px;
   position: relative;
   z-index: 10;
-  color: #ffffff;
   padding-right: 20px;
-  margin-top: -30px; /* Aligns neatly above the 3D laptop/books on background */
+  margin-top: -30px; /* Aligns neatly above 3D books & diploma */
 }
 
-.brand-header-box {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+.brand-title-group-concept-b {
   margin-bottom: 12px;
 }
 
-.brand-logo-emblem {
-  width: 50px;
-  height: 50px;
-  object-fit: contain;
-  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.35));
+.brand-title-main {
+  font-size: 26px;
+  font-weight: 800;
+  color: #0b2565;
+  letter-spacing: -0.5px;
+  margin: 0;
+  line-height: 1.2;
+  text-shadow: 0 1px 4px rgba(255, 255, 255, 0.9);
+}
+
+.brand-school-name {
+  font-size: 22px;
+  font-weight: 800;
+  color: #1d4ed8;
+  margin: 4px 0 0 0;
+  letter-spacing: -0.3px;
+  text-shadow: 0 1px 3px rgba(255, 255, 255, 0.8);
+}
+
+/* 4 Feature Badges Grid */
+.brand-badges-grid-concept-b {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 14px 0 18px 0;
+  max-width: 440px;
+}
+
+.feature-badge-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #1e3a8a;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1.5px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 0 3px 10px rgba(37, 99, 235, 0.08);
+  transition: all 0.2s ease;
+}
+
+.feature-badge-item:hover {
+  transform: translateY(-2px);
+  background: #ffffff;
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.16);
+}
+
+.feature-badge-item i {
+  color: #2563eb;
+  font-size: 14px;
+}
+
+/* Floating School Emblem with Glowing Cyan Halo Ring */
+.brand-emblem-glow-wrap {
+  display: flex;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.emblem-halo-ring {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.95) 0%, rgba(186, 230, 253, 0.6) 65%, rgba(56, 189, 248, 0.2) 100%);
+  box-shadow: 0 0 35px rgba(56, 189, 248, 0.45), inset 0 0 15px rgba(255, 255, 255, 0.9);
+  border: 2.5px solid rgba(255, 255, 255, 0.95);
   animation: floatSubtle 4s ease-in-out infinite alternate;
 }
 
 @keyframes floatSubtle {
   0% { transform: translateY(0); }
-  100% { transform: translateY(-4px); }
+  100% { transform: translateY(-5px); }
 }
 
-.brand-header-text h1, .brand-header-text h2 {
-  font-size: 20px;
-  font-weight: 800;
-  color: #ffffff;
-  line-height: 1.2;
-  margin: 0;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+.brand-logo-emblem-b {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.12));
 }
 
-.brand-header-text p {
-  font-size: 13.5px;
-  color: #bfdbfe;
-  margin: 2px 0 0 0;
-  font-weight: 600;
-}
-
-.brand-tagline {
-  font-size: 15px;
-  font-weight: 700;
-  line-height: 1.4;
-  color: #ffffff;
-  margin-bottom: 14px;
-  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
-}
-
-.brand-tagline span {
-  color: #93c5fd;
-}
-
-/* 3 Feature Pills (Compact) */
-.brand-features-vertical {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 10px;
-}
-
-.brand-feature-pill {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: rgba(255, 255, 255, 0.09);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 12px;
-  padding: 7px 12px;
-  transition: all 0.2s ease;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
-}
-
-.brand-feature-pill:hover {
-  background: rgba(255, 255, 255, 0.16);
-  border-color: rgba(255, 255, 255, 0.35);
-  transform: translateX(4px);
-}
-
-.feature-icon-circle {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0.1) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 13px;
-  color: #ffffff;
-  flex-shrink: 0;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
-}
-
-.feature-info-text strong {
-  display: block;
-  font-size: 13px;
-  font-weight: 700;
-  color: #ffffff;
-}
-
-.feature-info-text p {
-  font-size: 11.5px;
-  color: rgba(255, 255, 255, 0.85);
-  margin: 1px 0 0 0;
-}
-
-/* --- Right Glassmorphism Card (Ultra Frosted Translucent Glass) --- */
+/* --- Right Glassmorphism Card (Concept B Daylight Ethereal) --- */
 .login-form-wrapper-right {
   position: relative;
   z-index: 10;
@@ -746,15 +733,15 @@ a:hover { color: var(--primary-dark); }
 .login-glass-card {
   width: 410px;
   max-width: 100%;
-  background: rgba(255, 255, 255, 0.42);
-  backdrop-filter: blur(28px) saturate(190%);
-  -webkit-backdrop-filter: blur(28px) saturate(190%);
-  border-radius: 26px;
-  border: 1.5px solid rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border-radius: 24px;
+  border: 1.5px solid rgba(255, 255, 255, 0.95);
   box-shadow: 
-    0 25px 50px rgba(10, 41, 122, 0.18),
-    inset 0 1px 1px rgba(255, 255, 255, 0.95),
-    0 0 25px rgba(255, 255, 255, 0.35);
+    0 20px 45px rgba(15, 65, 150, 0.14),
+    inset 0 1px 2px rgba(255, 255, 255, 1),
+    0 0 25px rgba(255, 255, 255, 0.4);
   padding: 24px 28px;
   box-sizing: border-box;
 }
@@ -1102,11 +1089,15 @@ a:hover { color: var(--primary-dark); }
     max-width: 100%;
     margin-top: 0;
   }
-  .brand-header-box {
+  .brand-title-group-concept-b {
+    text-align: center;
+  }
+  .brand-badges-grid-concept-b {
     justify-content: center;
   }
-  .brand-features-vertical {
-    display: none;
+  .brand-emblem-glow-wrap {
+    justify-content: center;
+    margin-bottom: 12px;
   }
   .login-glass-card {
     width: 100%;

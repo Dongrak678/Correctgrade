@@ -24,8 +24,8 @@
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
   <!-- Application Stylesheets (with cache busting) -->
-  <link rel="stylesheet" href="css/main.css?v=3.0.0">
-  <link rel="stylesheet" href="css/components.css?v=3.0.0">
+  <link rel="stylesheet" href="css/main.css?v=3.2.0">
+  <link rel="stylesheet" href="css/components.css?v=3.2.0">
 </head>
 <body>
 
@@ -36,63 +36,48 @@
   </div>
 
   <!-- =========================================================================
-       1. LOGIN VIEW — Academic Ethereal Glassmorphism with Reference Background
+       1. LOGIN VIEW — Concept B: Bright Royal Sky & Daylight Ethereal
        ========================================================================= -->
-  <div id="view-login" class="login-view-wrapper" style="display: none; background-image: url('login-bg.jpg?v=3.0.0'); background-size: cover; background-position: center center; background-repeat: no-repeat;">
+  <div id="view-login" class="login-view-wrapper" style="display: none; background-image: url('login-bg.jpg?v=3.1.0'); background-size: cover; background-position: center center; background-repeat: no-repeat;">
 
     <!-- Atmospheric Overlay & Sweep Light -->
     <div class="login-bg-mesh">
       <div class="light-beam-sweep"></div>
     </div>
 
-    <!-- Left Hero Brand Panel -->
+    <!-- Left Hero Brand Panel (Concept B) -->
     <div class="login-hero-left">
       
-      <!-- Brand Header with School Logo -->
-      <div class="brand-header-box">
-        <img src="logo.png?v=2.8.0" alt="โลโก้โรงเรียนดงรักวิทยา" class="brand-logo-emblem">
-        <div class="brand-header-text">
-          <h1>ระบบติดตามแก้ไขผลการเรียน</h1>
-          <p>โรงเรียนดงรักวิทยา</p>
+      <!-- Brand Titles in Deep Royal Navy -->
+      <div class="brand-title-group-concept-b">
+        <h1 class="brand-title-main">ระบบติดตามแก้ไขผลการเรียน</h1>
+        <h2 class="brand-school-name">โรงเรียนดงรักวิทยา</h2>
+      </div>
+
+      <!-- Feature Badges Grid (4 Badges with Checkmarks) -->
+      <div class="brand-badges-grid-concept-b">
+        <div class="feature-badge-item">
+          <i class="fas fa-check-circle"></i>
+          <span>ติดตามผลการเรียน</span>
+        </div>
+        <div class="feature-badge-item">
+          <i class="fas fa-check-circle"></i>
+          <span>ยื่นขอแก้ไขผลการเรียน</span>
+        </div>
+        <div class="feature-badge-item">
+          <i class="fas fa-check-circle"></i>
+          <span>แจ้งเตือนสถานะคำร้อง</span>
+        </div>
+        <div class="feature-badge-item">
+          <i class="fas fa-check-circle"></i>
+          <span>ใช้งานสะดวก ปลอดภัย</span>
         </div>
       </div>
 
-      <!-- Tagline Text -->
-      <div class="brand-tagline">
-        ติดตามผลการเรียน แก้ไขให้ถูกต้อง<br>
-        <span>เพื่ออนาคตทางการศึกษาที่ดียิ่งขึ้น</span>
-      </div>
-
-      <!-- 3 Feature Highlight Pills -->
-      <div class="brand-features-vertical">
-        <div class="brand-feature-pill">
-          <div class="feature-icon-circle">
-            <i class="fas fa-chart-line"></i>
-          </div>
-          <div class="feature-info-text">
-            <strong>ติดตามผลการเรียน</strong>
-            <p>ตรวจสอบผลการเรียนของนักเรียน ได้อย่างสะดวก รวดเร็ว</p>
-          </div>
-        </div>
-
-        <div class="brand-feature-pill">
-          <div class="feature-icon-circle">
-            <i class="fas fa-edit"></i>
-          </div>
-          <div class="feature-info-text">
-            <strong>แก้ไขผลการเรียน</strong>
-            <p>ยื่นคำร้องขอแก้ไขผลการเรียน พร้อมติดตามสถานะการดำเนินการ</p>
-          </div>
-        </div>
-
-        <div class="brand-feature-pill">
-          <div class="feature-icon-circle">
-            <i class="fas fa-bell"></i>
-          </div>
-          <div class="feature-info-text">
-            <strong>แจ้งเตือนสถานะ</strong>
-            <p>รับการแจ้งเตือนเมื่อมีความคืบหน้าของคำร้อง</p>
-          </div>
+      <!-- Floating School Emblem with Glowing Cyan Halo Ring -->
+      <div class="brand-emblem-glow-wrap">
+        <div class="emblem-halo-ring">
+          <img src="logo.png?v=3.1.0" alt="โลโก้โรงเรียนดงรักวิทยา" class="brand-logo-emblem-b">
         </div>
       </div>
 
@@ -975,113 +960,154 @@
              VIEW 7: REPORTS & EXPORT ENGINE
              =================================================================== -->
         <section id="view-reports" class="app-view-panel">
-          <div class="page-header-banner">
-            <div class="page-title-group">
-              <h2><i class="fas fa-file-export text-indigo-600"></i> รายงานสรุปและการส่งออกข้อมูล (Reports & Export Engine)</h2>
-              <p>ส่งออกข้อมูลเป็นไฟล์ Excel, CSV หรือพิมพ์เอกสารสรุปผลการแก้เกรดมาตรฐานสถานศึกษา</p>
+          
+          <!-- Hero Header Banner with Badges -->
+          <div class="reports-hero-banner">
+            <div class="reports-title-wrap">
+              <div class="reports-hero-icon">
+                <i class="fas fa-file-export"></i>
+              </div>
+              <div class="reports-hero-text">
+                <h2>รายงานสรุปและการส่งออกข้อมูล (Reports & Export Engine)</h2>
+                <p>ส่งออกข้อมูลเป็นไฟล์ Excel, CSV หรือสั่งพิมพ์เอกสารสรุปผลการแก้ไขผลการเรียนมาตรฐานสถานศึกษา</p>
+              </div>
+            </div>
+            <div class="reports-badge-chips">
+              <span class="reports-chip"><i class="fas fa-check-circle text-emerald-400"></i> มาตรฐานราชการ</span>
+              <span class="reports-chip"><i class="fas fa-globe text-cyan-300"></i> UTF-8 BOM ภาษาไทย 100%</span>
+              <span class="reports-chip"><i class="fas fa-bolt text-amber-300"></i> ส่งออกใน 1 คลิก</span>
             </div>
           </div>
 
-          <div class="teachers-grid">
-            <!-- Card 1: Official Print Document -->
-            <div class="teacher-card">
-              <div class="teacher-card-header">
-                <div class="teacher-avatar" style="background: #fee2e2; color: #dc2626;">
+          <!-- 4 Colorful Modern Cards Grid -->
+          <div class="reports-grid-modern">
+            
+            <!-- Card 1: Official Print Document (Rose Theme) -->
+            <div class="report-card-modern theme-rose">
+              <div class="report-card-header">
+                <div class="report-card-avatar">
                   <i class="fas fa-print"></i>
                 </div>
-                <div class="teacher-info">
-                  <h4 class="font-bold">พิมพ์รายงานสรุปผล (Print / PDF)</h4>
-                  <span class="text-xs text-gray-500">แบบฟอร์มมาตรฐานทะเบียนและวัดผลสถานศึกษา</span>
+                <div class="report-card-heading">
+                  <h4>พิมพ์รายงานสรุปผล (Print / PDF)</h4>
+                  <span class="report-card-tag">แบบฟอร์มมาตรฐานทะเบียนและวัดผล</span>
                 </div>
               </div>
-              <p class="text-xs text-gray-600 mb-3">
-                ออกแบบตามมาตรฐานหนังสือราชการ มีสถิติสรุป รายการนักเรียน และช่องลงนาม 4 ฝ่าย (ครูผู้สอน, หน.กลุ่มสาระฯ, หน.งานวัดผล, ผอ.โรงเรียน)
+              <p class="report-card-desc">
+                ออกแบบตามมาตรฐานหนังสือราชการ มีสรุปสถิติจำนวนนักเรียน ตารางรายชื่อ และช่องลงนาม 4 ฝ่าย (ครูผู้สอน, หน.กลุ่มสาระฯ, หน.งานวัดผล, ผอ.โรงเรียน)
               </p>
-              <div class="form-group">
-                <label class="text-xs font-semibold">เลือกระดับชั้น:</label>
-                <select id="report-print-level" class="form-control text-xs">
-                  <option value="all">ทุกระดับชั้น (ม.1 - ม.6, ปวช.)</option>
-                  <option value="ม.1">มัธยมศึกษาปีที่ 1</option>
-                  <option value="ม.2">มัธยมศึกษาปีที่ 2</option>
-                  <option value="ม.3">มัธยมศึกษาปีที่ 3</option>
-                  <option value="ม.4">มัธยมศึกษาปีที่ 4</option>
-                  <option value="ม.5">มัธยมศึกษาปีที่ 5</option>
-                  <option value="ม.6">มัธยมศึกษาปีที่ 6</option>
-                  <option value="ปวช.">ระดับ ปวช.</option>
-                </select>
+              <div class="report-card-action">
+                <div class="form-group mb-2">
+                  <label class="text-xs font-semibold text-gray-700 flex items-center gap-1">
+                    <i class="fas fa-layer-group text-rose-500"></i> เลือกระดับชั้น:
+                  </label>
+                  <select id="report-print-level" class="form-control text-xs" style="border-radius: 8px; border-color: #fecdd3;">
+                    <option value="all">ทุกระดับชั้น (ม.1 - ม.6, ปวช.)</option>
+                    <option value="ม.1">มัธยมศึกษาปีที่ 1</option>
+                    <option value="ม.2">มัธยมศึกษาปีที่ 2</option>
+                    <option value="ม.3">มัธยมศึกษาปีที่ 3</option>
+                    <option value="ม.4">มัธยมศึกษาปีที่ 4</option>
+                    <option value="ม.5">มัธยมศึกษาปีที่ 5</option>
+                    <option value="ม.6">มัธยมศึกษาปีที่ 6</option>
+                    <option value="ปวช.">ระดับ ปวช.</option>
+                  </select>
+                </div>
+                <button type="button" class="btn-report-action btn-rose" onclick="exportEngine.openPrintReport(document.getElementById('report-print-level').value)">
+                  <i class="fas fa-external-link-alt"></i> เปิดหน้าพิมพ์รายงาน (Print Preview)
+                </button>
               </div>
-              <button type="button" class="btn btn-primary" onclick="exportEngine.openPrintReport(document.getElementById('report-print-level').value)">
-                <i class="fas fa-external-link-alt"></i> เปิดหน้าพิมพ์รายงาน (Print Preview)
-              </button>
             </div>
 
-            <!-- Card 2: Export Excel (.xlsx) -->
-            <div class="teacher-card">
-              <div class="teacher-card-header">
-                <div class="teacher-avatar" style="background: #d1fae5; color: #059669;">
+            <!-- Card 2: Export Excel (Emerald Theme) -->
+            <div class="report-card-modern theme-emerald">
+              <div class="report-card-header">
+                <div class="report-card-avatar">
                   <i class="fas fa-file-excel"></i>
                 </div>
-                <div class="teacher-info">
-                  <h4 class="font-bold">ส่งออกไฟล์ Microsoft Excel (.xlsx)</h4>
-                  <span class="text-xs text-gray-500">ข้อมูลสรุปผลการแก้ผลการเรียนทั้งโรงเรียน</span>
+                <div class="report-card-heading">
+                  <h4>ส่งออกไฟล์ Excel (.xlsx)</h4>
+                  <span class="report-card-tag">สรุปข้อมูลการแก้ผลการเรียนทั้งโรงเรียน</span>
                 </div>
               </div>
-              <p class="text-xs text-gray-600 mb-3">
-                ดาวน์โหลดข้อมูลเป็นไฟล์ Excel (.xlsx) พร้อมจัดรูปแบบหัวตารางและความกว้างคอลัมน์ให้อย่างสวยงาม
+              <p class="report-card-desc">
+                ดาวน์โหลดข้อมูลเป็นไฟล์ Microsoft Excel (.xlsx) อัตโนมัติ พร้อมจัดรูปแบบหัวตาราง เส้นขอบ ความกว้างคอลัมน์ และแยกชีตข้อมูลให้อย่างสมบูรณ์
               </p>
-              <div class="flex gap-2 mt-auto">
-                <button type="button" class="btn btn-emerald" style="flex: 1;" onclick="exportEngine.exportRecordsExcel(false)">
-                  <i class="fas fa-download"></i> ส่งออก Excel ทั้งหมด
+              <div class="report-card-action">
+                <button type="button" class="btn-report-action btn-emerald" onclick="exportEngine.exportRecordsExcel(false)">
+                  <i class="fas fa-file-download"></i> ส่งออกไฟล์ Excel (.xlsx) ทั้งหมด
                 </button>
               </div>
             </div>
 
-            <!-- Card 3: Export CSV (UTF-8 BOM) -->
-            <div class="teacher-card">
-              <div class="teacher-card-header">
-                <div class="teacher-avatar" style="background: #e0f2fe; color: #0284c7;">
+            <!-- Card 3: Export CSV (Sky Theme) -->
+            <div class="report-card-modern theme-sky">
+              <div class="report-card-header">
+                <div class="report-card-avatar">
                   <i class="fas fa-file-csv"></i>
                 </div>
-                <div class="teacher-info">
-                  <h4 class="font-bold">ส่งออกไฟล์ CSV (UTF-8 BOM)</h4>
-                  <span class="text-xs text-gray-500">รองรับภาษาไทยใน Microsoft Excel อย่างถูกต้อง</span>
+                <div class="report-card-heading">
+                  <h4>ส่งออกไฟล์ CSV (UTF-8 BOM)</h4>
+                  <span class="report-card-tag">รองรับภาษาไทยใน Microsoft Excel 100%</span>
                 </div>
               </div>
-              <p class="text-xs text-gray-600 mb-3">
-                ไฟล์ CSV ที่มี Byte Order Mark (BOM) ทำให้เปิดใน Excel เวอร์ชันภาษาไทยได้โดยไม่เกิดปัญหาตัวอักษรต่างดาว
+              <p class="report-card-desc">
+                ไฟล์ CSV เข้ารหัสพิเศษด้วย Byte Order Mark (BOM) ทำให้เปิดใน Excel หรือระบบอื่นๆ ได้ทันทีโดยไม่เกิดปัญหาตัวอักษรภาษาไทยเพี้ยนหรือต่างดาว
               </p>
-              <button type="button" class="btn btn-secondary mt-auto" onclick="exportEngine.exportRecordsCSV(false)">
-                <i class="fas fa-file-csv"></i> ส่งออกไฟล์ CSV
-              </button>
+              <div class="report-card-action">
+                <button type="button" class="btn-report-action btn-sky" onclick="exportEngine.exportRecordsCSV(false)">
+                  <i class="fas fa-download"></i> ส่งออกไฟล์ CSV ทั้งหมด
+                </button>
+              </div>
             </div>
 
-            <!-- Card 4: Download CSV Templates -->
-            <div class="teacher-card">
-              <div class="teacher-card-header">
-                <div class="teacher-avatar" style="background: #ede9fe; color: #7c3aed;">
-                  <i class="fas fa-download"></i>
+            <!-- Card 4: Download CSV Templates (Purple Theme with 2x2 Grid) -->
+            <div class="report-card-modern theme-purple">
+              <div class="report-card-header">
+                <div class="report-card-avatar">
+                  <i class="fas fa-cloud-download-alt"></i>
                 </div>
-                <div class="teacher-info">
-                  <h4 class="font-bold">ดาวน์โหลดไฟล์ตัวอย่าง CSV (Templates)</h4>
-                  <span class="text-xs text-gray-500">แบบฟอร์มเปล่าสำหรับจัดเตรียมข้อมูลนำเข้า</span>
+                <div class="report-card-heading">
+                  <h4>ดาวน์โหลดแม่แบบ CSV</h4>
+                  <span class="report-card-tag">ไฟล์ตัวอย่างสำหรับนำเข้าข้อมูล</span>
                 </div>
               </div>
-              <p class="text-xs text-gray-600 mb-2">เลือกดาวน์โหลด Template แต่ละประเภท:</p>
-              <div class="flex flex-col gap-2">
-                <button type="button" class="btn-sm btn-outline text-indigo-600" onclick="exportEngine.downloadTemplate('records')">
-                  <i class="fas fa-download"></i> 1. Template ผลการเรียน 0/ร/มส
-                </button>
-                <button type="button" class="btn-sm btn-outline text-indigo-600" onclick="exportEngine.downloadTemplate('teachers')">
-                  <i class="fas fa-download"></i> 2. Template ข้อมูลครูผู้สอน
-                </button>
-                <button type="button" class="btn-sm btn-outline text-indigo-600" onclick="exportEngine.downloadTemplate('students')">
-                  <i class="fas fa-download"></i> 3. Template ทะเบียนนักเรียน
-                </button>
-                <button type="button" class="btn-sm btn-outline text-indigo-600" onclick="exportEngine.downloadTemplate('users')">
-                  <i class="fas fa-download"></i> 4. Template บัญชีผู้ใช้งาน
-                </button>
+              <p class="report-card-desc">
+                แบบฟอร์มเปล่าพร้อมตัวอย่างหัวคอลัมน์มาตรฐาน สำหรับจัดเตรียมข้อมูลเพื่อนำเข้าแบบกลุ่ม (CSV Bulk Import)
+              </p>
+              <div class="report-card-action">
+                <div class="template-download-grid">
+                  <button type="button" class="template-download-pill" onclick="exportEngine.downloadTemplate('records')" title="ดาวน์โหลดแม่แบบผลการเรียน">
+                    <div class="pill-left">
+                      <div class="pill-icon"><i class="fas fa-chart-line"></i></div>
+                      <span class="pill-title">1. ผลการเรียน</span>
+                    </div>
+                    <i class="fas fa-arrow-down pill-arrow"></i>
+                  </button>
+                  <button type="button" class="template-download-pill" onclick="exportEngine.downloadTemplate('teachers')" title="ดาวน์โหลดแม่แบบครูผู้สอน">
+                    <div class="pill-left">
+                      <div class="pill-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+                      <span class="pill-title">2. ครูผู้สอน</span>
+                    </div>
+                    <i class="fas fa-arrow-down pill-arrow"></i>
+                  </button>
+                  <button type="button" class="template-download-pill" onclick="exportEngine.downloadTemplate('students')" title="ดาวน์โหลดแม่แบบทะเบียนนักเรียน">
+                    <div class="pill-left">
+                      <div class="pill-icon"><i class="fas fa-user-graduate"></i></div>
+                      <span class="pill-title">3. ทะเบียนนักเรียน</span>
+                    </div>
+                    <i class="fas fa-arrow-down pill-arrow"></i>
+                  </button>
+                  <button type="button" class="template-download-pill" onclick="exportEngine.downloadTemplate('users')" title="ดาวน์โหลดแม่แบบบัญชีผู้ใช้งาน">
+                    <div class="pill-left">
+                      <div class="pill-icon"><i class="fas fa-users-cog"></i></div>
+                      <span class="pill-title">4. บัญชีผู้ใช้</span>
+                    </div>
+                    <i class="fas fa-arrow-down pill-arrow"></i>
+                  </button>
+                </div>
               </div>
             </div>
+
           </div>
         </section>
 
@@ -1144,19 +1170,19 @@
   <div id="toast-container" class="toast-container"></div>
 
   <!-- Application Scripts (Loaded with Cache Busting) -->
-  <script src="js/config.js?v=3.0.0"></script>
-  <script src="js/firebase-service.js?v=3.0.0"></script>
-  <script src="js/cloudinary-service.js?v=3.0.0"></script>
-  <script src="js/auth.js?v=3.0.0"></script>
-  <script src="js/dashboard.js?v=3.0.0"></script>
-  <script src="js/workflow.js?v=3.0.0"></script>
-  <script src="js/records.js?v=3.0.0"></script>
-  <script src="js/audit.js?v=3.0.0"></script>
-  <script src="js/teachers.js?v=3.0.0"></script>
-  <script src="js/students.js?v=3.0.0"></script>
-  <script src="js/users.js?v=3.0.0"></script>
-  <script src="js/export-engine.js?v=3.0.0"></script>
-  <script src="js/app.js?v=3.0.0"></script>
+  <script src="js/config.js?v=3.2.0"></script>
+  <script src="js/firebase-service.js?v=3.2.0"></script>
+  <script src="js/cloudinary-service.js?v=3.2.0"></script>
+  <script src="js/auth.js?v=3.2.0"></script>
+  <script src="js/dashboard.js?v=3.2.0"></script>
+  <script src="js/workflow.js?v=3.2.0"></script>
+  <script src="js/records.js?v=3.2.0"></script>
+  <script src="js/audit.js?v=3.2.0"></script>
+  <script src="js/teachers.js?v=3.2.0"></script>
+  <script src="js/students.js?v=3.2.0"></script>
+  <script src="js/users.js?v=3.2.0"></script>
+  <script src="js/export-engine.js?v=3.2.0"></script>
+  <script src="js/app.js?v=3.2.0"></script>
 
   <script>
     // Tab role switcher helper in login view
