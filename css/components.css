@@ -1253,7 +1253,142 @@ select.form-control {
 }
 
 /* ==========================================================================
-   Data Tables & Badges (Standard Academic Table Format)
+   RECORDS MANAGEMENT HEADER & MINI STATS TICKER
+   ========================================================================== */
+.records-header-banner {
+  background: var(--bg-surface);
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.records-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.records-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.records-icon-badge {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, #1a56db 0%, #0d2f6e 100%);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(26, 86, 219, 0.25);
+}
+
+.records-title-row h2 {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text-main);
+  line-height: 1.2;
+}
+
+.records-title-row p {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  margin-top: 1px;
+}
+
+.records-mini-stats {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.records-mini-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: var(--radius-full);
+  font-size: 11.5px;
+  font-weight: 600;
+  background: #f8fafc;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+}
+.records-mini-pill strong {
+  font-weight: 800;
+  color: var(--text-main);
+}
+.records-mini-pill.pill-0 strong { color: #dc2626; }
+.records-mini-pill.pill-r strong { color: #d97706; }
+.records-mini-pill.pill-ms strong { color: #7c3aed; }
+.records-mini-pill.pill-pass strong { color: #059669; }
+
+.badge-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.dot-red { background: #ef4444; }
+.dot-amber { background: #f59e0b; }
+.dot-purple { background: #8b5cf6; }
+
+.records-action-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-clear-search {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #e2e8f0;
+  border: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: #64748b;
+  cursor: pointer;
+}
+.btn-clear-search:hover {
+  background: #cbd5e1;
+  color: #0f172a;
+}
+
+.badge-record-count {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: var(--radius-full);
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #1d4ed8;
+}
+
+/* ==========================================================================
+   DATA TABLES & MODERN ROW CELLS
    ========================================================================== */
 .table-card-container {
   background: var(--bg-surface);
@@ -1281,118 +1416,208 @@ select.form-control {
 }
 
 .data-table th {
-  background: #f1f5f9;
-  padding: 10px 13px;
-  font-size: 13px;
-  font-weight: 700;
-  color: #334155;
-  border-bottom: 2px solid var(--border-strong);
+  background: #f8fafc;
+  padding: 11px 14px;
+  font-weight: 800;
+  color: #475569;
+  border-bottom: 2px solid var(--border-subtle);
   white-space: nowrap;
-  letter-spacing: 0.01em;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
   font-size: 11.5px;
 }
 
 .data-table td {
-  padding: 10px 13px;
+  padding: 12px 14px;
   font-size: 13.5px;
-  border-bottom: 1px solid var(--border-subtle);
+  border-bottom: 1px solid #f1f5f9;
   color: var(--text-main);
   vertical-align: middle;
 }
 
 .data-table tr.hover-row:nth-child(even) td {
-  background-color: #fafbfd;
+  background-color: #fafbfc;
 }
 
 .data-table tr.hover-row:hover td {
-  background-color: var(--primary-light);
+  background-color: #f0f7ff;
   transition: background-color 0.12s ease;
 }
 
-.grade-badge {
+/* Student Modern Cell */
+.student-cell-modern {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.student-avatar-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #eff6ff;
+  border: 1.5px solid #bfdbfe;
+  color: #2563eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.student-info-col {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.student-name-bold {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.student-sub-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 2px;
+  font-size: 11.5px;
+}
+
+.student-id-chip {
+  background: #f1f5f9;
+  color: #475569;
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-weight: 700;
+}
+
+.class-room-badge {
+  background: #e0f2fe;
+  color: #0369a1;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+/* Subject Modern Cell */
+.subject-cell-modern {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.subject-code-chip {
+  display: inline-block;
+  align-self: flex-start;
+  background: #eef2ff;
+  color: #4338ca;
+  font-weight: 800;
+  font-size: 12px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  border: 1px solid #c7d2fe;
+  margin-bottom: 2px;
+}
+
+.subject-name-text {
+  font-size: 12.5px;
+  color: #334155;
+  line-height: 1.3;
+}
+
+/* Grade Modern Badge */
+.grade-badge-modern {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 26px;
-  height: 26px;
-  border-radius: 4px;
-  font-weight: 700;
-  font-size: 13px;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  font-weight: 800;
+  font-size: 14px;
 }
 
-.grade-badge.grade-0 {
+.grade-badge-modern.grade-0 {
   background: #fee2e2;
   color: #dc2626;
-  border: 1px solid #fca5a5;
+  border: 1.5px solid #fca5a5;
+  box-shadow: 0 2px 6px rgba(220, 38, 38, 0.12);
 }
 
-.grade-badge.grade-ร {
+.grade-badge-modern.grade-ร {
   background: #fef3c7;
   color: #d97706;
-  border: 1px solid #fcd34d;
+  border: 1.5px solid #fcd34d;
+  box-shadow: 0 2px 6px rgba(217, 119, 6, 0.12);
 }
 
-.grade-badge.grade-มส {
+.grade-badge-modern.grade-มส {
   background: #ede9fe;
   color: #7c3aed;
-  border: 1px solid #c4b5fd;
+  border: 1.5px solid #c4b5fd;
+  box-shadow: 0 2px 6px rgba(124, 58, 237, 0.12);
 }
+
+/* Teacher Modern Cell */
+.teacher-cell-modern {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  color: #334155;
+}
+
+.teacher-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #3b82f6;
+  flex-shrink: 0;
+}
+
+/* Status Modern Pill */
+.status-pill-modern {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.status-pill-modern.badge-blue    { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+.status-pill-modern.badge-amber   { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
+.status-pill-modern.badge-purple  { background: #f5f3ff; color: #6d28d9; border: 1px solid #ddd6fe; }
+.status-pill-modern.badge-emerald { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
+.status-pill-modern.badge-rose    { background: #fff1f2; color: #be123c; border: 1px solid #fecdd3; }
+.status-pill-modern.badge-gray    { background: #f8fafc; color: #64748b; border: 1px solid #e2e8f0; }
 
 .new-grade-pill {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  min-width: 36px;
   padding: 2px 8px;
   background: #d1fae5;
   color: #065f46;
   border: 1px solid #a7f3d0;
-  border-radius: 4px;
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.status-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 12.5px;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.badge-blue { background: #dbeafe; color: #1e40af; }
-.badge-amber { background: #fef3c7; color: #92400e; }
-.badge-purple { background: #ede9fe; color: #5b21b6; }
-.badge-emerald { background: #d1fae5; color: #065f46; }
-.badge-rose { background: #ffe4e6; color: #9f1239; }
-.badge-gray { background: #f1f5f9; color: #475569; }
-
-.badge-level {
-  display: inline-block;
-  padding: 2px 7px;
-  background: #e2e8f0;
-  border-radius: 4px;
-  font-size: 12.5px;
-  color: #334155;
-}
-
-.grade-compare-wrapper {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.grade-arrow {
-  color: var(--text-subtle);
-  font-size: 13px;
+  border-radius: 6px;
+  font-size: 13.5px;
+  font-weight: 800;
 }
 
 .action-btn-group {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
 }
 
 /* Pagination */
@@ -1401,23 +1626,41 @@ select.form-control {
   align-items: center;
   justify-content: flex-end;
   gap: 4px;
-  padding: 10px 14px;
+  padding: 12px 16px;
   background: #ffffff;
   border-top: 1px solid var(--border-subtle);
 }
 
 .btn-page {
-  min-width: 28px;
-  height: 28px;
+  min-width: 30px;
+  height: 30px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   background: #ffffff;
   border: 1px solid var(--border-subtle);
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.btn-page:hover:not([disabled]) {
+  background: var(--primary-light);
+  color: var(--primary);
+  border-color: #93c5fd;
+}
+.btn-page.active {
+  background: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
+  box-shadow: 0 2px 6px rgba(26, 86, 219, 0.25);
+}
+.btn-page[disabled] {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
   cursor: pointer;
   transition: all var(--transition-fast);
 }

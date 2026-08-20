@@ -101,17 +101,30 @@ class RecordsService {
     const countBadge = document.getElementById('records-count-badge');
     if (!tableBody) return;
 
+    this.renderMiniStats();
+
     const filtered = this.getFilteredRecords();
     if (countBadge) countBadge.innerText = `${filtered.length} รายการ`;
+
+    // Toggle search clear button
+    const clearBtn = document.getElementById('btn-clear-search');
+    if (clearBtn) {
+      clearBtn.style.display = (this.searchQuery && this.searchQuery.trim().length > 0) ? 'flex' : 'none';
+    }
 
     if (filtered.length === 0) {
       tableBody.innerHTML = `
         <tr>
-          <td colspan="8" class="text-center py-8 text-gray-500">
-            <div class="empty-state-card">
-              <i class="fas fa-folder-open text-4xl mb-2 text-gray-300"></i>
-              <p class="font-semibold">ไม่พบข้อมูลผลการเรียนตามเงื่อนไขที่เลือก</p>
-              <span class="text-xs text-gray-400">ลองเปลี่ยนตัวกรอง หรือกดเพิ่มข้อมูลใหม่</span>
+          <td colspan="8" class="text-center py-10 text-gray-500">
+            <div class="empty-state-card" style="padding: 28px 16px; text-align: center;">
+              <div style="width: 56px; height: 56px; border-radius: 50%; background: #eff6ff; color: #2563eb; display: inline-flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 12px;">
+                <i class="fas fa-search"></i>
+              </div>
+              <h4 style="font-size: 15px; font-weight: 700; color: #1e293b; margin-bottom: 4px;">ไม่พบข้อมูลผลการเรียนตามเงื่อนไขที่เลือก</h4>
+              <p style="font-size: 13px; color: #64748b; margin-bottom: 12px;">ลองเปลี่ยนตัวกรอง ค้นหาด้วยคำอื่น หรือกดปุ่มล้างตัวกรอง</p>
+              <button type="button" class="btn-sm btn-outline" onclick="recordsService.resetAllFilters()">
+                <i class="fas fa-undo mr-1"></i> ล้างตัวกรองทั้งหมด
+              </button>
             </div>
           </td>
         </tr>
@@ -127,43 +140,50 @@ class RecordsService {
     const pageRecords = filtered.slice(startIndex, startIndex + this.pageSize);
 
     const currentUser = authService.getCurrentUser();
-    const isAdmin = authService.isAdmin();
-    const isTeacher = authService.isTeacher();
-    const isStudent = authService.isStudent();
 
     tableBody.innerHTML = pageRecords.map((r, idx) => {
-      const condition = APP_CONFIG.CONDITION_TYPES[r.conditionType] || { label: r.conditionType, color: '#64748b' };
       const statusTitle = app.getStatusTitle(r.status);
       const statusClass = app.getStatusBadgeClass(r.status);
 
       return `
         <tr class="hover-row">
-          <td class="text-center text-xs text-gray-500 font-mono">${startIndex + idx + 1}</td>
+          <td class="text-center text-xs text-gray-400 font-mono font-bold">${startIndex + idx + 1}</td>
           <td>
-            <div class="student-cell">
-              <span class="student-name font-medium text-gray-900">${r.studentName}</span>
-              <span class="student-sub text-xs text-gray-500">รหัส ${r.studentId} • ชั้น ${r.gradeLevel}/${r.room || '1'}</span>
+            <div class="student-cell-modern">
+              <div class="student-avatar-circle" title="${this.escapeHtml(r.studentName)}">
+                <i class="fas fa-user-graduate"></i>
+              </div>
+              <div class="student-info-col">
+                <span class="student-name-bold">${this.escapeHtml(r.studentName)}</span>
+                <div class="student-sub-row">
+                  <span class="student-id-chip">รหัส ${this.escapeHtml(r.studentId)}</span>
+                  <span class="class-room-badge">ชั้น ${this.escapeHtml(r.gradeLevel || '-')}/${this.escapeHtml(r.room || '1')}</span>
+                </div>
+              </div>
             </div>
           </td>
           <td>
-            <div class="subject-cell">
-              <span class="subject-code font-bold text-indigo-700">${r.subjectCode}</span>
-              <span class="subject-name text-xs text-gray-600">${r.subjectName}</span>
+            <div class="subject-cell-modern">
+              <span class="subject-code-chip">${this.escapeHtml(r.subjectCode)}</span>
+              <span class="subject-name-text">${this.escapeHtml(r.subjectName)}</span>
             </div>
           </td>
           <td class="text-center">
-            <span class="grade-badge grade-${r.conditionType}">${r.conditionType}</span>
+            <span class="grade-badge-modern grade-${r.conditionType}">${r.conditionType}</span>
           </td>
           <td>
-            <span class="text-sm text-gray-700">${r.teacherName || '-'}</span>
+            <div class="teacher-cell-modern">
+              <span class="teacher-dot"></span>
+              <span>${this.escapeHtml(r.teacherName || '-')}</span>
+            </div>
           </td>
           <td class="text-center">
-            <span class="status-pill ${statusClass}">
+            <span class="status-pill-modern ${statusClass}">
               <i class="${app.getStatusIcon(r.status)}"></i> ${statusTitle}
             </span>
           </td>
           <td class="text-center">
-            ${r.newGrade ? `<span class="new-grade-pill font-bold">${r.newGrade}</span>` : '<span class="text-gray-300">-</span>'}
+            ${r.newGrade ? `<span class="new-grade-pill">${r.newGrade}</span>` : '<span class="text-gray-300 font-bold">-</span>'}
           </td>
           <td class="text-right">
             <div class="action-btn-group">
@@ -175,6 +195,49 @@ class RecordsService {
     }).join('');
 
     this.renderPagination(filtered.length);
+  }
+
+  /**
+   * คำนวณและแสดง Mini Quick Stats Ticker ด้านบนของตาราง
+   */
+  renderMiniStats() {
+    let allRecords = db.get('records') || [];
+    const currentUser = authService.getCurrentUser();
+
+    if (currentUser) {
+      if (currentUser.role === APP_CONFIG.ROLES.STUDENT) {
+        allRecords = allRecords.filter(r => 
+          String(r.studentId) === String(currentUser.studentId) ||
+          String(r.studentName).includes(currentUser.name)
+        );
+      } else if (currentUser.role === APP_CONFIG.ROLES.TEACHER) {
+        allRecords = allRecords.filter(r => this.isTeacherRecordOwner(r, currentUser));
+      }
+    }
+
+    let count0 = 0;
+    let countR = 0;
+    let countMS = 0;
+    let countPass = 0;
+
+    allRecords.forEach(r => {
+      if (r.conditionType === '0') count0++;
+      else if (r.conditionType === 'ร') countR++;
+      else if (r.conditionType === 'มส') countMS++;
+
+      if (r.status === 'approved') countPass++;
+    });
+
+    const setVal = (id, val) => {
+      const el = document.getElementById(id);
+      if (el) el.innerText = val;
+    };
+
+    setVal('rec-stat-total', allRecords.length);
+    setVal('rec-stat-0', count0);
+    setVal('rec-stat-r', countR);
+    setVal('rec-stat-ms', countMS);
+    setVal('rec-stat-pass', countPass);
   }
 
   renderActionButtons(r, currentUser) {
@@ -193,13 +256,19 @@ class RecordsService {
       if (r.status === 'pending_request' || !r.status) {
         buttons += `
           <button type="button" class="btn-sm btn-primary" onclick="workflowService.openStepModal('${r.id}', 'request')">
-            <i class="fas fa-paper-plane"></i> ยื่นคำร้อง
+            <i class="fas fa-paper-plane mr-1"></i> ยื่นคำร้อง
           </button>
         `;
       } else if (r.status === 'assigned' || r.status === 'rejected') {
         buttons += `
           <button type="button" class="btn-sm btn-purple" onclick="workflowService.openStepModal('${r.id}', 'submit')">
-            <i class="fas fa-upload"></i> ส่งงาน
+            <i class="fas fa-upload mr-1"></i> ส่งงาน
+          </button>
+        `;
+      } else if (r.status === 'approved') {
+        buttons += `
+          <button type="button" class="btn-sm btn-emerald" onclick="workflowService.openStepModal('${r.id}', 'timeline')" title="ผลการเรียนผ่านการอนุมัติแล้ว">
+            <i class="fas fa-check-circle mr-1"></i> ผ่านแล้ว
           </button>
         `;
       }
@@ -208,14 +277,12 @@ class RecordsService {
     // 2. สิทธิ์ครูผู้สอน & Admin
     if (role === APP_CONFIG.ROLES.TEACHER || role === APP_CONFIG.ROLES.ADMIN) {
       if (r.status === 'pending_request' || !r.status) {
-        // ครูยังไม่สามารถมอบหมายงานได้ จนกว่านักเรียนจะกดยื่นคำร้อง
         buttons += `
           <button type="button" class="btn-sm btn-outline text-gray-400" disabled style="cursor: not-allowed; opacity: 0.65; border-color: #cbd5e1;" title="รอนักเรียนกดยื่นคำร้องขอแก้ไขผลการเรียนก่อน จึงจะสามารถมอบหมายงานได้">
-            <i class="fas fa-clock text-gray-400 mr-1"></i> รอนักเรียนยื่นคำร้อง
+            <i class="fas fa-clock mr-1"></i> รอนักเรียนยื่นคำร้อง
           </button>
         `;
       } else if (r.status === 'requested') {
-        // นักเรียนยื่นคำร้องแล้ว -> ครูสามารถมอบหมายงานได้ทันที
         buttons += `
           <button type="button" class="btn-sm btn-amber" onclick="workflowService.openStepModal('${r.id}', 'assign')">
             <i class="fas fa-tasks mr-1"></i> มอบหมายงาน
@@ -280,7 +347,7 @@ class RecordsService {
           <button class="btn-page ${i === this.currentPage ? 'active' : ''}" onclick="recordsService.changePage(${i})">${i}</button>
         `;
       } else if (i === this.currentPage - 2 || i === this.currentPage + 2) {
-        html += `<span class="page-ellipsis">...</span>`;
+        html += `<span class="page-ellipsis" style="padding: 0 4px; color: #94a3b8;">...</span>`;
       }
     }
 
@@ -313,12 +380,16 @@ class RecordsService {
   setStatusFilter(status) {
     this.filterStatus = status;
     this.currentPage = 1;
+    const statusSelect = document.getElementById('filter-records-status');
+    if (statusSelect && statusSelect.value !== status) statusSelect.value = status;
     this.renderRecordsTable();
   }
 
   setGradeLevelFilter(level) {
     this.filterGradeLevel = level;
     this.currentPage = 1;
+    const levelSelect = document.getElementById('filter-records-level');
+    if (levelSelect && levelSelect.value !== level) levelSelect.value = level;
     this.renderRecordsTable();
   }
 
@@ -326,6 +397,40 @@ class RecordsService {
     this.searchQuery = q;
     this.currentPage = 1;
     this.renderRecordsTable();
+  }
+
+  clearSearch() {
+    this.searchQuery = '';
+    const input = document.getElementById('search-records-input');
+    if (input) input.value = '';
+    this.currentPage = 1;
+    this.renderRecordsTable();
+  }
+
+  resetAllFilters() {
+    this.filterGradeType = 'all';
+    this.filterStatus = 'all';
+    this.filterGradeLevel = 'all';
+    this.searchQuery = '';
+    this.currentPage = 1;
+
+    const searchInput = document.getElementById('search-records-input');
+    if (searchInput) searchInput.value = '';
+
+    const statusSelect = document.getElementById('filter-records-status');
+    if (statusSelect) statusSelect.value = 'all';
+
+    const levelSelect = document.getElementById('filter-records-level');
+    if (levelSelect) levelSelect.value = 'all';
+
+    document.querySelectorAll('.filter-pill-grade').forEach(el => {
+      el.classList.toggle('active', el.dataset.grade === 'all');
+    });
+
+    this.renderRecordsTable();
+    if (typeof app !== 'undefined' && app.showToast) {
+      app.showToast('ล้างตัวกรองทั้งหมดแล้ว', 'info');
+    }
   }
 
   /**

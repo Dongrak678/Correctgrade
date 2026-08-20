@@ -20,8 +20,8 @@
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
   <!-- Application Stylesheets (with cache busting) -->
-  <link rel="stylesheet" href="css/main.css?v=2.2.0">
-  <link rel="stylesheet" href="css/components.css?v=2.2.0">
+  <link rel="stylesheet" href="css/main.css?v=2.3.0">
+  <link rel="stylesheet" href="css/components.css?v=2.3.0">
 </head>
 <body>
 
@@ -555,15 +555,49 @@
 
 
         <!-- ===================================================================
-             VIEW 2: REMEDIATION RECORDS MANAGEMENT (0/ร/มส)
+             VIEW 2: REMEDIATION RECORDS MANAGEMENT (0/ร/มส) - Modern Data Center
              =================================================================== -->
         <section id="view-records" class="app-view-panel">
-          <div class="page-header-banner">
-            <div class="page-title-group">
-              <h2><i class="fas fa-clipboard-check text-indigo-600"></i> การจัดการข้อมูลผลการเรียน (0 / ร / มส)</h2>
-              <p>บันทึก ติดตามกระบวนการยื่นคำร้อง 4 ขั้นตอน และตรวจสอบสถานะ</p>
+          
+          <!-- Modern Page Header Banner with Quick Stats -->
+          <div class="records-header-banner">
+            <div class="records-title-group">
+              <div class="records-title-row">
+                <div class="records-icon-badge">
+                  <i class="fas fa-clipboard-list"></i>
+                </div>
+                <div>
+                  <h2>การจัดการข้อมูลผลการเรียน (0 / ร / มส)</h2>
+                  <p>บันทึก ติดตามกระบวนการยื่นคำร้อง 4 ขั้นตอน และตรวจสอบสถานะการแก้ไขแบบเรียลไทม์</p>
+                </div>
+              </div>
+              
+              <!-- Mini Quick Stats Ticker -->
+              <div class="records-mini-stats">
+                <div class="records-mini-pill pill-total">
+                  <i class="fas fa-layer-group text-blue-600"></i>
+                  <span>ทั้งหมด:</span> <strong id="rec-stat-total">0</strong>
+                </div>
+                <div class="records-mini-pill pill-0">
+                  <span class="badge-dot dot-red"></span>
+                  <span>ติด 0:</span> <strong id="rec-stat-0">0</strong>
+                </div>
+                <div class="records-mini-pill pill-r">
+                  <span class="badge-dot dot-amber"></span>
+                  <span>ติด ร:</span> <strong id="rec-stat-r">0</strong>
+                </div>
+                <div class="records-mini-pill pill-ms">
+                  <span class="badge-dot dot-purple"></span>
+                  <span>ติด มส:</span> <strong id="rec-stat-ms">0</strong>
+                </div>
+                <div class="records-mini-pill pill-pass">
+                  <i class="fas fa-check-circle text-emerald-500"></i>
+                  <span>ผ่านแล้ว:</span> <strong id="rec-stat-pass">0</strong>
+                </div>
+              </div>
             </div>
-            <div class="page-action-group">
+            
+            <div class="records-action-group">
               <button type="button" class="btn btn-outline text-indigo-600 nav-admin-only" onclick="recordsService.openBulkImportModal()">
                 <i class="fas fa-file-csv"></i> นำเข้าไฟล์ CSV
               </button>
@@ -571,40 +605,41 @@
                 <i class="fas fa-trash-alt"></i> ล้างประวัติทั้งหมด
               </button>
               <button type="button" class="btn btn-primary nav-teacher-only" onclick="recordsService.openAddRecordModal()">
-                <i class="fas fa-plus"></i> บันทึกข้อมูล 0/ร/มส
+                <i class="fas fa-plus-circle"></i> บันทึกข้อมูล 0/ร/มส
               </button>
             </div>
           </div>
 
-          <!-- Filter & Search Bar -->
+          <!-- Modern Filter & Search Bar -->
           <div class="filter-card-bar">
             <div class="filter-left-group">
               <div class="search-input-box">
                 <i class="fas fa-search"></i>
-                <input type="text" class="form-control" placeholder="ค้นหาชื่อ, รหัสนักเรียน, รหัสวิชา, ครู..." oninput="recordsService.setSearchQuery(this.value)">
+                <input type="text" id="search-records-input" class="form-control" placeholder="ค้นหาชื่อ, รหัสนักเรียน, รหัสวิชา, ครู..." oninput="recordsService.setSearchQuery(this.value)">
+                <button type="button" id="btn-clear-search" class="btn-clear-search" onclick="recordsService.clearSearch()" style="display:none;" title="ล้างคำค้นหา">&times;</button>
               </div>
 
               <!-- Grade Type Filter Pills -->
               <div class="filter-pills-row">
                 <button type="button" class="filter-pill-grade active" data-grade="all" onclick="recordsService.setGradeFilter('all')">ทั้งหมด</button>
-                <button type="button" class="filter-pill-grade" data-grade="0" onclick="recordsService.setGradeFilter('0')">ติด 0</button>
-                <button type="button" class="filter-pill-grade" data-grade="ร" onclick="recordsService.setGradeFilter('ร')">ติด ร</button>
-                <button type="button" class="filter-pill-grade" data-grade="มส" onclick="recordsService.setGradeFilter('มส')">ติด มส</button>
+                <button type="button" class="filter-pill-grade" data-grade="0" onclick="recordsService.setGradeFilter('0')"><span class="badge-dot dot-red"></span> ติด 0</button>
+                <button type="button" class="filter-pill-grade" data-grade="ร" onclick="recordsService.setGradeFilter('ร')"><span class="badge-dot dot-amber"></span> ติด ร</button>
+                <button type="button" class="filter-pill-grade" data-grade="มส" onclick="recordsService.setGradeFilter('มส')"><span class="badge-dot dot-purple"></span> ติด มส</button>
               </div>
 
               <!-- Status Dropdown -->
-              <select class="form-control" style="width: auto;" onchange="recordsService.setStatusFilter(this.value)">
+              <select id="filter-records-status" class="form-control filter-select" onchange="recordsService.setStatusFilter(this.value)">
                 <option value="all">-- ทุกสถานะการแก้ไข --</option>
-                <option value="pending_request">ยังไม่ยื่นคำร้อง</option>
-                <option value="requested">ยื่นคำร้องแล้ว</option>
-                <option value="assigned">ครูมอบหมายงานแล้ว</option>
-                <option value="submitted">นักเรียนส่งงานแล้ว (รอตรวจ)</option>
-                <option value="approved">ผ่านการแก้ไขแล้ว</option>
-                <option value="rejected">ส่งคืนให้แก้ไขเพิ่มเติม</option>
+                <option value="pending_request">⚪ ยังไม่ยื่นคำร้อง</option>
+                <option value="requested">🟡 ยื่นคำร้องแล้ว</option>
+                <option value="assigned">🔵 ครูมอบหมายงานแล้ว</option>
+                <option value="submitted">🟣 นักเรียนส่งงานแล้ว (รอตรวจ)</option>
+                <option value="approved">🟢 ผ่านการแก้ไขแล้ว</option>
+                <option value="rejected">🔴 ส่งคืนให้แก้ไขเพิ่มเติม</option>
               </select>
 
               <!-- Level Dropdown -->
-              <select class="form-control" style="width: auto;" onchange="recordsService.setGradeLevelFilter(this.value)">
+              <select id="filter-records-level" class="form-control filter-select" onchange="recordsService.setGradeLevelFilter(this.value)">
                 <option value="all">-- ทุกระดับชั้น --</option>
                 <option value="ม.1">มัธยมศึกษาปีที่ 1</option>
                 <option value="ม.2">มัธยมศึกษาปีที่ 2</option>
@@ -614,10 +649,14 @@
                 <option value="ม.6">มัธยมศึกษาปีที่ 6</option>
                 <option value="ปวช.">ระดับ ปวช.</option>
               </select>
+
+              <button type="button" id="btn-reset-filters" class="btn btn-xs btn-outline" onclick="recordsService.resetAllFilters()" title="ล้างตัวกรองทั้งหมด">
+                <i class="fas fa-undo"></i> ล้างตัวกรอง
+              </button>
             </div>
 
             <div class="filter-right-group">
-              <span id="records-count-badge" class="badge-level font-semibold">0 รายการ</span>
+              <span id="records-count-badge" class="badge-record-count">0 รายการ</span>
             </div>
           </div>
 
@@ -627,13 +666,13 @@
               <table class="data-table">
                 <thead>
                   <tr>
-                    <th style="width: 5%;" class="text-center">#</th>
-                    <th style="width: 20%;">นักเรียน</th>
-                    <th style="width: 18%;">รายวิชา</th>
+                    <th style="width: 4%;" class="text-center">#</th>
+                    <th style="width: 21%;">นักเรียน</th>
+                    <th style="width: 20%;">รายวิชา</th>
                     <th style="width: 8%;" class="text-center">เงื่อนไข</th>
-                    <th style="width: 16%;">ครูผู้สอน</th>
+                    <th style="width: 15%;">ครูผู้สอน</th>
                     <th style="width: 15%;" class="text-center">สถานะการแก้ไข</th>
-                    <th style="width: 8%;" class="text-center">เกรดใหม่</th>
+                    <th style="width: 7%;" class="text-center">เกรดใหม่</th>
                     <th style="width: 10%;" class="text-right">จัดการ</th>
                   </tr>
                 </thead>
@@ -645,6 +684,7 @@
             <div id="records-pagination"></div>
           </div>
         </section>
+
 
         <!-- ===================================================================
              VIEW 3: AUDIT LOG (BEFORE ➔ AFTER COMPARISON)
@@ -1052,19 +1092,19 @@
   <div id="toast-container" class="toast-container"></div>
 
   <!-- Application Scripts (Loaded with Cache Busting) -->
-  <script src="js/config.js?v=2.2.0"></script>
-  <script src="js/firebase-service.js?v=2.2.0"></script>
-  <script src="js/cloudinary-service.js?v=2.2.0"></script>
-  <script src="js/auth.js?v=2.2.0"></script>
-  <script src="js/dashboard.js?v=2.2.0"></script>
-  <script src="js/workflow.js?v=2.2.0"></script>
-  <script src="js/records.js?v=2.2.0"></script>
-  <script src="js/audit.js?v=2.2.0"></script>
-  <script src="js/teachers.js?v=2.2.0"></script>
-  <script src="js/students.js?v=2.2.0"></script>
-  <script src="js/users.js?v=2.2.0"></script>
-  <script src="js/export-engine.js?v=2.2.0"></script>
-  <script src="js/app.js?v=2.2.0"></script>
+  <script src="js/config.js?v=2.3.0"></script>
+  <script src="js/firebase-service.js?v=2.3.0"></script>
+  <script src="js/cloudinary-service.js?v=2.3.0"></script>
+  <script src="js/auth.js?v=2.3.0"></script>
+  <script src="js/dashboard.js?v=2.3.0"></script>
+  <script src="js/workflow.js?v=2.3.0"></script>
+  <script src="js/records.js?v=2.3.0"></script>
+  <script src="js/audit.js?v=2.3.0"></script>
+  <script src="js/teachers.js?v=2.3.0"></script>
+  <script src="js/students.js?v=2.3.0"></script>
+  <script src="js/users.js?v=2.3.0"></script>
+  <script src="js/export-engine.js?v=2.3.0"></script>
+  <script src="js/app.js?v=2.3.0"></script>
 
   <script>
     // Tab role switcher helper in login view
