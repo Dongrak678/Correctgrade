@@ -2847,75 +2847,104 @@ select.form-control {
   transform: translateY(-1px);
 }
 
-/* Template 2x2 Download Badges Grid (Fixed & Non-Overflowing) */
-.template-download-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
+/* Template 1-Column Download List (Spacious & Zero Overflow) */
+.template-download-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
   width: 100%;
 }
 
-.template-download-pill {
+.template-download-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 6px;
+  gap: 8px;
   background: #f8fafc;
-  border: 1.5px solid #e2e8f0;
+  border: 1px solid #e2e8f0;
   border-radius: 10px;
-  padding: 8px 10px;
+  padding: 6px 10px;
   cursor: pointer;
   transition: all 0.18s ease;
   text-decoration: none;
   color: #1e293b;
-  text-align: left;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-.template-download-pill:hover {
+.template-download-row:hover {
   background: #f5f3ff;
   border-color: #c4b5fd;
-  color: #7c3aed;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.15);
+  transform: translateX(3px);
+  box-shadow: 0 3px 10px rgba(139, 92, 246, 0.12);
 }
 
-.template-download-pill .pill-left {
+.template-download-row .row-left {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
   min-width: 0;
+  flex: 1;
 }
 
-.template-download-pill .pill-icon {
+.template-download-row .row-icon {
   width: 26px;
   height: 26px;
   border-radius: 6px;
-  background: #ede9fe;
-  color: #7c3aed;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 11.5px;
+  font-size: 11px;
   flex-shrink: 0;
 }
 
-.template-download-pill .pill-title {
+.template-download-row .row-icon.icon-rose {
+  background: #fee2e2;
+  color: #e11d48;
+}
+.template-download-row .row-icon.icon-emerald {
+  background: #d1fae5;
+  color: #059669;
+}
+.template-download-row .row-icon.icon-sky {
+  background: #e0f2fe;
+  color: #0284c7;
+}
+.template-download-row .row-icon.icon-purple {
+  background: #ede9fe;
+  color: #7c3aed;
+}
+
+.template-download-row .row-title {
   font-size: 11.5px;
   font-weight: 700;
+  color: #1e293b;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.template-download-pill .pill-arrow {
-  color: #94a3b8;
-  font-size: 11px;
-  flex-shrink: 0;
-  transition: transform 0.15s ease;
+.template-download-row:hover .row-title {
+  color: #7c3aed;
 }
 
-.template-download-pill:hover .pill-arrow {
+.template-download-row .row-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 700;
   color: #7c3aed;
-  transform: translateY(1px);
+  background: #ede9fe;
+  padding: 2px 6px;
+  border-radius: 6px;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
 }
+
+.template-download-row:hover .row-tag {
+  background: #7c3aed;
+  color: #ffffff;
+}
+
 

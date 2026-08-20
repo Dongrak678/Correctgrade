@@ -24,8 +24,8 @@
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
   <!-- Application Stylesheets (with cache busting) -->
-  <link rel="stylesheet" href="css/main.css?v=3.3.0">
-  <link rel="stylesheet" href="css/components.css?v=3.3.0">
+  <link rel="stylesheet" href="css/main.css?v=3.4.0">
+  <link rel="stylesheet" href="css/components.css?v=3.4.0">
 </head>
 <body>
 
@@ -1093,34 +1093,34 @@
                 แบบฟอร์มเปล่าพร้อมตัวอย่างหัวคอลัมน์มาตรฐาน สำหรับจัดเตรียมข้อมูลเพื่อนำเข้าแบบกลุ่ม (CSV Bulk Import)
               </p>
               <div class="report-card-action">
-                <div class="template-download-grid">
-                  <button type="button" class="template-download-pill" onclick="exportEngine.downloadTemplate('records')" title="ดาวน์โหลดแม่แบบผลการเรียน">
-                    <div class="pill-left">
-                      <div class="pill-icon"><i class="fas fa-chart-line"></i></div>
-                      <span class="pill-title">1. ผลการเรียน</span>
+                <div class="template-download-list">
+                  <button type="button" class="template-download-row" onclick="exportEngine.downloadTemplate('records')" title="ดาวน์โหลดแม่แบบผลการเรียน 0/ร/มส">
+                    <div class="row-left">
+                      <div class="row-icon icon-rose"><i class="fas fa-chart-line"></i></div>
+                      <span class="row-title">1. แม่แบบผลการเรียน (0/ร/มส)</span>
                     </div>
-                    <i class="fas fa-arrow-down pill-arrow"></i>
+                    <span class="row-tag"><i class="fas fa-download"></i> .CSV</span>
                   </button>
-                  <button type="button" class="template-download-pill" onclick="exportEngine.downloadTemplate('teachers')" title="ดาวน์โหลดแม่แบบครูผู้สอน">
-                    <div class="pill-left">
-                      <div class="pill-icon"><i class="fas fa-chalkboard-teacher"></i></div>
-                      <span class="pill-title">2. ครูผู้สอน</span>
+                  <button type="button" class="template-download-row" onclick="exportEngine.downloadTemplate('teachers')" title="ดาวน์โหลดแม่แบบข้อมูลครูผู้สอน">
+                    <div class="row-left">
+                      <div class="row-icon icon-emerald"><i class="fas fa-chalkboard-teacher"></i></div>
+                      <span class="row-title">2. แม่แบบข้อมูลครูผู้สอน</span>
                     </div>
-                    <i class="fas fa-arrow-down pill-arrow"></i>
+                    <span class="row-tag"><i class="fas fa-download"></i> .CSV</span>
                   </button>
-                  <button type="button" class="template-download-pill" onclick="exportEngine.downloadTemplate('students')" title="ดาวน์โหลดแม่แบบทะเบียนนักเรียน">
-                    <div class="pill-left">
-                      <div class="pill-icon"><i class="fas fa-user-graduate"></i></div>
-                      <span class="pill-title">3. ทะเบียนนักเรียน</span>
+                  <button type="button" class="template-download-row" onclick="exportEngine.downloadTemplate('students')" title="ดาวน์โหลดแม่แบบทะเบียนนักเรียน">
+                    <div class="row-left">
+                      <div class="row-icon icon-sky"><i class="fas fa-user-graduate"></i></div>
+                      <span class="row-title">3. แม่แบบทะเบียนนักเรียน</span>
                     </div>
-                    <i class="fas fa-arrow-down pill-arrow"></i>
+                    <span class="row-tag"><i class="fas fa-download"></i> .CSV</span>
                   </button>
-                  <button type="button" class="template-download-pill" onclick="exportEngine.downloadTemplate('users')" title="ดาวน์โหลดแม่แบบบัญชีผู้ใช้งาน">
-                    <div class="pill-left">
-                      <div class="pill-icon"><i class="fas fa-users-cog"></i></div>
-                      <span class="pill-title">4. บัญชีผู้ใช้</span>
+                  <button type="button" class="template-download-row" onclick="exportEngine.downloadTemplate('users')" title="ดาวน์โหลดแม่แบบบัญชีผู้ใช้งาน">
+                    <div class="row-left">
+                      <div class="row-icon icon-purple"><i class="fas fa-users-cog"></i></div>
+                      <span class="row-title">4. แม่แบบบัญชีผู้ใช้งาน</span>
                     </div>
-                    <i class="fas fa-arrow-down pill-arrow"></i>
+                    <span class="row-tag"><i class="fas fa-download"></i> .CSV</span>
                   </button>
                 </div>
               </div>
@@ -1188,19 +1188,19 @@
   <div id="toast-container" class="toast-container"></div>
 
   <!-- Application Scripts (Loaded with Cache Busting) -->
-  <script src="js/config.js?v=3.3.0"></script>
-  <script src="js/firebase-service.js?v=3.3.0"></script>
-  <script src="js/cloudinary-service.js?v=3.3.0"></script>
-  <script src="js/auth.js?v=3.3.0"></script>
-  <script src="js/dashboard.js?v=3.3.0"></script>
-  <script src="js/workflow.js?v=3.3.0"></script>
-  <script src="js/records.js?v=3.3.0"></script>
-  <script src="js/audit.js?v=3.3.0"></script>
-  <script src="js/teachers.js?v=3.3.0"></script>
-  <script src="js/students.js?v=3.3.0"></script>
-  <script src="js/users.js?v=3.3.0"></script>
-  <script src="js/export-engine.js?v=3.3.0"></script>
-  <script src="js/app.js?v=3.3.0"></script>
+  <script src="js/config.js?v=3.4.0"></script>
+  <script src="js/firebase-service.js?v=3.4.0"></script>
+  <script src="js/cloudinary-service.js?v=3.4.0"></script>
+  <script src="js/auth.js?v=3.4.0"></script>
+  <script src="js/dashboard.js?v=3.4.0"></script>
+  <script src="js/workflow.js?v=3.4.0"></script>
+  <script src="js/records.js?v=3.4.0"></script>
+  <script src="js/audit.js?v=3.4.0"></script>
+  <script src="js/teachers.js?v=3.4.0"></script>
+  <script src="js/students.js?v=3.4.0"></script>
+  <script src="js/users.js?v=3.4.0"></script>
+  <script src="js/export-engine.js?v=3.4.0"></script>
+  <script src="js/app.js?v=3.4.0"></script>
 
   <script>
     // Tab role switcher helper in login view
