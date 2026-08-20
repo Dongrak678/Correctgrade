@@ -568,20 +568,25 @@ a:hover { color: var(--primary-dark); }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: linear-gradient(135deg, #092265 0%, #123e9c 25%, #1d5ec9 50%, #3b82f6 75%, #93c5fd 100%);
+  background-color: #0c2b74;
+  background-image: url('../login-bg.jpg?v=2.8.0');
+  background-position: center center;
+  background-size: cover;
+  background-repeat: no-repeat;
   position: relative;
   overflow: hidden;
-  padding: 30px 60px;
+  padding: 40px 70px;
   box-sizing: border-box;
 }
 
-/* Background Ethereal Waves & Silhouettes */
+/* Atmospheric Overlay Layer */
 .login-bg-mesh {
   position: absolute;
   inset: 0;
   pointer-events: none;
   overflow: hidden;
   z-index: 1;
+  background: radial-gradient(circle at 75% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 60%);
 }
 
 .login-bg-wave-1 {
