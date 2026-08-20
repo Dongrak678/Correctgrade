@@ -12,33 +12,65 @@ class AppController {
     console.log(`🚀 กำลังเริ่มต้น ${APP_CONFIG.APP_NAME} v${APP_CONFIG.APP_VERSION}`);
 
     // กำหนดชื่อโรงเรียนและปีการศึกษาบนหัวเว็บ
-    document.querySelectorAll('.school-name-text').forEach(el => el.innerText = APP_CONFIG.SCHOOL_NAME);
-    document.querySelectorAll('.app-version-text').forEach(el => el.innerText = `v${APP_CONFIG.APP_VERSION}`);
-    document.querySelectorAll('.current-year-text').forEach(el => el.innerText = `ปีการศึกษา ${APP_CONFIG.ACADEMIC_YEAR} ภาคเรียนที่ ${APP_CONFIG.SEMESTER}`);
+    try {
+      document.querySelectorAll('.school-name-text').forEach(el => el.innerText = APP_CONFIG.SCHOOL_NAME);
+      document.querySelectorAll('.app-version-text').forEach(el => el.innerText = `v${APP_CONFIG.APP_VERSION}`);
+      document.querySelectorAll('.current-year-text').forEach(el => el.innerText = `ปีการศึกษา ${APP_CONFIG.ACADEMIC_YEAR} ภาคเรียนที่ ${APP_CONFIG.SEMESTER}`);
+    } catch (e) {
+      console.warn("UI header warning:", e);
+    }
 
     // เริ่มต้นระบบเชื่อมต่อ Firebase Realtime DB
-    await db.init();
+    try {
+      await db.init();
+    } catch (e) {
+      console.warn("DB init warning:", e);
+    }
 
     // ตรวจสอบสถานะการล็อกอิน
-    this.checkAuthState();
+    try {
+      this.checkAuthState();
+    } catch (e) {
+      console.error("Auth check error:", e);
+    }
 
     // ผูก Event Listeners
-    this.bindEvents();
+    try {
+      this.bindEvents();
+    } catch (e) {
+      console.error("Bind events error:", e);
+    }
 
-    // เริ่มต้นเซอร์วิสย่อย
-    dashboardService.init();
-    recordsService.init();
-    auditService.init();
-    teachersService.init();
-    studentsService.init();
-    usersService.init();
+    // เริ่มต้นเซอร์วิสย่อยแบบปลอดภัย (Safe Service Init)
+    try { if (typeof dashboardService !== 'undefined') dashboardService.init(); } catch (e) { console.error("dashboardService init error:", e); }
+    try { if (typeof recordsService !== 'undefined') recordsService.init(); } catch (e) { console.error("recordsService init error:", e); }
+    try { if (typeof auditService !== 'undefined') auditService.init(); } catch (e) { console.error("auditService init error:", e); }
+    try { if (typeof teachersService !== 'undefined') teachersService.init(); } catch (e) { console.error("teachersService init error:", e); }
+    try { if (typeof studentsService !== 'undefined') studentsService.init(); } catch (e) { console.error("studentsService init error:", e); }
+    try { if (typeof usersService !== 'undefined') usersService.init(); } catch (e) { console.error("usersService init error:", e); }
 
-    // ซ่อน Splash Screen / Preloader
+    // ซ่อน Splash Screen / Preloader เสมอ (Guaranteed Dismiss)
+    this.hidePreloader();
+  }
+
+  hidePreloader() {
     const preloader = document.getElementById('app-preloader');
     if (preloader) {
       preloader.classList.add('fade-out');
-      setTimeout(() => preloader.style.display = 'none', 400);
+      setTimeout(() => {
+        preloader.style.display = 'none';
+      }, 400);
     }
+  }
+
+  escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
   }
 
   checkAuthState() {
