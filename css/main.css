@@ -622,10 +622,10 @@ a:hover { color: var(--primary-dark); }
 /* --- Left Hero Brand Panel (Massive Logo & Academic Elegance) --- */
 .login-hero-left {
   flex: 1;
-  max-width: 580px;
+  max-width: 560px;
   position: relative;
   z-index: 10;
-  padding-right: 30px;
+  margin-left: clamp(40px, 7.5vw, 130px); /* Shifts the logo and text more to the right for perfect visual balance */
   margin-top: -20px;
 }
 
@@ -1161,49 +1161,6 @@ a:hover { color: var(--primary-dark); }
   }
 }
 
-/* Fallback compact card (mobile / small screens) */
-.login-glass-card {
-  width: 100%;
-  max-width: 440px;
-  background: #ffffff;
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-xl);
-  overflow: hidden;
-  border: 1px solid var(--border-subtle);
-}
-
-.login-card-header {
-  background: var(--primary-gradient);
-  padding: 24px 22px 20px;
-  text-align: center;
-  color: #ffffff;
-}
-
-.login-brand-icon {
-  width: 54px;
-  height: 54px;
-  margin: 0 auto 12px;
-  background: rgba(255,255,255,0.15);
-  border-radius: var(--radius-md);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  border: 1.5px solid rgba(255,255,255,0.25);
-}
-
-.login-card-header h2 {
-  font-size: 18px;
-  font-weight: 700;
-  color: #ffffff;
-}
-.login-card-header p, .login-card-header .school-name-text {
-  font-size: 13px;
-  color: rgba(255,255,255,0.8);
-  margin-top: 2px;
-}
-
-.login-card-body { padding: 22px 24px; }
 
 /* ==========================================================================
    Responsive
