@@ -24,8 +24,8 @@
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
   <!-- Application Stylesheets (with cache busting) -->
-  <link rel="stylesheet" href="css/main.css?v=4.2.0">
-  <link rel="stylesheet" href="css/components.css?v=4.2.0">
+  <link rel="stylesheet" href="css/main.css?v=4.3.0">
+  <link rel="stylesheet" href="css/components.css?v=4.3.0">
 </head>
 <body>
 
@@ -1191,19 +1191,15 @@
   </div>
 
   <!-- 8.5 Academic Term & Semester Selector Modal -->
-  <div id="modal-term-selector" class="modal-backdrop">
-    <div class="modal-box modal-md animate-scale-in" style="max-width: 480px;">
+  <div id="modal-term-selector" class="modal-wrapper">
+    <div class="modal-backdrop" onclick="app.closeTermSelectorModal()"></div>
+    <div class="modal-dialog" style="max-width: 500px;">
       <div class="modal-header">
         <div class="modal-title-wrap">
-          <div class="modal-icon-badge bg-blue-soft text-primary">
-            <i class="far fa-calendar-alt"></i>
-          </div>
-          <div>
-            <h3>เลือกปีการศึกษาและภาคเรียน</h3>
-            <p class="text-xs text-muted">กำหนดภาคเรียนสำหรับการติดตามและบันทึกผลการเรียน (1 ปีการศึกษา มี 2 ภาคเรียน)</p>
-          </div>
+          <span class="modal-badge bg-blue-soft text-primary"><i class="far fa-calendar-alt"></i> ภาคเรียน</span>
+          <h3 style="margin-left: 6px;">เลือกปีการศึกษาและภาคเรียน</h3>
         </div>
-        <button type="button" class="btn-modal-close" onclick="app.closeTermSelectorModal()">&times;</button>
+        <button type="button" class="btn-close-modal" onclick="app.closeTermSelectorModal()">&times;</button>
       </div>
       <div class="modal-body">
         <div class="form-group mb-3">
@@ -1260,19 +1256,19 @@
   <div id="toast-container" class="toast-container"></div>
 
   <!-- Application Scripts (Loaded with Cache Busting) -->
-  <script src="js/config.js?v=4.2.0"></script>
-  <script src="js/firebase-service.js?v=4.2.0"></script>
-  <script src="js/cloudinary-service.js?v=4.2.0"></script>
-  <script src="js/auth.js?v=4.2.0"></script>
-  <script src="js/dashboard.js?v=4.2.0"></script>
-  <script src="js/workflow.js?v=4.2.0"></script>
-  <script src="js/records.js?v=4.2.0"></script>
-  <script src="js/audit.js?v=4.2.0"></script>
-  <script src="js/teachers.js?v=4.2.0"></script>
-  <script src="js/students.js?v=4.2.0"></script>
-  <script src="js/users.js?v=4.2.0"></script>
-  <script src="js/export-engine.js?v=4.2.0"></script>
-  <script src="js/app.js?v=4.2.0"></script>
+  <script src="js/config.js?v=4.3.0"></script>
+  <script src="js/firebase-service.js?v=4.3.0"></script>
+  <script src="js/cloudinary-service.js?v=4.3.0"></script>
+  <script src="js/auth.js?v=4.3.0"></script>
+  <script src="js/dashboard.js?v=4.3.0"></script>
+  <script src="js/workflow.js?v=4.3.0"></script>
+  <script src="js/records.js?v=4.3.0"></script>
+  <script src="js/audit.js?v=4.3.0"></script>
+  <script src="js/teachers.js?v=4.3.0"></script>
+  <script src="js/students.js?v=4.3.0"></script>
+  <script src="js/users.js?v=4.3.0"></script>
+  <script src="js/export-engine.js?v=4.3.0"></script>
+  <script src="js/app.js?v=4.3.0"></script>
 
   <script>
     // Tab role switcher helper in login view
