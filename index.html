@@ -24,8 +24,8 @@
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
   <!-- Application Stylesheets (with cache busting) -->
-  <link rel="stylesheet" href="css/main.css?v=4.1.0">
-  <link rel="stylesheet" href="css/components.css?v=4.1.0">
+  <link rel="stylesheet" href="css/main.css?v=4.2.0">
+  <link rel="stylesheet" href="css/components.css?v=4.2.0">
 </head>
 <body>
 
@@ -276,7 +276,11 @@
           </button>
           <div class="topbar-title">
             <h3 id="page-current-title">ระบบติดตามแก้ไขผลการเรียน</h3>
-            <p class="current-year-text">ปีการศึกษา 2569 ภาคเรียนที่ 1</p>
+            <div class="term-selector-pill" onclick="app.openTermSelectorModal()" title="คลิกเพื่อเลือกปีการศึกษา / ภาคเรียนที่ 1 หรือ 2">
+              <i class="far fa-calendar-alt text-primary"></i>
+              <span id="topbar-academic-term-text">ปีการศึกษา 2569 ภาคเรียนที่ 1</span>
+              <i class="fas fa-chevron-down text-xs opacity-75"></i>
+            </div>
           </div>
         </div>
 
@@ -324,7 +328,9 @@
                   <span class="hero-status-pill">
                     <span class="pulse-dot"></span> เชื่อมต่อ Realtime Live
                   </span>
-                  <span class="hero-academic-pill" id="dashboard-hero-term">ปีการศึกษา 2569 ภาคเรียนที่ 1</span>
+                  <button type="button" class="hero-academic-pill btn-term-switch" onclick="app.openTermSelectorModal()" title="คลิกเพื่อสลับภาคเรียนที่ 1 / ภาคเรียนที่ 2">
+                    <i class="far fa-calendar-alt"></i> <span id="dashboard-hero-term">ปีการศึกษา 2569 ภาคเรียนที่ 1</span> <i class="fas fa-chevron-down ml-1 text-xs"></i>
+                  </button>
                   <span class="hero-date-pill" id="dashboard-hero-date">
                     <i class="far fa-calendar-alt"></i> วันนี้
                   </span>
@@ -1184,23 +1190,89 @@
     </div>
   </div>
 
+  <!-- 8.5 Academic Term & Semester Selector Modal -->
+  <div id="modal-term-selector" class="modal-backdrop">
+    <div class="modal-box modal-md animate-scale-in" style="max-width: 480px;">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <div class="modal-icon-badge bg-blue-soft text-primary">
+            <i class="far fa-calendar-alt"></i>
+          </div>
+          <div>
+            <h3>เลือกปีการศึกษาและภาคเรียน</h3>
+            <p class="text-xs text-muted">กำหนดภาคเรียนสำหรับการติดตามและบันทึกผลการเรียน (1 ปีการศึกษา มี 2 ภาคเรียน)</p>
+          </div>
+        </div>
+        <button type="button" class="btn-modal-close" onclick="app.closeTermSelectorModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group mb-3">
+          <label for="term-selector-year" class="font-bold mb-1 block" style="font-size: 13.5px; color: #1e293b;">
+            <i class="fas fa-calendar mr-1 text-primary"></i> ปีการศึกษา (Academic Year)
+          </label>
+          <select id="term-selector-year" class="form-control" style="font-weight: 700; font-size: 14px;">
+            <option value="2569">ปีการศึกษา 2569 (ปัจจุบัน)</option>
+            <option value="2568">ปีการศึกษา 2568</option>
+            <option value="2567">ปีการศึกษา 2567</option>
+            <option value="2566">ปีการศึกษา 2566</option>
+            <option value="2570">ปีการศึกษา 2570</option>
+          </select>
+        </div>
+
+        <label class="font-bold mb-2 block" style="font-size: 13.5px; color: #1e293b;">
+          <i class="fas fa-layer-group mr-1 text-primary"></i> เลือกภาคเรียน (Semester)
+        </label>
+        <div class="term-choice-grid">
+          <!-- Semester 1 Button -->
+          <div class="term-choice-btn active" data-semester="1" onclick="app.selectModalSemester('1')">
+            <div class="term-choice-icon">
+              <i class="fas fa-book-open"></i>
+            </div>
+            <div class="term-choice-title">ภาคเรียนที่ 1</div>
+            <div class="term-choice-sub">เทอมต้น (1 มิ.ย. - 31 ต.ค.)</div>
+          </div>
+
+          <!-- Semester 2 Button -->
+          <div class="term-choice-btn" data-semester="2" onclick="app.selectModalSemester('2')">
+            <div class="term-choice-icon">
+              <i class="fas fa-graduation-cap"></i>
+            </div>
+            <div class="term-choice-title">ภาคเรียนที่ 2</div>
+            <div class="term-choice-sub">เทอมปลาย (1 พ.ย. - 31 มี.ค.)</div>
+          </div>
+        </div>
+
+        <div class="alert alert-info py-2 px-3 text-xs mt-3 flex items-center gap-2" style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; color: #1e40af;">
+          <i class="fas fa-info-circle text-primary" style="font-size: 14px;"></i>
+          <span>เมื่อสลับภาคเรียน ระบบจะปรับปรุงรายงานสถิติ แดชบอร์ด และข้อมูลผลการเรียนให้สอดคล้องกับภาคเรียนที่เลือกทันที</span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" onclick="app.closeTermSelectorModal()">ยกเลิก</button>
+        <button type="button" class="btn btn-primary" onclick="app.saveTermSelector()">
+          <i class="fas fa-check mr-1"></i> บันทึกและสลับภาคเรียน
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- 9. Toast Notification Stack Container -->
   <div id="toast-container" class="toast-container"></div>
 
   <!-- Application Scripts (Loaded with Cache Busting) -->
-  <script src="js/config.js?v=4.1.0"></script>
-  <script src="js/firebase-service.js?v=4.1.0"></script>
-  <script src="js/cloudinary-service.js?v=4.1.0"></script>
-  <script src="js/auth.js?v=4.1.0"></script>
-  <script src="js/dashboard.js?v=4.1.0"></script>
-  <script src="js/workflow.js?v=4.1.0"></script>
-  <script src="js/records.js?v=4.1.0"></script>
-  <script src="js/audit.js?v=4.1.0"></script>
-  <script src="js/teachers.js?v=4.1.0"></script>
-  <script src="js/students.js?v=4.1.0"></script>
-  <script src="js/users.js?v=4.1.0"></script>
-  <script src="js/export-engine.js?v=4.1.0"></script>
-  <script src="js/app.js?v=4.1.0"></script>
+  <script src="js/config.js?v=4.2.0"></script>
+  <script src="js/firebase-service.js?v=4.2.0"></script>
+  <script src="js/cloudinary-service.js?v=4.2.0"></script>
+  <script src="js/auth.js?v=4.2.0"></script>
+  <script src="js/dashboard.js?v=4.2.0"></script>
+  <script src="js/workflow.js?v=4.2.0"></script>
+  <script src="js/records.js?v=4.2.0"></script>
+  <script src="js/audit.js?v=4.2.0"></script>
+  <script src="js/teachers.js?v=4.2.0"></script>
+  <script src="js/students.js?v=4.2.0"></script>
+  <script src="js/users.js?v=4.2.0"></script>
+  <script src="js/export-engine.js?v=4.2.0"></script>
+  <script src="js/app.js?v=4.2.0"></script>
 
   <script>
     // Tab role switcher helper in login view

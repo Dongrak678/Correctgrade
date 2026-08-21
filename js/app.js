@@ -341,6 +341,83 @@ class AppController {
     }
   }
 
+  // --- Academic Year & Semester Switcher ---
+  updateAcademicTermDisplay() {
+    const text = `ปีการศึกษา ${APP_CONFIG.ACADEMIC_YEAR} ภาคเรียนที่ ${APP_CONFIG.SEMESTER}`;
+    document.querySelectorAll('.current-year-text').forEach(el => el.innerText = text);
+    
+    const topbarText = document.getElementById('topbar-academic-term-text');
+    if (topbarText) topbarText.innerText = text;
+
+    const heroTerm = document.getElementById('dashboard-hero-term');
+    if (heroTerm) heroTerm.innerText = text;
+  }
+
+  setAcademicTerm(year, semester) {
+    if (!year) year = "2569";
+    if (!semester) semester = "1";
+
+    APP_CONFIG.ACADEMIC_YEAR = String(year);
+    APP_CONFIG.SEMESTER = String(semester);
+
+    localStorage.setItem('dongrak_academic_year', String(year));
+    localStorage.setItem('dongrak_semester', String(semester));
+
+    this.updateAcademicTermDisplay();
+
+    // รีเฟรชหน้า Dashboard และตารางผลการเรียน
+    try {
+      if (typeof dashboardService !== 'undefined') dashboardService.init(true);
+      if (typeof recordsService !== 'undefined') recordsService.renderRecordsTable();
+    } catch (e) {
+      console.warn("Term refresh error:", e);
+    }
+
+    this.showToast(`📅 เปลี่ยนเป็น ปีการศึกษา ${year} ภาคเรียนที่ ${semester} เรียบร้อยแล้ว`, "success");
+    this.closeTermSelectorModal();
+  }
+
+  openTermSelectorModal() {
+    const modal = document.getElementById('modal-term-selector');
+    if (!modal) return;
+
+    // เลือกปีและเทอมปัจจุบัน
+    const yearSelect = document.getElementById('term-selector-year');
+    if (yearSelect) yearSelect.value = APP_CONFIG.ACADEMIC_YEAR;
+
+    this.selectedModalSemester = APP_CONFIG.SEMESTER || "1";
+    this.highlightModalSemester(this.selectedModalSemester);
+
+    modal.classList.add('active');
+  }
+
+  closeTermSelectorModal() {
+    const modal = document.getElementById('modal-term-selector');
+    if (modal) modal.classList.remove('active');
+  }
+
+  selectModalSemester(sem) {
+    this.selectedModalSemester = String(sem);
+    this.highlightModalSemester(sem);
+  }
+
+  highlightModalSemester(sem) {
+    document.querySelectorAll('.term-choice-btn').forEach(btn => {
+      if (btn.getAttribute('data-semester') === String(sem)) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+  }
+
+  saveTermSelector() {
+    const yearSelect = document.getElementById('term-selector-year');
+    const year = yearSelect ? yearSelect.value : APP_CONFIG.ACADEMIC_YEAR;
+    const semester = this.selectedModalSemester || "1";
+    this.setAcademicTerm(year, semester);
+  }
+
   bindEvents() {
     // Login Form Submit
     const loginForm = document.getElementById('main-login-form');

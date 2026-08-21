@@ -128,6 +128,11 @@
       // ดึงข้อมูลจากฐานข้อมูล
       await db.init();
       
+      const metaEl = document.getElementById('doc-meta-text');
+      if (metaEl) {
+        metaEl.innerText = `ปีการศึกษา ${APP_CONFIG.ACADEMIC_YEAR} ภาคเรียนที่ ${APP_CONFIG.SEMESTER} • งานทะเบียนและวัดผล กลุ่มบริหารวิชาการ`;
+      }
+
       const params = new URLSearchParams(window.location.search);
       const levelFilter = params.get('level') || 'all';
       const statusFilter = params.get('status') || 'all';

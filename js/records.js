@@ -535,11 +535,18 @@ class RecordsService {
               </div>
               <div class="form-group col-md-3">
                 <label for="rec-semester">ภาคเรียน</label>
-                <input type="text" id="rec-semester" class="form-control" value="${APP_CONFIG.SEMESTER}">
+                <select id="rec-semester" class="form-control">
+                  <option value="1" ${String(APP_CONFIG.SEMESTER) === '1' ? 'selected' : ''}>ภาคเรียนที่ 1</option>
+                  <option value="2" ${String(APP_CONFIG.SEMESTER) === '2' ? 'selected' : ''}>ภาคเรียนที่ 2</option>
+                </select>
               </div>
               <div class="form-group col-md-3">
                 <label for="rec-academic-year">ปีการศึกษา</label>
-                <input type="text" id="rec-academic-year" class="form-control" value="${APP_CONFIG.ACADEMIC_YEAR}">
+                <select id="rec-academic-year" class="form-control">
+                  ${(APP_CONFIG.AVAILABLE_YEARS || ["2569", "2568", "2567", "2570"]).map(y => `
+                    <option value="${y}" ${String(APP_CONFIG.ACADEMIC_YEAR) === String(y) ? 'selected' : ''}>${y}</option>
+                  `).join('')}
+                </select>
               </div>
             </div>
 

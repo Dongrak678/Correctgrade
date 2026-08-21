@@ -7,8 +7,13 @@ const APP_CONFIG = {
   APP_NAME: "ระบบติดตามแก้ไขผลการเรียน",
   APP_VERSION: "1.0.0",
   SCHOOL_NAME: "โรงเรียนพนมดงรักวิทยา",
-  ACADEMIC_YEAR: "2569",
-  SEMESTER: "1",
+  ACADEMIC_YEAR: localStorage.getItem('dongrak_academic_year') || "2569",
+  SEMESTER: localStorage.getItem('dongrak_semester') || "1",
+  AVAILABLE_YEARS: ["2569", "2568", "2567", "2566", "2570"],
+  AVAILABLE_SEMESTERS: [
+    { value: "1", label: "ภาคเรียนที่ 1", desc: "ภาคเรียนที่ 1 (เทอมต้น)" },
+    { value: "2", label: "ภาคเรียนที่ 2", desc: "ภาคเรียนที่ 2 (เทอมปลาย)" }
+  ],
   
   // Firebase Realtime Database
   FIREBASE_DB_URL: "https://newdatadongrak-default-rtdb.asia-southeast1.firebasedatabase.app/",
