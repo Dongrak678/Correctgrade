@@ -571,13 +571,13 @@ a:hover { color: var(--primary-dark); }
   align-items: center;
   justify-content: space-between;
   background-color: #dbeafe;
-  background-image: url('../login-bg.jpg?v=3.1.0');
+  background-image: url('../login-bg.jpg?v=3.6.0');
   background-position: center center;
   background-size: cover;
   background-repeat: no-repeat;
   position: relative;
   overflow: hidden;
-  padding: 20px 60px;
+  padding: 20px clamp(40px, 4vw, 70px);
   box-sizing: border-box;
 }
 
@@ -625,8 +625,8 @@ a:hover { color: var(--primary-dark); }
   max-width: 560px;
   position: relative;
   z-index: 10;
-  margin-left: clamp(40px, 7.5vw, 130px); /* Shifts the logo and text more to the right for perfect visual balance */
-  margin-top: -20px;
+  margin-left: clamp(90px, 14vw, 260px); /* Shifts the logo and text further to the right for ideal visual balance */
+  margin-top: -15px;
 }
 
 .brand-hero-header-row {

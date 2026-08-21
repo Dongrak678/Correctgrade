@@ -6,7 +6,7 @@
 const APP_CONFIG = {
   APP_NAME: "ระบบติดตามแก้ไขผลการเรียน",
   APP_VERSION: "1.0.0",
-  SCHOOL_NAME: "โรงเรียนดงรักวิทยา",
+  SCHOOL_NAME: "โรงเรียนพนมดงรักวิทยา",
   ACADEMIC_YEAR: "2569",
   SEMESTER: "1",
   
