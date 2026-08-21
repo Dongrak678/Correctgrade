@@ -339,7 +339,15 @@ class TeachersService {
   }
 
   async deleteTeacherPrompt(id, name) {
-    if (confirm(`คุณต้องการลบข้อมูล "${name}" หรือไม่?`)) {
+    const confirmed = await app.confirmAction({
+      title: "ยืนยันการลบข้อมูลครูผู้สอน",
+      message: `คุณต้องการลบข้อมูลครู "${name}" และบัญชีผู้ใช้งานที่เกี่ยวข้องออกจากระบบหรือไม่?`,
+      type: "danger",
+      confirmText: "ลบข้อมูลครู",
+      confirmIcon: "fas fa-trash-alt",
+      btnClass: "btn-rose"
+    });
+    if (confirmed) {
       const teacher = db.getById('teachers', id);
       await db.deleteItem('teachers', id);
       if (teacher && teacher.teacherId) {

@@ -197,7 +197,17 @@ class AuthService {
     return { success: true, user: this.currentUser };
   }
 
-  logout() {
+  async logout() {
+    const confirmed = await app.confirmAction({
+      title: "ยืนยันการออกจากระบบ",
+      message: "คุณต้องการออกจากระบบติดตามผลการเรียนหรือไม่?",
+      type: "logout",
+      confirmText: "ออกจากระบบ",
+      confirmIcon: "fas fa-sign-out-alt",
+      btnClass: "btn-rose"
+    });
+    if (!confirmed) return;
+
     if (this.currentUser) {
       db.addActivityLog(
         'logout',

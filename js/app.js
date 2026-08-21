@@ -418,6 +418,78 @@ class AppController {
     this.setAcademicTerm(year, semester);
   }
 
+  /**
+   * แสดงหน้าต่าง Pop-up ยืนยันการกระทำ (Universal Confirm Modal)
+   * @param {Object} options
+   * @param {string} options.title - หัวข้อ เช่น "ยืนยันการลบข้อมูล"
+   * @param {string} options.message - ข้อความอธิบาย
+   * @param {string} options.type - 'danger' | 'warning' | 'info' | 'logout'
+   * @param {string} options.confirmText - ข้อความบนปุ่มยืนยัน
+   * @param {string} options.confirmIcon - ไอคอน เช่น "fas fa-trash-alt"
+   * @param {string} options.btnClass - คลาสของปุ่มยืนยัน เช่น "btn-rose", "btn-amber", "btn-primary"
+   * @returns {Promise<boolean>}
+   */
+  confirmAction(options = {}) {
+    return new Promise((resolve) => {
+      const modal = document.getElementById('modal-confirm-dialog');
+      if (!modal) {
+        // Fallback ถ้าไม่มี modal ใน DOM
+        resolve(window.confirm(options.message || "คุณต้องการดำเนินการต่อไปหรือไม่?"));
+        return;
+      }
+
+      const titleEl = document.getElementById('confirm-title');
+      const msgEl = document.getElementById('confirm-message');
+      const iconBox = document.getElementById('confirm-icon-box');
+      const iconEl = document.getElementById('confirm-icon');
+      const okBtn = document.getElementById('confirm-ok-btn');
+      const cancelBtn = document.getElementById('confirm-cancel-btn');
+
+      if (titleEl) titleEl.innerText = options.title || "ยืนยันการทำรายการ";
+      if (msgEl) msgEl.innerText = options.message || "คุณแน่ใจหรือไม่ว่าต้องการดำเนินการนี้?";
+
+      const type = options.type || "danger";
+      if (iconBox) {
+        iconBox.className = `confirm-modal-icon confirm-type-${type}`;
+      }
+
+      if (iconEl) {
+        if (options.confirmIcon) {
+          iconEl.className = options.confirmIcon;
+        } else if (type === 'logout') {
+          iconEl.className = 'fas fa-sign-out-alt';
+        } else if (type === 'danger') {
+          iconEl.className = 'fas fa-trash-alt';
+        } else if (type === 'warning') {
+          iconEl.className = 'fas fa-exclamation-triangle';
+        } else {
+          iconEl.className = 'fas fa-question-circle';
+        }
+      }
+
+      if (okBtn) {
+        okBtn.className = `btn ${options.btnClass || (type === 'danger' || type === 'logout' ? 'btn-rose' : 'btn-primary')} px-4 font-bold`;
+        okBtn.innerHTML = `<i class="${options.confirmIcon || (type === 'danger' ? 'fas fa-trash-alt' : type === 'logout' ? 'fas fa-sign-out-alt' : 'fas fa-check')} mr-1"></i> ${options.confirmText || 'ยืนยัน'}`;
+      }
+
+      if (cancelBtn) {
+        cancelBtn.innerText = options.cancelText || 'ยกเลิก';
+      }
+
+      this._confirmResolve = resolve;
+      modal.classList.add('active');
+    });
+  }
+
+  closeConfirmDialog(result = false) {
+    const modal = document.getElementById('modal-confirm-dialog');
+    if (modal) modal.classList.remove('active');
+    if (this._confirmResolve) {
+      this._confirmResolve(Boolean(result));
+      this._confirmResolve = null;
+    }
+  }
+
   bindEvents() {
     // Login Form Submit
     const loginForm = document.getElementById('main-login-form');

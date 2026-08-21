@@ -174,7 +174,15 @@ class AuditService {
   }
 
   async deleteAuditPrompt(id) {
-    if (confirm("คุณต้องการลบประวัติการอนุมัตินี้ออกจาก Audit Log หรือไม่?")) {
+    const confirmed = await app.confirmAction({
+      title: "ยืนยันการลบประวัติการอนุมัติ",
+      message: "คุณต้องการลบประวัติการอนุมัตินี้ออกจาก Audit Log หรือไม่?",
+      type: "danger",
+      confirmText: "ลบประวัติ",
+      confirmIcon: "fas fa-trash-alt",
+      btnClass: "btn-rose"
+    });
+    if (confirmed) {
       await db.deleteItem('auditLogs', id);
       app.showToast("ลบประวัติการอนุมัติเรียบร้อยแล้ว", "info");
     }

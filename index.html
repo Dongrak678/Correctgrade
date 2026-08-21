@@ -24,8 +24,8 @@
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
   <!-- Application Stylesheets (with cache busting) -->
-  <link rel="stylesheet" href="css/main.css?v=4.4.0">
-  <link rel="stylesheet" href="css/components.css?v=4.4.0">
+  <link rel="stylesheet" href="css/main.css?v=4.5.0">
+  <link rel="stylesheet" href="css/components.css?v=4.5.0">
 </head>
 <body>
 
@@ -1226,23 +1226,46 @@
     </div>
   </div>
 
+  <!-- 8.6 Universal Confirmation Dialog Modal -->
+  <div id="modal-confirm-dialog" class="modal-wrapper">
+    <div class="modal-backdrop" onclick="app.closeConfirmDialog(false)"></div>
+    <div class="modal-dialog animate-scale-in" style="max-width: 440px; text-align: center;">
+      <div class="modal-body py-6 px-6">
+        <div id="confirm-icon-box" class="confirm-modal-icon confirm-type-danger">
+          <i id="confirm-icon" class="fas fa-trash-alt"></i>
+        </div>
+        <h3 id="confirm-title" class="confirm-modal-title">ยืนยันการลบข้อมูล</h3>
+        <p id="confirm-message" class="confirm-modal-desc">คุณต้องการลบข้อมูลนี้ออกจากระบบหรือไม่?</p>
+        
+        <div class="confirm-modal-actions mt-5">
+          <button type="button" class="btn btn-outline px-4" onclick="app.closeConfirmDialog(false)" id="confirm-cancel-btn">
+            ยกเลิก
+          </button>
+          <button type="button" class="btn btn-rose px-4 font-bold" onclick="app.closeConfirmDialog(true)" id="confirm-ok-btn">
+            <i class="fas fa-trash-alt mr-1"></i> ยืนยันการลบ
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- 9. Toast Notification Stack Container -->
   <div id="toast-container" class="toast-container"></div>
 
   <!-- Application Scripts (Loaded with Cache Busting) -->
-  <script src="js/config.js?v=4.4.0"></script>
-  <script src="js/firebase-service.js?v=4.4.0"></script>
-  <script src="js/cloudinary-service.js?v=4.4.0"></script>
-  <script src="js/auth.js?v=4.4.0"></script>
-  <script src="js/dashboard.js?v=4.4.0"></script>
-  <script src="js/workflow.js?v=4.4.0"></script>
-  <script src="js/records.js?v=4.4.0"></script>
-  <script src="js/audit.js?v=4.4.0"></script>
-  <script src="js/teachers.js?v=4.4.0"></script>
-  <script src="js/students.js?v=4.4.0"></script>
-  <script src="js/users.js?v=4.4.0"></script>
-  <script src="js/export-engine.js?v=4.4.0"></script>
-  <script src="js/app.js?v=4.4.0"></script>
+  <script src="js/config.js?v=4.5.0"></script>
+  <script src="js/firebase-service.js?v=4.5.0"></script>
+  <script src="js/cloudinary-service.js?v=4.5.0"></script>
+  <script src="js/auth.js?v=4.5.0"></script>
+  <script src="js/dashboard.js?v=4.5.0"></script>
+  <script src="js/workflow.js?v=4.5.0"></script>
+  <script src="js/records.js?v=4.5.0"></script>
+  <script src="js/audit.js?v=4.5.0"></script>
+  <script src="js/teachers.js?v=4.5.0"></script>
+  <script src="js/students.js?v=4.5.0"></script>
+  <script src="js/users.js?v=4.5.0"></script>
+  <script src="js/export-engine.js?v=4.5.0"></script>
+  <script src="js/app.js?v=4.5.0"></script>
 
   <script>
     // Tab role switcher helper in login view

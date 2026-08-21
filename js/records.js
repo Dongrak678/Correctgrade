@@ -811,7 +811,15 @@ class RecordsService {
    * ลบรายการเดี่ยวพร้อม Pop-up ยืนยัน
    */
   async deleteRecordPrompt(id, studentName, subjectCode) {
-    if (confirm(`คุณต้องการลบข้อมูลผลการเรียนของ "${studentName}" วิชา ${subjectCode} หรือไม่?`)) {
+    const confirmed = await app.confirmAction({
+      title: "ยืนยันการลบข้อมูลผลการเรียน",
+      message: `คุณต้องการลบข้อมูลผลการเรียนของ "${studentName}" วิชา ${subjectCode} หรือไม่?`,
+      type: "danger",
+      confirmText: "ลบผลการเรียน",
+      confirmIcon: "fas fa-trash-alt",
+      btnClass: "btn-rose"
+    });
+    if (confirmed) {
       await db.deleteItem('records', id);
       app.showToast("ลบข้อมูลผลการเรียนเรียบร้อยแล้ว", "info");
     }

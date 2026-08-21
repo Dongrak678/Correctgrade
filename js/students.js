@@ -454,7 +454,15 @@ class StudentsService {
   }
 
   async deleteStudentPrompt(id, name) {
-    if (confirm(`คุณต้องการลบข้อมูล "${name}" ออกจากทะเบียนหรือไม่?`)) {
+    const confirmed = await app.confirmAction({
+      title: "ยืนยันการลบข้อมูลนักเรียน",
+      message: `คุณต้องการลบข้อมูลนักเรียน "${name}" ออกจากทะเบียนหรือไม่?`,
+      type: "danger",
+      confirmText: "ลบนักเรียน",
+      confirmIcon: "fas fa-trash-alt",
+      btnClass: "btn-rose"
+    });
+    if (confirmed) {
       await db.deleteItem('students', id);
       app.showToast("ลบข้อมูลนักเรียนเรียบร้อยแล้ว", "info");
     }

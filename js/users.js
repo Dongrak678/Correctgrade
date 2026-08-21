@@ -469,7 +469,15 @@ class UsersService {
   }
 
   async deleteUserPrompt(id, name) {
-    if (confirm(`คุณต้องการลบบัญชีผู้ใช้ "${name}" หรือไม่?`)) {
+    const confirmed = await app.confirmAction({
+      title: "ยืนยันการลบบัญชีผู้ใช้งาน",
+      message: `คุณต้องการลบบัญชีผู้ใช้ "${name}" ออกจากระบบหรือไม่?`,
+      type: "danger",
+      confirmText: "ลบบัญชีผู้ใช้",
+      confirmIcon: "fas fa-trash-alt",
+      btnClass: "btn-rose"
+    });
+    if (confirmed) {
       await db.deleteItem('users', id);
       app.showToast("ลบบัญชีผู้ใช้งานเรียบร้อยแล้ว", "info");
     }
