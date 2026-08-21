@@ -24,8 +24,8 @@
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
   <!-- Application Stylesheets (with cache busting) -->
-  <link rel="stylesheet" href="css/main.css?v=4.5.0">
-  <link rel="stylesheet" href="css/components.css?v=4.5.0">
+  <link rel="stylesheet" href="css/main.css?v=4.6.0">
+  <link rel="stylesheet" href="css/components.css?v=4.6.0">
 </head>
 <body>
 
@@ -189,9 +189,9 @@
       </div>
 
       <nav class="sidebar-menu">
-        <span class="menu-category">ภาพรวมและข้อมูล</span>
+        <span class="menu-category">เมนูระบบ</span>
         
-        <div class="nav-item active" data-view="dashboard" onclick="app.switchView('dashboard')">
+        <div class="nav-item nav-teacher-only active" data-view="dashboard" onclick="app.switchView('dashboard')">
           <i class="fas fa-chart-pie"></i>
           <span>แดชบอร์ดสรุปภาพรวม</span>
         </div>
@@ -206,7 +206,7 @@
           <span>ตารางเปรียบเทียบก่อน-หลัง</span>
         </div>
 
-        <span class="menu-category">ทำเนียบและทะเบียน</span>
+        <span class="menu-category nav-teacher-only">ทำเนียบและทะเบียน</span>
 
         <div class="nav-item nav-teacher-only" data-view="teachers" onclick="app.switchView('teachers')">
           <i class="fas fa-chalkboard-teacher"></i>
@@ -225,7 +225,7 @@
           <span>จัดการผู้ใช้งานระบบ</span>
         </div>
 
-        <div class="nav-item" data-view="reports" onclick="app.switchView('reports')">
+        <div class="nav-item nav-teacher-only" data-view="reports" onclick="app.switchView('reports')">
           <i class="fas fa-file-export"></i>
           <span>รายงานและการส่งออก</span>
         </div>
@@ -1253,19 +1253,19 @@
   <div id="toast-container" class="toast-container"></div>
 
   <!-- Application Scripts (Loaded with Cache Busting) -->
-  <script src="js/config.js?v=4.5.0"></script>
-  <script src="js/firebase-service.js?v=4.5.0"></script>
-  <script src="js/cloudinary-service.js?v=4.5.0"></script>
-  <script src="js/auth.js?v=4.5.0"></script>
-  <script src="js/dashboard.js?v=4.5.0"></script>
-  <script src="js/workflow.js?v=4.5.0"></script>
-  <script src="js/records.js?v=4.5.0"></script>
-  <script src="js/audit.js?v=4.5.0"></script>
-  <script src="js/teachers.js?v=4.5.0"></script>
-  <script src="js/students.js?v=4.5.0"></script>
-  <script src="js/users.js?v=4.5.0"></script>
-  <script src="js/export-engine.js?v=4.5.0"></script>
-  <script src="js/app.js?v=4.5.0"></script>
+  <script src="js/config.js?v=4.6.0"></script>
+  <script src="js/firebase-service.js?v=4.6.0"></script>
+  <script src="js/cloudinary-service.js?v=4.6.0"></script>
+  <script src="js/auth.js?v=4.6.0"></script>
+  <script src="js/dashboard.js?v=4.6.0"></script>
+  <script src="js/workflow.js?v=4.6.0"></script>
+  <script src="js/records.js?v=4.6.0"></script>
+  <script src="js/audit.js?v=4.6.0"></script>
+  <script src="js/teachers.js?v=4.6.0"></script>
+  <script src="js/students.js?v=4.6.0"></script>
+  <script src="js/users.js?v=4.6.0"></script>
+  <script src="js/export-engine.js?v=4.6.0"></script>
+  <script src="js/app.js?v=4.6.0"></script>
 
   <script>
     // Tab role switcher helper in login view

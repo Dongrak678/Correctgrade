@@ -86,7 +86,13 @@ class AppController {
       if (mainApp) mainApp.style.display = 'block';
       this.updateUserUI(user);
       this.updateNavigationForRole(user.role);
-      this.switchView('dashboard');
+      
+      // กำหนดหน้าเริ่มต้น: นักเรียนเปิดมาที่หน้าจัดการผลการเรียนทันที / ครูและแอดมินเปิดแดชบอร์ด
+      if (user.role === APP_CONFIG.ROLES.STUDENT) {
+        this.switchView('records');
+      } else {
+        this.switchView('dashboard');
+      }
     }
   }
 
@@ -123,6 +129,14 @@ class AppController {
   }
 
   switchView(viewName) {
+    const user = authService.getCurrentUser();
+    // ป้องกันนักเรียนเข้าถึงหน้าที่ไม่มีสิทธิ์
+    if (user && user.role === APP_CONFIG.ROLES.STUDENT) {
+      if (viewName !== 'records' && viewName !== 'audit') {
+        viewName = 'records';
+      }
+    }
+
     this.currentView = viewName;
 
     // อัปเดต Active Tab ใน Sidebar / Navigation
