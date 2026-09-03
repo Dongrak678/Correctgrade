@@ -257,15 +257,7 @@
       justify-content: center;
       gap: 36px;
       margin-bottom: 6px;
-    }
-
-    .approval-box-square {
-      display: inline-block;
-      width: 12px;
-      height: 12px;
-      border: 1px solid #000000;
-      vertical-align: middle;
-      margin-right: 4px;
+      font-size: 14px;
     }
 
     /* Print Media Styles */
@@ -393,8 +385,8 @@
     <!-- 8. School Director Decision Block -->
     <div class="director-approval-box">
       <div class="approval-choice-row">
-        <span><span class="approval-box-square"></span> ( &nbsp; ) อนุมัติ</span>
-        <span><span class="approval-box-square"></span> ( &nbsp; ) ไม่อนุมัติ</span>
+        <span>(&nbsp;&nbsp;&nbsp;) อนุมัติ</span>
+        <span>(&nbsp;&nbsp;&nbsp;) ไม่อนุมัติ</span>
       </div>
       <div style="margin-bottom: 3px;">
         ลงชื่อ......................................................
@@ -410,8 +402,8 @@
   </div>
 
   <!-- Scripts to Load Realtime Data from App Storage / Database -->
-  <script src="js/config.js?v=5.0.0"></script>
-  <script src="js/firebase-service.js?v=5.0.0"></script>
+  <script src="js/config.js?v=5.1.0"></script>
+  <script src="js/firebase-service.js?v=5.1.0"></script>
   <script>
     document.addEventListener('DOMContentLoaded', async function() {
       // 1. Initialise DB connection
