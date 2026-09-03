@@ -1478,7 +1478,7 @@ class RecordsService {
 
     subjectSelect.innerHTML = subjectsList.map(s => {
       const label = `${s.code} - ${s.name} ${s.level ? `(${s.level})` : ''} [ติดเงื่อนไข ${s.count} รายการ]`;
-      return `<option value="${s.code}">${label}</option>`;
+      return `<option value="${s.code}" data-subject-code="${s.code}" data-subject-name="${s.name.replace(/"/g, '&quot;')}">${label}</option>`;
     }).join('');
 
     this.updateCondStudentPreview();
@@ -1511,7 +1511,7 @@ class RecordsService {
 
     const allRecords = db.get('records') || [];
     const matched = allRecords.filter(r => 
-      (r.teacherName && r.teacherName.trim() === teacherName) &&
+      (r.teacherName && (r.teacherName.trim() === teacherName || r.teacherName.includes(teacherName) || teacherName.includes(r.teacherName.trim()))) &&
       (r.subjectCode && r.subjectCode.trim().toLowerCase() === subjectCode.toLowerCase()) &&
       (String(r.semester) === String(sem)) &&
       (String(r.academicYear) === String(year))
@@ -1556,8 +1556,12 @@ class RecordsService {
   }
 
   previewConditionalApproval() {
-    const teacherName = (document.getElementById('print-cond-teacher')?.value || '').trim();
-    const subjectCode = (document.getElementById('print-cond-subject')?.value || '').trim();
+    const teacherSelect = document.getElementById('print-cond-teacher');
+    const subjectSelect = document.getElementById('print-cond-subject');
+    const teacherName = (teacherSelect?.value || '').trim();
+    const subjectCode = (subjectSelect?.value || '').trim();
+    const selectedOption = subjectSelect?.options[subjectSelect.selectedIndex];
+    const subjectName = (selectedOption?.getAttribute('data-subject-name') || '').trim();
     const sem = document.getElementById('print-cond-sem')?.value || '1';
     const year = document.getElementById('print-cond-year')?.value || '2569';
 
@@ -1566,13 +1570,17 @@ class RecordsService {
       return;
     }
 
-    const url = `print-conditional-approval.html?teacher=${encodeURIComponent(teacherName)}&subject=${encodeURIComponent(subjectCode)}&semester=${encodeURIComponent(sem)}&year=${encodeURIComponent(year)}`;
+    const url = `print-conditional-approval.html?teacher=${encodeURIComponent(teacherName)}&subjectCode=${encodeURIComponent(subjectCode)}&subjectName=${encodeURIComponent(subjectName)}&subject=${encodeURIComponent(subjectCode)}&semester=${encodeURIComponent(sem)}&year=${encodeURIComponent(year)}`;
     window.open(url, '_blank');
   }
 
   printConditionalApproval() {
-    const teacherName = (document.getElementById('print-cond-teacher')?.value || '').trim();
-    const subjectCode = (document.getElementById('print-cond-subject')?.value || '').trim();
+    const teacherSelect = document.getElementById('print-cond-teacher');
+    const subjectSelect = document.getElementById('print-cond-subject');
+    const teacherName = (teacherSelect?.value || '').trim();
+    const subjectCode = (subjectSelect?.value || '').trim();
+    const selectedOption = subjectSelect?.options[subjectSelect.selectedIndex];
+    const subjectName = (selectedOption?.getAttribute('data-subject-name') || '').trim();
     const sem = document.getElementById('print-cond-sem')?.value || '1';
     const year = document.getElementById('print-cond-year')?.value || '2569';
 
@@ -1581,7 +1589,7 @@ class RecordsService {
       return;
     }
 
-    const url = `print-conditional-approval.html?teacher=${encodeURIComponent(teacherName)}&subject=${encodeURIComponent(subjectCode)}&semester=${encodeURIComponent(sem)}&year=${encodeURIComponent(year)}&autoprint=1`;
+    const url = `print-conditional-approval.html?teacher=${encodeURIComponent(teacherName)}&subjectCode=${encodeURIComponent(subjectCode)}&subjectName=${encodeURIComponent(subjectName)}&subject=${encodeURIComponent(subjectCode)}&semester=${encodeURIComponent(sem)}&year=${encodeURIComponent(year)}&autoprint=1`;
     window.open(url, '_blank');
   }
 }

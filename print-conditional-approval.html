@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="th">
 <head>
   <meta charset="UTF-8">
@@ -23,7 +23,7 @@
       background-color: #e2e8f0;
       font-family: 'Sarabun', 'TH Sarabun New', 'TH Sarabun PSK', sans-serif;
       font-size: 15px;
-      line-height: 1.4;
+      line-height: 1.45;
       color: #000000;
     }
 
@@ -79,7 +79,7 @@
       width: 210mm;
       min-height: 297mm;
       margin: 0 auto;
-      padding: 16mm 18mm 14mm 18mm;
+      padding: 14mm 16mm 10mm 16mm;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
       position: relative;
     }
@@ -87,120 +87,142 @@
     /* Header & Emblem */
     .doc-logo-wrap {
       text-align: center;
-      margin-bottom: 4px;
+      margin-bottom: 2px;
     }
 
     .doc-logo-img {
-      width: 60px;
-      height: 60px;
+      width: 62px;
+      height: 62px;
       object-fit: contain;
     }
 
     .doc-main-heading {
       text-align: center;
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 700;
-      margin: 4px 0 10px 0;
+      margin: 2px 0 8px 0;
       letter-spacing: -0.2px;
     }
 
     /* Official Memo Meta */
     .memo-row {
-      margin-bottom: 4px;
-      font-size: 15px;
+      margin-bottom: 3px;
+      font-size: 14.5px;
       display: flex;
     }
 
     .memo-row strong {
       font-weight: 700;
       display: inline-block;
-      min-width: 50px;
+      min-width: 45px;
     }
 
     .memo-body-paragraph {
       text-indent: 48px;
-      line-height: 1.8;
-      margin-top: 4px;
-      margin-bottom: 8px;
-      font-size: 15px;
+      line-height: 1.85;
+      margin-top: 3px;
+      margin-bottom: 6px;
+      font-size: 14.5px;
       text-align: justify;
     }
 
-    .fill-data {
+    .doc-dotted-fill {
+      border-bottom: 1px dotted #000000;
       font-weight: 600;
       color: #000000;
       padding: 0 4px;
+      display: inline-block;
+      min-width: 24px;
+      text-align: center;
+      line-height: 1.2;
     }
 
-    /* Data Table (Exact 18 Rows Format) */
+    .doc-dotted-fill.fill-wide {
+      min-width: 140px;
+    }
+
+    /* Data Table (Exact 18 Rows Format matching Image 3) */
     .form-table {
       width: 100%;
       border-collapse: collapse;
-      margin: 8px 0 10px 0;
+      margin: 6px 0 8px 0;
       font-size: 13.5px;
-    }
-
-    .form-table th, .form-table td {
       border: 1px solid #000000;
-      padding: 3.5px 5px;
-      vertical-align: middle;
-      height: 25px;
     }
 
     .form-table th {
-      background-color: #f8fafc;
+      border: 1px solid #000000;
+      background-color: transparent;
       font-weight: 700;
       text-align: center;
+      padding: 3px 4px;
       font-size: 13.5px;
+      height: 24px;
+    }
+
+    .form-table td {
+      border-left: 1px solid #000000;
+      border-right: 1px solid #000000;
+      border-top: none;
+      border-bottom: 1px dashed #000000;
+      padding: 2.5px 5px;
+      vertical-align: middle;
+      height: 23px;
+      font-size: 13px;
+    }
+
+    /* Last row has solid bottom border */
+    .form-table tr:last-child td {
+      border-bottom: 1px solid #000000;
     }
 
     .col-no { width: 5%; text-align: center; }
     .col-class { width: 9%; text-align: center; }
-    .col-id { width: 14%; text-align: center; font-family: 'Sarabun', sans-serif; }
-    .col-name { width: 34%; text-align: left; padding-left: 8px; }
-    .col-grade { width: 14%; text-align: center; font-weight: 700; }
-    .col-remark { width: 24%; text-align: left; padding-left: 6px; font-size: 12.5px; }
+    .col-id { width: 13%; text-align: center; font-family: 'Sarabun', sans-serif; }
+    .col-name { width: 35%; text-align: left; padding-left: 8px; }
+    .col-grade { width: 13%; text-align: center; font-weight: 700; }
+    .col-remark { width: 25%; text-align: left; padding-left: 6px; font-size: 12px; }
 
     /* Signatures Section */
     .sig-intro {
-      margin-top: 8px;
-      margin-bottom: 8px;
-      font-size: 14.5px;
+      margin-top: 6px;
+      margin-bottom: 6px;
+      font-size: 14px;
     }
 
     .signatures-2col-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      row-gap: 16px;
+      row-gap: 14px;
       column-gap: 20px;
       margin-top: 4px;
-      font-size: 14px;
+      font-size: 13.5px;
     }
 
     .sig-block {
       text-align: left;
-      padding-left: 10px;
+      padding-left: 6px;
     }
 
     .director-approval-box {
       text-align: center;
-      margin-top: 14px;
-      font-size: 14px;
-      line-height: 1.5;
+      margin-top: 10px;
+      font-size: 13.5px;
+      line-height: 1.45;
     }
 
     .approval-choice-row {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 40px;
-      margin-bottom: 8px;
+      gap: 36px;
+      margin-bottom: 6px;
     }
 
     .approval-box-square {
       display: inline-block;
-      width: 13px;
-      height: 13px;
+      width: 12px;
+      height: 12px;
       border: 1px solid #000000;
       vertical-align: middle;
       margin-right: 4px;
@@ -228,11 +250,7 @@
 
       @page {
         size: A4 portrait;
-        margin: 14mm 16mm 10mm 16mm;
-      }
-
-      .form-table th {
-        background-color: transparent !important;
+        margin: 10mm 15mm 8mm 15mm;
       }
     }
   </style>
@@ -275,15 +293,15 @@
 
     <!-- 4. Body Paragraph -->
     <div class="memo-body-paragraph">
-      ด้วยข้าพเจ้า <span class="fill-data" id="doc-teacher-name">...................................................</span> 
-      ผู้สอนรายวิชา <span class="fill-data" id="doc-subject-name">...................................................</span> 
-      รหัส <span class="fill-data font-bold" id="doc-subject-code">.........................</span>
-      ภาคเรียนที่ <span class="fill-data font-bold" id="doc-semester">1</span> 
-      ปีการศึกษา <span class="fill-data font-bold" id="doc-year">2569</span> 
-      มีนักเรียน มี ผลการเรียน“0” “ร” “มส.” “มผ” “ขร” จำนวน <span class="fill-data font-bold" id="doc-student-count">0</span> คน ดังนี้
+      ด้วยข้าพเจ้า <span class="doc-dotted-fill fill-wide" id="doc-teacher-name">...................................................</span> 
+      ผู้สอนรายวิชา <span class="doc-dotted-fill fill-wide" id="doc-subject-name">...................................................</span> 
+      รหัส <span class="doc-dotted-fill font-bold" id="doc-subject-code">.........................</span>
+      ภาคเรียนที่ <span class="doc-dotted-fill font-bold" id="doc-semester">1</span> 
+      ปีการศึกษา <span class="doc-dotted-fill font-bold" id="doc-year">2569</span> 
+      มีนักเรียน มี ผลการเรียน“0” “ร” “มส.” “มผ” “ขร” จำนวน <span class="doc-dotted-fill font-bold" id="doc-student-count">0</span> คน ดังนี้
     </div>
 
-    <!-- 5. 18-Rows Table -->
+    <!-- 5. 18-Rows Table with Dashed Lines (matching Image 3) -->
     <table class="form-table">
       <thead>
         <tr>
@@ -324,13 +342,13 @@
     <!-- 8. School Director Decision Block -->
     <div class="director-approval-box">
       <div class="approval-choice-row">
-        <span><span class="approval-box-square"></span> อนุมัติ</span>
-        <span><span class="approval-box-square"></span> ไม่อนุมัติ</span>
+        <span><span class="approval-box-square"></span> ( &nbsp; ) อนุมัติ</span>
+        <span><span class="approval-box-square"></span> ( &nbsp; ) ไม่อนุมัติ</span>
       </div>
-      <div style="margin-bottom: 4px;">
+      <div style="margin-bottom: 3px;">
         ลงชื่อ......................................................
       </div>
-      <div style="font-weight: 600; margin-bottom: 2px;">
+      <div style="font-weight: 600; margin-bottom: 1px;">
         ( นายมนัด เทศทอง )
       </div>
       <div>
@@ -341,134 +359,161 @@
   </div>
 
   <!-- Scripts to Load Realtime Data from App Storage / Database -->
-  <script src="js/config.js?v=4.8.0"></script>
-  <script src="js/firebase-service.js?v=4.8.0"></script>
+  <script src="js/config.js?v=4.9.0"></script>
+  <script src="js/firebase-service.js?v=4.9.0"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', async () => {
+    document.addEventListener('DOMContentLoaded', async function() {
       // 1. Initialise DB connection
-      await db.init();
+      try {
+        await db.init();
+      } catch (err) {
+        console.warn("DB init notice:", err);
+      }
 
       // 2. Parse URL Parameters
-      const params = new URLSearchParams(window.location.search);
-      const teacherParam = (params.get('teacher') || '').trim();
-      const subjectParam = (params.get('subject') || '').trim();
-      const semParam = params.get('semester') || APP_CONFIG.SEMESTER || '1';
-      const yearParam = params.get('year') || APP_CONFIG.ACADEMIC_YEAR || '2569';
-      const autoprint = params.get('autoprint') === '1';
+      var params = new URLSearchParams(window.location.search);
+      var teacherParam = (params.get('teacher') || '').trim();
+      var subjectCodeParam = (params.get('subjectCode') || params.get('subject') || '').trim();
+      var subjectNameParam = (params.get('subjectName') || '').trim();
+      var semParam = params.get('semester') || (typeof APP_CONFIG !== 'undefined' ? APP_CONFIG.SEMESTER : '1');
+      var yearParam = params.get('year') || (typeof APP_CONFIG !== 'undefined' ? APP_CONFIG.ACADEMIC_YEAR : '2569');
+      var autoprint = params.get('autoprint') === '1';
 
-      // 3. Load records from database
-      const allRecords = db.get('records') || [];
-      const allTeachers = db.get('teachers') || [];
+      // 3. Load records and teachers from database
+      var allRecords = db.get('records') || [];
+      var allTeachers = db.get('teachers') || [];
+      var allStudents = db.get('students') || [];
 
-      // Find teacher details
-      let matchedTeacher = allTeachers.find(t => 
-        (t.name && (t.name === teacherParam || t.name.includes(teacherParam))) ||
-        (t.teacherId && t.teacherId === teacherParam) ||
-        (t.id === teacherParam)
-      );
+      // Find teacher
+      var matchedTeacher = allTeachers.find(function(t) {
+        return (t.name && (t.name === teacherParam || t.name.indexOf(teacherParam) !== -1)) ||
+               (t.teacherId && String(t.teacherId) === teacherParam) ||
+               (t.id === teacherParam);
+      });
 
-      const teacherName = matchedTeacher ? matchedTeacher.name : (teacherParam || '...................................................');
+      var teacherDisplayName = teacherParam || (matchedTeacher ? matchedTeacher.name : '...................................................');
 
-      // Filter matching records for this teacher and subject
-      let filteredRecords = allRecords.filter(r => {
-        // Match teacher
-        const matchTeacher = !teacherParam || 
-          (r.teacherName && (r.teacherName === teacherName || r.teacherName.includes(teacherParam)));
-        
-        // Match subject code or subject name
-        const matchSubject = !subjectParam || 
-          (r.subjectCode && r.subjectCode.toLowerCase() === subjectParam.toLowerCase()) ||
-          (r.subjectName && r.subjectName.toLowerCase() === subjectParam.toLowerCase());
+      // Find subject name if not provided in URL
+      var subjectCode = subjectCodeParam;
+      var subjectName = subjectNameParam;
+
+      if (!subjectName) {
+        // Search in records first
+        var foundRec = allRecords.find(function(r) {
+          return r.subjectCode && r.subjectCode.trim().toLowerCase() === subjectCode.toLowerCase() && r.subjectName;
+        });
+        if (foundRec) {
+          subjectName = foundRec.subjectName;
+        } else if (matchedTeacher && Array.isArray(matchedTeacher.subjects)) {
+          var foundSub = matchedTeacher.subjects.find(function(s) {
+            return s.code && s.code.trim().toLowerCase() === subjectCode.toLowerCase();
+          });
+          if (foundSub) {
+            subjectName = foundSub.name;
+          }
+        }
+      }
+
+      // 4. Filter matching records for this teacher + subject
+      var filteredRecords = allRecords.filter(function(r) {
+        // Match teacher (trimming & substring)
+        var matchTeacher = !teacherParam || 
+          (r.teacherName && (r.teacherName.trim() === teacherDisplayName.trim() || 
+                             r.teacherName.indexOf(teacherParam) !== -1 || 
+                             teacherParam.indexOf(r.teacherName.trim()) !== -1));
+
+        // Match subject code (case-insensitive)
+        var matchSubject = !subjectCode || 
+          (r.subjectCode && r.subjectCode.trim().toLowerCase() === subjectCode.toLowerCase());
 
         // Match semester & year (if specified)
-        const matchSem = !semParam || String(r.semester) === String(semParam);
-        const matchYear = !yearParam || String(r.academicYear) === String(yearParam);
+        var matchSem = !semParam || String(r.semester) === String(semParam);
+        var matchYear = !yearParam || String(r.academicYear) === String(yearParam);
 
         return matchTeacher && matchSubject && matchSem && matchYear;
       });
 
-      // Sort by grade level and student ID
-      filteredRecords.sort((a, b) => {
-        if ((a.gradeLevel || '') !== (b.gradeLevel || '')) {
-          return (a.gradeLevel || '').localeCompare(b.gradeLevel || '', 'th');
-        }
+      // Sort students by grade level and student ID
+      filteredRecords.sort(function(a, b) {
+        var gA = a.gradeLevel || '';
+        var gB = b.gradeLevel || '';
+        if (gA !== gB) return gA.localeCompare(gB, 'th');
         return (a.studentId || '').localeCompare(b.studentId || '', 'th');
       });
 
-      // Subject info from records or teacher
-      let subjectCode = subjectParam;
-      let subjectName = '';
-
-      if (filteredRecords.length > 0) {
-        subjectCode = filteredRecords[0].subjectCode || subjectParam;
+      // If subject name is still empty and we have records, take from first record
+      if (!subjectName && filteredRecords.length > 0) {
         subjectName = filteredRecords[0].subjectName || '';
-      } else if (matchedTeacher && Array.isArray(matchedTeacher.subjects)) {
-        const s = matchedTeacher.subjects.find(sub => sub.code.toLowerCase() === subjectParam.toLowerCase());
-        if (s) {
-          subjectCode = s.code;
-          subjectName = s.name;
-        }
       }
 
-      // Populate Header Memo Text
-      document.getElementById('doc-teacher-name').innerText = teacherName;
-      document.getElementById('doc-subject-name').innerText = subjectName || (subjectParam || '...................................................');
+      // 5. Populate Header Memo Text
+      document.getElementById('doc-teacher-name').innerText = teacherDisplayName;
+      document.getElementById('doc-subject-name').innerText = subjectName || (subjectCode ? 'รายวิชา ' + subjectCode : '...................................................');
       document.getElementById('doc-subject-code').innerText = subjectCode || '.........................';
       document.getElementById('doc-semester').innerText = semParam;
       document.getElementById('doc-year').innerText = yearParam;
       document.getElementById('doc-student-count').innerText = filteredRecords.length;
 
-      // 4. Render exactly 18 Rows in the Table (matching official A4 PDF sheet)
-      const TOTAL_ROWS = 18;
-      const tbody = document.getElementById('form-table-body');
-      let rowsHtml = '';
+      // 6. Render exactly 18 Rows in the Table (matching Image 3)
+      var TOTAL_ROWS = 18;
+      var tbody = document.getElementById('form-table-body');
+      var rowsHtml = '';
 
-      for (let i = 0; i < TOTAL_ROWS; i++) {
-        const num = i + 1;
+      for (var i = 0; i < TOTAL_ROWS; i++) {
+        var num = i + 1;
         if (i < filteredRecords.length) {
-          const r = filteredRecords[i];
-          const classRoom = r.room ? ${r.gradeLevel}/ : (r.gradeLevel || '');
+          var r = filteredRecords[i];
           
-          // Remarks formatted based on condition type or custom remarks
-          let remark = r.remarks || '';
+          // Determine class room: e.g. "ม.1/1" or "ม.4/2"
+          var classRoom = '';
+          if (r.room) {
+            classRoom = r.gradeLevel + '/' + r.room;
+          } else {
+            // Lookup in students database
+            var stObj = allStudents.find(function(s) { return s.studentId === r.studentId; });
+            if (stObj && stObj.room) {
+              classRoom = (stObj.gradeLevel || r.gradeLevel) + '/' + stObj.room;
+            } else {
+              classRoom = r.gradeLevel || '';
+            }
+          }
+
+          // Format remarks
+          var remark = r.remarks || '';
           if (!remark) {
-            if (r.conditionType === 'ร') remark = 'ร รอประเมิน/ส่งงาน';
+            if (r.conditionType === 'ร') remark = 'ร พิเศษ ยังไม่ได้สอบ/ส่งงาน';
             else if (r.conditionType === 'มส') remark = 'เวลาเรียนไม่ถึง 80%';
             else if (r.conditionType === '0') remark = 'คะแนนไม่ถึงเกณฑ์';
           }
 
-          rowsHtml += 
-            <tr>
-              <td class="col-no"></td>
-              <td class="col-class"></td>
-              <td class="col-id"></td>
-              <td class="col-name"></td>
-              <td class="col-grade"></td>
-              <td class="col-remark" contenteditable="true" title="คลิกเพื่อแก้ไขหมายเหตุได้ก่อนพิมพ์"></td>
-            </tr>
-          ;
+          rowsHtml += '<tr>' +
+            '<td class="col-no">' + num + '</td>' +
+            '<td class="col-class">' + classRoom + '</td>' +
+            '<td class="col-id">' + (r.studentId || '') + '</td>' +
+            '<td class="col-name">' + (r.studentName || '') + '</td>' +
+            '<td class="col-grade">' + (r.conditionType || '') + '</td>' +
+            '<td class="col-remark" contenteditable="true" title="คลิกเพื่อแก้ไขหมายเหตุได้">' + remark + '</td>' +
+          '</tr>';
         } else {
-          // Empty row with clean grid borders
-          rowsHtml += 
-            <tr>
-              <td class="col-no"></td>
-              <td class="col-class"></td>
-              <td class="col-id"></td>
-              <td class="col-name"></td>
-              <td class="col-grade"></td>
-              <td class="col-remark"></td>
-            </tr>
-          ;
+          // Empty row with numbered counter and dashed borders
+          rowsHtml += '<tr>' +
+            '<td class="col-no">' + num + '</td>' +
+            '<td class="col-class"></td>' +
+            '<td class="col-id"></td>' +
+            '<td class="col-name"></td>' +
+            '<td class="col-grade"></td>' +
+            '<td class="col-remark"></td>' +
+          '</tr>';
         }
       }
 
       tbody.innerHTML = rowsHtml;
 
-      // 5. Trigger auto-print if requested
+      // 7. Auto-print if parameter was passed
       if (autoprint) {
-        setTimeout(() => {
+        setTimeout(function() {
           window.print();
-        }, 600);
+        }, 500);
       }
     });
   </script>
