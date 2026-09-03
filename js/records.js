@@ -1315,6 +1315,7 @@ class RecordsService {
     });
 
     const teacherList = Array.from(teacherMap.values()).sort((a, b) => a.name.localeCompare(b.name, 'th'));
+    this._cachedTeacherList = teacherList;
 
     // กำหนดครูเริ่มต้น (ถ้าผู้ใช้ที่ล็อกอินอยู่เป็นครู ให้เลือกชื่อตนเองอัตโนมัติ)
     let defaultTeacherName = '';
@@ -1323,6 +1324,9 @@ class RecordsService {
     } else if (teacherList.length > 0) {
       defaultTeacherName = teacherList[0].name;
     }
+
+    const defaultTeacherObj = teacherList.find(t => t.name === defaultTeacherName) || teacherList[0];
+    const initialDisplayText = defaultTeacherObj ? `${defaultTeacherObj.name} ${defaultTeacherObj.area ? `(${defaultTeacherObj.area})` : ''}` : '';
 
     modal.innerHTML = `
       <div class="modal-backdrop" onclick="recordsService.closeConditionalApprovalModal()"></div>
@@ -1341,18 +1345,35 @@ class RecordsService {
         </div>
 
         <div class="modal-body py-4 px-5">
-          <!-- Step 1: Select Teacher -->
+          <!-- Step 1: Searchable Teacher Selector -->
           <div class="form-group mb-3">
-            <label for="print-cond-teacher" class="font-bold text-gray-800 text-xs block mb-1">
+            <label for="print-cond-teacher-search" class="font-bold text-gray-800 text-xs block mb-1">
               <i class="fas fa-chalkboard-teacher text-primary mr-1"></i> 1. เลือกครูผู้สอนประจำวิชา <span class="text-red-500">*</span>
+              <span class="text-xs text-blue-600 font-normal ml-1">(พิมพ์ชื่อครูเพื่อค้นหาได้)</span>
             </label>
-            <select id="print-cond-teacher" class="form-control" style="font-weight: 600;" onchange="recordsService.onCondTeacherSelect(this.value)">
-              ${teacherList.map(t => `
-                <option value="${t.name}" ${t.name === defaultTeacherName ? 'selected' : ''}>
-                  ${t.name} ${t.area ? `(${t.area})` : ''}
-                </option>
-              `).join('')}
-            </select>
+            <div class="cond-combobox-wrap" id="print-cond-combobox">
+              <div class="cond-search-input-group">
+                <i class="fas fa-search cond-search-icon"></i>
+                <input 
+                  type="text" 
+                  id="print-cond-teacher-search" 
+                  class="form-control" 
+                  placeholder="🔍 พิมพ์ชื่อครู หรือกลุ่มสาระ เพื่อค้นหา..." 
+                  value="${initialDisplayText.replace(/"/g, '&quot;')}" 
+                  autocomplete="off"
+                  oninput="recordsService.filterCondTeachers(this.value)"
+                  onfocus="this.select(); recordsService.showCondTeacherDropdown()"
+                  onclick="recordsService.showCondTeacherDropdown()"
+                />
+                <input type="hidden" id="print-cond-teacher" value="${defaultTeacherName.replace(/"/g, '&quot;')}" />
+                <button type="button" class="cond-search-toggle-btn" onclick="recordsService.toggleCondTeacherDropdown()" title="เปิด/ปิด รายชื่อครู">
+                  <i class="fas fa-chevron-down" id="print-cond-chevron"></i>
+                </button>
+              </div>
+              <div id="print-cond-teacher-dropdown" class="cond-dropdown-list" style="display: none;">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
           </div>
 
           <!-- Step 2: Select Subject -->
@@ -1419,6 +1440,94 @@ class RecordsService {
 
     // โหลดรายวิชาของครูเริ่มต้น
     this.onCondTeacherSelect(defaultTeacherName);
+  }
+
+  showCondTeacherDropdown() {
+    const dropdown = document.getElementById('print-cond-teacher-dropdown');
+    if (!dropdown) return;
+    const searchInput = document.getElementById('print-cond-teacher-search');
+    const query = searchInput ? searchInput.value : '';
+    this.renderCondTeacherDropdown(query);
+    dropdown.style.display = 'block';
+    const chevron = document.getElementById('print-cond-chevron');
+    if (chevron) chevron.className = 'fas fa-chevron-up';
+
+    if (!this._condDocClickBound) {
+      this._condDocClickBound = true;
+      document.addEventListener('click', (e) => {
+        const combobox = document.getElementById('print-cond-combobox');
+        if (combobox && !combobox.contains(e.target)) {
+          this.hideCondTeacherDropdown();
+        }
+      });
+    }
+  }
+
+  hideCondTeacherDropdown() {
+    const dropdown = document.getElementById('print-cond-teacher-dropdown');
+    if (dropdown) dropdown.style.display = 'none';
+    const chevron = document.getElementById('print-cond-chevron');
+    if (chevron) chevron.className = 'fas fa-chevron-down';
+  }
+
+  toggleCondTeacherDropdown() {
+    const dropdown = document.getElementById('print-cond-teacher-dropdown');
+    if (dropdown && dropdown.style.display === 'block') {
+      this.hideCondTeacherDropdown();
+    } else {
+      this.showCondTeacherDropdown();
+    }
+  }
+
+  filterCondTeachers(query) {
+    const dropdown = document.getElementById('print-cond-teacher-dropdown');
+    if (dropdown && dropdown.style.display !== 'block') {
+      dropdown.style.display = 'block';
+      const chevron = document.getElementById('print-cond-chevron');
+      if (chevron) chevron.className = 'fas fa-chevron-up';
+    }
+    this.renderCondTeacherDropdown(query);
+  }
+
+  renderCondTeacherDropdown(query = '') {
+    const dropdown = document.getElementById('print-cond-teacher-dropdown');
+    if (!dropdown) return;
+
+    const list = this._cachedTeacherList || [];
+    const q = (query || '').trim().toLowerCase();
+    const currentVal = (document.getElementById('print-cond-teacher')?.value || '').trim();
+
+    const filtered = q 
+      ? list.filter(t => (t.name && t.name.toLowerCase().includes(q)) || (t.area && t.area.toLowerCase().includes(q)))
+      : list;
+
+    if (filtered.length === 0) {
+      dropdown.innerHTML = `<div class="cond-dropdown-empty"><i class="fas fa-search mr-1"></i> ไม่พบชื่อครูที่ตรงกับ "${query.replace(/</g, '&lt;')}"</div>`;
+      return;
+    }
+
+    dropdown.innerHTML = filtered.map(t => {
+      const isSelected = t.name === currentVal;
+      const safeName = t.name.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+      const safeArea = (t.area || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+      return `
+        <div class="cond-dropdown-item ${isSelected ? 'active' : ''}" onclick="recordsService.selectCondTeacher('${safeName}', '${safeArea}')">
+          <span class="teacher-name"><i class="fas fa-user-tie text-blue-500 mr-1.5"></i>${t.name}</span>
+          ${t.area ? `<span class="teacher-area">${t.area}</span>` : ''}
+        </div>
+      `;
+    }).join('');
+  }
+
+  selectCondTeacher(teacherName, teacherArea) {
+    const searchInput = document.getElementById('print-cond-teacher-search');
+    const hiddenInput = document.getElementById('print-cond-teacher');
+
+    if (hiddenInput) hiddenInput.value = teacherName;
+    if (searchInput) searchInput.value = teacherArea ? `${teacherName} (${teacherArea})` : teacherName;
+
+    this.hideCondTeacherDropdown();
+    this.onCondTeacherSelect(teacherName);
   }
 
   closeConditionalApprovalModal() {

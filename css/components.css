@@ -3290,4 +3290,119 @@ select.form-control {
   background: #eff6ff;
 }
 
+/* Searchable Combobox for Teacher Selection in Print Modal */
+.cond-combobox-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.cond-search-input-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.cond-search-input-group input {
+  padding-left: 36px !important;
+  padding-right: 36px !important;
+  font-weight: 600;
+  cursor: text;
+}
+
+.cond-search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #64748b;
+  font-size: 13px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.cond-search-toggle-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 6px 8px;
+  font-size: 12px;
+  border-radius: 4px;
+  z-index: 2;
+  transition: all 0.15s ease;
+}
+
+.cond-search-toggle-btn:hover {
+  color: #2563eb;
+  background: #eff6ff;
+}
+
+.cond-dropdown-list {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border: 1.5px solid #93c5fd;
+  border-radius: var(--radius-md);
+  max-height: 220px;
+  overflow-y: auto;
+  z-index: 1050;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+}
+
+.cond-dropdown-item {
+  padding: 9px 12px;
+  cursor: pointer;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #f1f5f9;
+  transition: all 0.15s ease;
+}
+
+.cond-dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.cond-dropdown-item:hover, .cond-dropdown-item.active {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.cond-dropdown-item .teacher-name {
+  color: #1e293b;
+  font-weight: 600;
+}
+
+.cond-dropdown-item:hover .teacher-name, .cond-dropdown-item.active .teacher-name {
+  color: #1d4ed8;
+}
+
+.cond-dropdown-item .teacher-area {
+  font-size: 11px;
+  color: #64748b;
+  margin-left: 8px;
+  background: #f1f5f9;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.cond-dropdown-item:hover .teacher-area, .cond-dropdown-item.active .teacher-area {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.cond-dropdown-empty {
+  padding: 14px;
+  text-align: center;
+  font-size: 12px;
+  color: #94a3b8;
+}
+
 
