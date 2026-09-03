@@ -501,20 +501,33 @@ class RecordsService {
               </div>
               <div class="form-group col-md-3">
                 <label for="rec-grade-level">ระดับชั้น</label>
-                <select id="rec-grade-level" class="form-control">
+                <select id="rec-grade-level" class="form-control" onchange="recordsService.onGradeLevelChange()">
                   ${APP_CONFIG.GRADE_LEVELS.map(g => `<option value="${g}">${g}</option>`).join('')}
                 </select>
               </div>
             </div>
 
+            <!-- Dynamic Teacher Subjects Quick Picker Container -->
+            <div id="teacher-subjects-quick-box" class="teacher-subjects-quick-box" style="display: none;">
+              <div class="teacher-subjects-header flex items-center justify-between">
+                <span id="teacher-subjects-label" class="text-xs font-bold text-blue-900">
+                  <i class="fas fa-layer-group text-primary mr-1"></i> เลือกวิชาที่ครูผู้สอนสอนในระดับชั้นนี้:
+                </span>
+                <span class="text-xs text-blue-600 font-medium">คลิกเพื่อเลือกวิชาอัตโนมัติ</span>
+              </div>
+              <div id="teacher-subjects-chips" class="teacher-subject-chips-container"></div>
+            </div>
+
             <div class="form-row">
               <div class="form-group col-md-3">
                 <label for="rec-subject-code">รหัสวิชา <span class="text-red-500">*</span></label>
-                <input type="text" id="rec-subject-code" class="form-control" required placeholder="เช่น ค31101">
+                <input type="text" id="rec-subject-code" class="form-control" required placeholder="เช่น ค31101" list="teacher-subject-codes-datalist" autocomplete="off" oninput="recordsService.onSubjectCodeManualInput(this.value)">
+                <datalist id="teacher-subject-codes-datalist"></datalist>
               </div>
               <div class="form-group col-md-6">
                 <label for="rec-subject-name">ชื่อรายวิชา <span class="text-red-500">*</span></label>
-                <input type="text" id="rec-subject-name" class="form-control" required placeholder="เช่น คณิตศาสตร์พื้นฐาน 1">
+                <input type="text" id="rec-subject-name" class="form-control" required placeholder="เช่น คณิตศาสตร์พื้นฐาน 1" list="teacher-subject-names-datalist" autocomplete="off">
+                <datalist id="teacher-subject-names-datalist"></datalist>
               </div>
               <div class="form-group col-md-3">
                 <label for="rec-condition-type">ผลการเรียนที่ติด <span class="text-red-500">*</span></label>
@@ -649,6 +662,9 @@ class RecordsService {
       levelInput.value = g;
     }
     if (dropdown) dropdown.classList.add('hidden');
+
+    // อัปเดตรายการวิชาที่ครูสอนตามระดับชั้นของนักเรียนทันที
+    this.updateTeacherSubjectOptions();
   }
 
   clearStudentSelection() {
@@ -662,6 +678,12 @@ class RecordsService {
     if (idInput) idInput.value = '';
     if (nameInput) nameInput.value = '';
     this.renderStudentDropdown('');
+    this.updateTeacherSubjectOptions();
+  }
+
+  onGradeLevelChange() {
+    // เมื่อเปลี่ยนระดับชั้น ให้รีเฟรชวิชาที่ครูสอนในระดับชั้นนั้นใหม่
+    this.updateTeacherSubjectOptions();
   }
 
   onTeacherSearchInput(query) {
@@ -706,26 +728,25 @@ class RecordsService {
     const teacher = db.getById('teachers', teacherDbId);
     if (!teacher) return;
 
+    this.selectedTeacherId = teacher.id;
+
     const searchInput = document.getElementById('rec-teacher-search');
     const nameHidden = document.getElementById('rec-teacher-name');
     const areaInput = document.getElementById('rec-learning-area');
-    const subjCodeInput = document.getElementById('rec-subject-code');
-    const subjNameInput = document.getElementById('rec-subject-name');
     const dropdown = document.getElementById('rec-teacher-dropdown-list');
 
     if (searchInput) searchInput.value = `${teacher.name} (${teacher.learningArea || '-'})`;
     if (nameHidden) nameHidden.value = teacher.name;
     if (areaInput && teacher.learningArea) areaInput.value = teacher.learningArea;
 
-    if (teacher.subjects && teacher.subjects.length > 0) {
-      if (subjCodeInput && !subjCodeInput.value) subjCodeInput.value = teacher.subjects[0].code || '';
-      if (subjNameInput && !subjNameInput.value) subjNameInput.value = teacher.subjects[0].name || '';
-    }
-
     if (dropdown) dropdown.classList.add('hidden');
+
+    // อัปเดตตัวเลือกวิชาที่ครูสอนในระดับชั้นนั้นมาให้เลือกทันที
+    this.updateTeacherSubjectOptions(true);
   }
 
   clearTeacherSelection() {
+    this.selectedTeacherId = null;
     const searchInput = document.getElementById('rec-teacher-search');
     const nameHidden = document.getElementById('rec-teacher-name');
     if (searchInput) {
@@ -734,6 +755,229 @@ class RecordsService {
     }
     if (nameHidden) nameHidden.value = '';
     this.renderTeacherDropdown('');
+    this.updateTeacherSubjectOptions();
+  }
+
+  /**
+   * ดึงรายวิชาที่ครูสอน และกรองตามระดับชั้นที่เลือก นำมาแสดงให้เลือกอัตโนมัติ
+   * @param {boolean} isInitialSelect - หากเป็นจริงและมีวิชาเดียวตรงระดับชั้น จะเลือกให้อัตโนมัติ
+   */
+  updateTeacherSubjectOptions(isInitialSelect = false) {
+    const box = document.getElementById('teacher-subjects-quick-box');
+    const chipsContainer = document.getElementById('teacher-subjects-chips');
+    const labelEl = document.getElementById('teacher-subjects-label');
+    const datalistCodes = document.getElementById('teacher-subject-codes-datalist');
+    const datalistNames = document.getElementById('teacher-subject-names-datalist');
+
+    if (!box || !chipsContainer) return;
+
+    const teacherName = (document.getElementById('rec-teacher-name')?.value || '').trim();
+    const teacherSearch = (document.getElementById('rec-teacher-search')?.value || '').trim();
+    const gradeLevel = (document.getElementById('rec-grade-level')?.value || 'ม.1').trim();
+
+    if (!teacherName && !teacherSearch) {
+      box.style.display = 'none';
+      if (datalistCodes) datalistCodes.innerHTML = '';
+      if (datalistNames) datalistNames.innerHTML = '';
+      return;
+    }
+
+    // ค้นหา Object ข้อมูลครู
+    const teachers = db.get('teachers') || [];
+    let teacher = teachers.find(t => 
+      (this.selectedTeacherId && t.id === this.selectedTeacherId) ||
+      (t.name && (t.name === teacherName || teacherSearch.includes(t.name) || t.name.includes(teacherSearch)))
+    );
+
+    // รวบรวมวิชาทั้งหมดที่ครูท่านนี้สอน
+    let allSubjects = [];
+    if (teacher && Array.isArray(teacher.subjects)) {
+      teacher.subjects.forEach(s => {
+        if (s && s.code) {
+          allSubjects.push({
+            code: s.code.trim(),
+            name: (s.name || '').trim(),
+            level: (s.level || '').trim(),
+            learningArea: teacher.learningArea || ''
+          });
+        }
+      });
+    }
+
+    // ค้นหาเพิ่มเติมจากประวัติผลการเรียนเดิม (Records Database) เพื่อให้ครอบคลุมที่สุด
+    const records = db.get('records') || [];
+    records.forEach(r => {
+      const matchName = r.teacherName && (r.teacherName === teacherName || (teacher && r.teacherName === teacher.name));
+      if (matchName && r.subjectCode) {
+        const exists = allSubjects.some(s => s.code.toLowerCase() === r.subjectCode.trim().toLowerCase());
+        if (!exists) {
+          allSubjects.push({
+            code: r.subjectCode.trim(),
+            name: (r.subjectName || '').trim(),
+            level: (r.gradeLevel || '').trim(),
+            learningArea: r.learningArea || (teacher ? teacher.learningArea : '')
+          });
+        }
+      }
+    });
+
+    if (allSubjects.length === 0) {
+      box.style.display = 'none';
+      if (datalistCodes) datalistCodes.innerHTML = '';
+      if (datalistNames) datalistNames.innerHTML = '';
+      return;
+    }
+
+    // ระดับชั้นเป้าหมาย เช่น "ม.1", "ม.2", "ม.4"
+    let targetLevel = gradeLevel;
+    if (targetLevel.includes('/')) targetLevel = targetLevel.split('/')[0].trim();
+
+    // กรองวิชาที่ตรงกับระดับชั้นนี้ (หรือวิชาที่สอนทุกระดับชั้น)
+    const levelMatches = allSubjects.filter(s => {
+      if (!s.level || s.level === 'all' || s.level === 'ทุกระดับ') return true;
+      let sLvl = s.level.trim();
+      if (sLvl.includes('/')) sLvl = sLvl.split('/')[0].trim();
+      return sLvl.startsWith(targetLevel) || targetLevel.startsWith(sLvl);
+    });
+
+    // วิชาอื่นๆ ที่ครูสอนในระดับชั้นอื่น
+    const otherSubjects = allSubjects.filter(s => !levelMatches.includes(s));
+
+    const currentCode = (document.getElementById('rec-subject-code')?.value || '').trim();
+
+    // อัปเดต HTML Datalist เพื่อให้สามารถพิมพ์แล้วมีคำแนะนำขึ้นมา
+    if (datalistCodes) {
+      datalistCodes.innerHTML = allSubjects.map(s => 
+        `<option value="${s.code}">${s.name} (${s.level || 'ทุกระดับ'})</option>`
+      ).join('');
+    }
+    if (datalistNames) {
+      datalistNames.innerHTML = allSubjects.map(s => 
+        `<option value="${s.name}">${s.code} (${s.level || 'ทุกระดับ'})</option>`
+      ).join('');
+    }
+
+    // แสดงกล่อง Quick Selector
+    box.style.display = 'block';
+    const teacherDisplayName = teacher ? teacher.name : teacherName;
+
+    if (labelEl) {
+      if (levelMatches.length > 0) {
+        labelEl.innerHTML = `<i class="fas fa-book-open text-primary mr-1"></i> วิชาที่ <b>${teacherDisplayName}</b> สอนในระดับชั้น <b>${targetLevel}</b>:`;
+      } else {
+        labelEl.innerHTML = `<i class="fas fa-book-open text-primary mr-1"></i> รายวิชาทั้งหมดที่ <b>${teacherDisplayName}</b> สอน:`;
+      }
+    }
+
+    let chipsHtml = '';
+
+    if (levelMatches.length > 0) {
+      chipsHtml += levelMatches.map(s => {
+        const isSelected = currentCode && currentCode.toLowerCase() === s.code.toLowerCase();
+        return `
+          <button type="button" 
+                  class="btn-subject-quick-chip ${isSelected ? 'active' : ''}" 
+                  onclick="recordsService.applySubjectSelection('${s.code.replace(/'/g, "\\'")}', '${s.name.replace(/'/g, "\\'")}', '${(s.learningArea || '').replace(/'/g, "\\'")}')"
+                  title="คลิกเพื่อเลือกรหัสวิชา ${s.code}">
+            <span class="chip-code">${s.code}</span>
+            <span class="chip-name">${s.name}</span>
+            ${s.level ? `<span class="chip-level">${s.level}</span>` : ''}
+            ${isSelected ? `<i class="fas fa-check-circle text-emerald-500 ml-1"></i>` : ''}
+          </button>
+        `;
+      }).join('');
+    }
+
+    if (otherSubjects.length > 0) {
+      if (levelMatches.length > 0) {
+        chipsHtml += `<div class="w-full text-xs text-gray-500 mt-1 mb-0.5 font-medium">วิชาที่สอนในระดับชั้นอื่น:</div>`;
+      }
+      chipsHtml += otherSubjects.map(s => {
+        const isSelected = currentCode && currentCode.toLowerCase() === s.code.toLowerCase();
+        return `
+          <button type="button" 
+                  class="btn-subject-quick-chip chip-secondary ${isSelected ? 'active' : ''}" 
+                  onclick="recordsService.applySubjectSelection('${s.code.replace(/'/g, "\\'")}', '${s.name.replace(/'/g, "\\'")}', '${(s.learningArea || '').replace(/'/g, "\\'")}')"
+                  title="คลิกเพื่อเลือกรหัสวิชา ${s.code}">
+            <span class="chip-code">${s.code}</span>
+            <span class="chip-name">${s.name}</span>
+            <span class="chip-level">${s.level || '-'}</span>
+            ${isSelected ? `<i class="fas fa-check-circle text-emerald-500 ml-1"></i>` : ''}
+          </button>
+        `;
+      }).join('');
+    }
+
+    chipsContainer.innerHTML = chipsHtml;
+
+    // หากเป็นการเลือกครู และมีวิชาตรงกับระดับชั้นเพียง 1 วิชา ให้เลือกให้อัตโนมัติทันที
+    if (isInitialSelect && levelMatches.length === 1 && !currentCode) {
+      this.applySubjectSelection(levelMatches[0].code, levelMatches[0].name, levelMatches[0].learningArea);
+    }
+  }
+
+  /**
+   * ใส่ข้อมูลรหัสวิชา ชื่อวิชา และกลุ่มสาระการเรียนรู้ที่เลือก ลงในฟอร์มอัตโนมัติ
+   */
+  applySubjectSelection(code, name, learningArea) {
+    const codeInput = document.getElementById('rec-subject-code');
+    const nameInput = document.getElementById('rec-subject-name');
+    const areaInput = document.getElementById('rec-learning-area');
+
+    if (codeInput) codeInput.value = code;
+    if (nameInput) nameInput.value = name;
+    if (areaInput && learningArea) areaInput.value = learningArea;
+
+    // อัปเดตสถานะ Active บน Chip
+    document.querySelectorAll('.btn-subject-quick-chip').forEach(chip => {
+      const c = chip.querySelector('.chip-code')?.innerText;
+      const isMatch = c && c.trim().toLowerCase() === code.trim().toLowerCase();
+      chip.classList.toggle('active', isMatch);
+    });
+  }
+
+  /**
+   * เมื่อผู้ใช้พิมพ์รหัสวิชาเอง ให้ค้นหาชื่อวิชาและกลุ่มสาระฯ เติมอัตโนมัติถ้ามีข้อมูล
+   */
+  onSubjectCodeManualInput(typedCode) {
+    const code = (typedCode || '').trim().toLowerCase();
+    if (!code) return;
+
+    // ค้นหาวิชาจาก teachers หรือ records
+    const teachers = db.get('teachers') || [];
+    let matched = null;
+
+    for (const t of teachers) {
+      if (Array.isArray(t.subjects)) {
+        const s = t.subjects.find(sub => sub.code && sub.code.toLowerCase() === code);
+        if (s) {
+          matched = { ...s, learningArea: t.learningArea || '' };
+          break;
+        }
+      }
+    }
+
+    if (!matched) {
+      const records = db.get('records') || [];
+      const r = records.find(rec => rec.subjectCode && rec.subjectCode.toLowerCase() === code);
+      if (r) {
+        matched = { code: r.subjectCode, name: r.subjectName, learningArea: r.learningArea || '' };
+      }
+    }
+
+    if (matched) {
+      const nameInput = document.getElementById('rec-subject-name');
+      const areaInput = document.getElementById('rec-learning-area');
+      if (nameInput && !nameInput.value) nameInput.value = matched.name;
+      if (areaInput && matched.learningArea) areaInput.value = matched.learningArea;
+    }
+
+    // Refresh active chips
+    document.querySelectorAll('.btn-subject-quick-chip').forEach(chip => {
+      const c = chip.querySelector('.chip-code')?.innerText;
+      const isMatch = c && c.trim().toLowerCase() === code;
+      chip.classList.toggle('active', isMatch);
+    });
   }
 
   openEditRecordModal(id) {
@@ -764,6 +1008,8 @@ class RecordsService {
       document.getElementById('rec-semester').value = record.semester || '1';
       document.getElementById('rec-academic-year').value = record.academicYear || '2569';
       document.getElementById('rec-teacher-name').value = record.teacherName || '';
+
+      this.updateTeacherSubjectOptions();
     }, 50);
   }
 
