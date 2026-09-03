@@ -1317,17 +1317,7 @@ class RecordsService {
     const teacherList = Array.from(teacherMap.values()).sort((a, b) => a.name.localeCompare(b.name, 'th'));
     this._cachedTeacherList = teacherList;
 
-    // กำหนดครูเริ่มต้น (ถ้าผู้ใช้ที่ล็อกอินอยู่เป็นครู ให้เลือกชื่อตนเองอัตโนมัติ)
-    let defaultTeacherName = '';
-    if (currentUser && currentUser.role === APP_CONFIG.ROLES.TEACHER) {
-      defaultTeacherName = currentUser.name;
-    } else if (teacherList.length > 0) {
-      defaultTeacherName = teacherList[0].name;
-    }
-
-    const defaultTeacherObj = teacherList.find(t => t.name === defaultTeacherName) || teacherList[0];
-    const initialDisplayText = defaultTeacherObj ? `${defaultTeacherObj.name} ${defaultTeacherObj.area ? `(${defaultTeacherObj.area})` : ''}` : '';
-
+    // เริ่มต้นเป็นช่องว่างเพื่อให้ผู้ใช้พิมพ์ค้นหา
     modal.innerHTML = `
       <div class="modal-backdrop" onclick="recordsService.closeConditionalApprovalModal()"></div>
       <div class="modal-dialog animate-scale-in" style="max-width: 580px;">
@@ -1349,7 +1339,6 @@ class RecordsService {
           <div class="form-group mb-3">
             <label for="print-cond-teacher-search" class="font-bold text-gray-800 text-xs block mb-1">
               <i class="fas fa-chalkboard-teacher text-primary mr-1"></i> 1. เลือกครูผู้สอนประจำวิชา <span class="text-red-500">*</span>
-              <span class="text-xs text-blue-600 font-normal ml-1">(พิมพ์ชื่อครูเพื่อค้นหาได้)</span>
             </label>
             <div class="cond-combobox-wrap" id="print-cond-combobox">
               <div class="cond-search-input-group">
@@ -1358,20 +1347,19 @@ class RecordsService {
                   type="text" 
                   id="print-cond-teacher-search" 
                   class="form-control" 
-                  placeholder="🔍 พิมพ์ชื่อครู หรือกลุ่มสาระ เพื่อค้นหา..." 
-                  value="${initialDisplayText.replace(/"/g, '&quot;')}" 
+                  placeholder="พิมพ์ชื่อครูเพื่อค้นหา..." 
+                  value="" 
                   autocomplete="off"
                   oninput="recordsService.filterCondTeachers(this.value)"
-                  onfocus="this.select(); recordsService.showCondTeacherDropdown()"
-                  onclick="recordsService.showCondTeacherDropdown()"
+                  onfocus="recordsService.onCondTeacherInputFocus()"
                 />
-                <input type="hidden" id="print-cond-teacher" value="${defaultTeacherName.replace(/"/g, '&quot;')}" />
-                <button type="button" class="cond-search-toggle-btn" onclick="recordsService.toggleCondTeacherDropdown()" title="เปิด/ปิด รายชื่อครู">
+                <input type="hidden" id="print-cond-teacher" value="" />
+                <button type="button" class="cond-search-toggle-btn" onclick="recordsService.toggleCondTeacherDropdown()" title="เปิดดูรายชื่อครูทั้งหมด">
                   <i class="fas fa-chevron-down" id="print-cond-chevron"></i>
                 </button>
               </div>
               <div id="print-cond-teacher-dropdown" class="cond-dropdown-list" style="display: none;">
-                <!-- Dynamically populated -->
+                <!-- Dynamically populated when typing -->
               </div>
             </div>
           </div>
@@ -1382,7 +1370,7 @@ class RecordsService {
               <i class="fas fa-book-open text-primary mr-1"></i> 2. เลือกรายวิชาที่ครูท่านนี้สอน <span class="text-red-500">*</span>
             </label>
             <select id="print-cond-subject" class="form-control font-bold text-blue-900" onchange="recordsService.onCondSubjectSelect(this.value)">
-              <!-- Dynamically populated -->
+              <option value="">-- กรุณาพิมพ์และเลือกครูผู้สอนก่อน --</option>
             </select>
           </div>
 
@@ -1438,8 +1426,16 @@ class RecordsService {
 
     modal.classList.add('active');
 
-    // โหลดรายวิชาของครูเริ่มต้น
-    this.onCondTeacherSelect(defaultTeacherName);
+    // เริ่มต้นสถานะว่างเปล่า
+    this.onCondTeacherSelect('');
+  }
+
+  onCondTeacherInputFocus() {
+    const searchInput = document.getElementById('print-cond-teacher-search');
+    const query = searchInput ? searchInput.value.trim() : '';
+    if (query.length > 0) {
+      this.filterCondTeachers(query);
+    }
   }
 
   showCondTeacherDropdown() {
@@ -1480,13 +1476,36 @@ class RecordsService {
   }
 
   filterCondTeachers(query) {
+    const q = (query || '').trim();
     const dropdown = document.getElementById('print-cond-teacher-dropdown');
-    if (dropdown && dropdown.style.display !== 'block') {
-      dropdown.style.display = 'block';
+    if (!dropdown) return;
+
+    if (q.length === 0) {
+      // ถ้าล้างข้อความออก ให้รีเซ็ตค่าครู
+      const hiddenInput = document.getElementById('print-cond-teacher');
+      if (hiddenInput) hiddenInput.value = '';
+      this.onCondTeacherSelect('');
+      dropdown.style.display = 'none';
       const chevron = document.getElementById('print-cond-chevron');
-      if (chevron) chevron.className = 'fas fa-chevron-up';
+      if (chevron) chevron.className = 'fas fa-chevron-down';
+      return;
     }
-    this.renderCondTeacherDropdown(query);
+
+    dropdown.style.display = 'block';
+    const chevron = document.getElementById('print-cond-chevron');
+    if (chevron) chevron.className = 'fas fa-chevron-up';
+
+    if (!this._condDocClickBound) {
+      this._condDocClickBound = true;
+      document.addEventListener('click', (e) => {
+        const combobox = document.getElementById('print-cond-combobox');
+        if (combobox && !combobox.contains(e.target)) {
+          this.hideCondTeacherDropdown();
+        }
+      });
+    }
+
+    this.renderCondTeacherDropdown(q);
   }
 
   renderCondTeacherDropdown(query = '') {
@@ -1538,6 +1557,12 @@ class RecordsService {
   onCondTeacherSelect(teacherName) {
     const subjectSelect = document.getElementById('print-cond-subject');
     if (!subjectSelect) return;
+
+    if (!teacherName) {
+      subjectSelect.innerHTML = '<option value="">-- กรุณาพิมพ์และเลือกครูผู้สอนก่อน --</option>';
+      this.updateCondStudentPreview();
+      return;
+    }
 
     const allRecords = db.get('records') || [];
     const allTeachers = db.get('teachers') || [];
