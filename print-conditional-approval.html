@@ -117,13 +117,30 @@
       min-width: 45px;
     }
 
-    .memo-body-paragraph {
-      text-indent: 48px;
-      line-height: 1.85;
-      margin-top: 3px;
-      margin-bottom: 6px;
+    /* 2-Line Memo Header Block (matching Image 2) */
+    .memo-official-block {
+      margin-top: 4px;
+      margin-bottom: 8px;
       font-size: 14.5px;
-      text-align: justify;
+      color: #000000;
+      line-height: 1.9;
+    }
+
+    .memo-line {
+      display: flex;
+      align-items: baseline;
+      white-space: nowrap;
+      width: 100%;
+    }
+
+    .memo-line-1 {
+      padding-left: 48px; /* Standard official memo indentation */
+    }
+
+    .memo-label {
+      flex-shrink: 0;
+      white-space: nowrap;
+      padding: 0 2px;
     }
 
     .doc-dotted-fill {
@@ -131,14 +148,37 @@
       font-weight: 600;
       color: #000000;
       padding: 0 4px;
-      display: inline-block;
-      min-width: 24px;
       text-align: center;
       line-height: 1.2;
+      flex-shrink: 0;
+      white-space: nowrap;
     }
 
-    .doc-dotted-fill.fill-wide {
-      min-width: 140px;
+    .doc-dotted-fill.fill-teacher {
+      flex: 1 1 auto;
+      min-width: 120px;
+    }
+
+    .doc-dotted-fill.fill-subject {
+      flex: 0 1 auto;
+      min-width: 80px;
+    }
+
+    .doc-dotted-fill.fill-code {
+      flex: 0 1 auto;
+      min-width: 50px;
+    }
+
+    .doc-dotted-fill.fill-sem {
+      min-width: 24px;
+    }
+
+    .doc-dotted-fill.fill-year {
+      min-width: 40px;
+    }
+
+    .doc-dotted-fill.fill-count {
+      min-width: 28px;
     }
 
     /* Data Table (Exact 18 Rows Format matching Image 3) */
@@ -291,14 +331,25 @@
       <strong>เรียน</strong> <span>ผู้อำนวยการโรงเรียนพนมดงรักวิทยา</span>
     </div>
 
-    <!-- 4. Body Paragraph -->
-    <div class="memo-body-paragraph">
-      ด้วยข้าพเจ้า <span class="doc-dotted-fill fill-wide" id="doc-teacher-name">...................................................</span> 
-      ผู้สอนรายวิชา <span class="doc-dotted-fill fill-wide" id="doc-subject-name">...................................................</span> 
-      รหัส <span class="doc-dotted-fill font-bold" id="doc-subject-code">.........................</span>
-      ภาคเรียนที่ <span class="doc-dotted-fill font-bold" id="doc-semester">1</span> 
-      ปีการศึกษา <span class="doc-dotted-fill font-bold" id="doc-year">2569</span> 
-      มีนักเรียน มี ผลการเรียน“0” “ร” “มส.” “มผ” “ขร” จำนวน <span class="doc-dotted-fill font-bold" id="doc-student-count">0</span> คน ดังนี้
+    <!-- 4. Official Memo Body (Exact 2-Line Layout matching Image 2) -->
+    <div class="memo-official-block">
+      <div class="memo-line memo-line-1">
+        <span class="memo-label">ด้วยข้าพเจ้า</span>
+        <span class="doc-dotted-fill fill-teacher" id="doc-teacher-name">...................................................</span>
+        <span class="memo-label">ผู้สอนรายวิชา</span>
+        <span class="doc-dotted-fill fill-subject" id="doc-subject-name">...................................................</span>
+        <span class="memo-label">รหัส</span>
+        <span class="doc-dotted-fill fill-code font-bold" id="doc-subject-code">.........................</span>
+      </div>
+      <div class="memo-line memo-line-2">
+        <span class="memo-label">ภาคเรียนที่</span>
+        <span class="doc-dotted-fill fill-sem font-bold" id="doc-semester">1</span>
+        <span class="memo-label">ปีการศึกษา</span>
+        <span class="doc-dotted-fill fill-year font-bold" id="doc-year">2569</span>
+        <span class="memo-label">มีนักเรียน มี ผลการเรียน“0” “ร” “มส.” “มผ” “ขร” จำนวน</span>
+        <span class="doc-dotted-fill fill-count font-bold" id="doc-student-count">0</span>
+        <span class="memo-label">คน ดังนี้</span>
+      </div>
     </div>
 
     <!-- 5. 18-Rows Table with Dashed Lines (matching Image 3) -->
@@ -359,8 +410,8 @@
   </div>
 
   <!-- Scripts to Load Realtime Data from App Storage / Database -->
-  <script src="js/config.js?v=4.9.0"></script>
-  <script src="js/firebase-service.js?v=4.9.0"></script>
+  <script src="js/config.js?v=5.0.0"></script>
+  <script src="js/firebase-service.js?v=5.0.0"></script>
   <script>
     document.addEventListener('DOMContentLoaded', async function() {
       // 1. Initialise DB connection
