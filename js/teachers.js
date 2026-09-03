@@ -59,7 +59,10 @@ class TeachersService {
       return;
     }
 
+    const currentUser = authService.getCurrentUser();
     const isAdmin = authService.isAdmin();
+    const isTeacher = currentUser && currentUser.role === APP_CONFIG.ROLES.TEACHER;
+    const canEdit = isAdmin || isTeacher;
 
     container.innerHTML = filtered.map(t => `
       <div class="teacher-card">
@@ -94,14 +97,15 @@ class TeachersService {
           </div>
         </div>
 
-        ${isAdmin ? `
+        ${canEdit ? `
         <div class="teacher-card-footer">
-          <button type="button" class="btn-sm btn-outline text-indigo-600" onclick="teachersService.openEditTeacherModal('${t.id}')">
-            <i class="fas fa-edit"></i> แก้ไข
+          <button type="button" class="btn-sm btn-outline text-indigo-600 font-bold" onclick="teachersService.openEditTeacherModal('${t.id}')" title="แก้ไขข้อมูลครูและจัดการรายวิชาที่สอน">
+            <i class="fas fa-edit"></i> แก้ไข / เพิ่มรายวิชา
           </button>
+          ${isAdmin ? `
           <button type="button" class="btn-sm btn-outline text-red-600" onclick="teachersService.deleteTeacherPrompt('${t.id}', '${t.name}')">
             <i class="fas fa-trash-alt"></i> ลบ
-          </button>
+          </button>` : ''}
         </div>` : ''}
       </div>
     `).join('');
