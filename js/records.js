@@ -1279,7 +1279,313 @@ class RecordsService {
     if (modal) modal.classList.remove('active');
     this.parsedCsvData = [];
   }
+
+  /**
+   * เปิดหน้าต่างเลือกครูและรายวิชาสำหรับพิมพ์แบบอนุมัติผลการเรียนที่มีเงื่อนไข
+   */
+  openConditionalApprovalModal() {
+    const modal = document.getElementById('conditional-approval-modal');
+    if (!modal) return;
+
+    const teachers = db.get('teachers') || [];
+    const records = db.get('records') || [];
+    const currentUser = authService.getCurrentUser();
+
+    // รวบรวมรายชื่อครูทั้งหมด (จากฐานข้อมูลครู และจากประวัติ records)
+    const teacherMap = new Map();
+    teachers.forEach(t => {
+      if (t && t.name) {
+        teacherMap.set(t.name.trim(), { 
+          id: t.id, 
+          name: t.name.trim(), 
+          area: t.learningArea || '', 
+          subjects: Array.isArray(t.subjects) ? t.subjects : [] 
+        });
+      }
+    });
+    records.forEach(r => {
+      if (r && r.teacherName && !teacherMap.has(r.teacherName.trim())) {
+        teacherMap.set(r.teacherName.trim(), { 
+          id: '', 
+          name: r.teacherName.trim(), 
+          area: r.learningArea || '', 
+          subjects: [] 
+        });
+      }
+    });
+
+    const teacherList = Array.from(teacherMap.values()).sort((a, b) => a.name.localeCompare(b.name, 'th'));
+
+    // กำหนดครูเริ่มต้น (ถ้าผู้ใช้ที่ล็อกอินอยู่เป็นครู ให้เลือกชื่อตนเองอัตโนมัติ)
+    let defaultTeacherName = '';
+    if (currentUser && currentUser.role === APP_CONFIG.ROLES.TEACHER) {
+      defaultTeacherName = currentUser.name;
+    } else if (teacherList.length > 0) {
+      defaultTeacherName = teacherList[0].name;
+    }
+
+    modal.innerHTML = `
+      <div class="modal-backdrop" onclick="recordsService.closeConditionalApprovalModal()"></div>
+      <div class="modal-dialog animate-scale-in" style="max-width: 580px;">
+        <div class="modal-header" style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-bottom: 1.5px solid #bfdbfe;">
+          <div class="modal-title-wrap">
+            <div class="modal-icon-badge bg-blue-soft text-primary">
+              <i class="fas fa-file-signature"></i>
+            </div>
+            <div>
+              <h3 style="color: #1e3a8a; font-size: 16px; margin: 0;">พิมพ์แบบอนุมัติผลการเรียนที่มีเงื่อนไข</h3>
+              <p class="text-xs text-muted" style="margin: 2px 0 0 0;">แบบฟอร์มขออนุมัติผลการเรียน 0, ร, มส, มผ, ขร (ตามรายวิชา/ครูผู้สอน)</p>
+            </div>
+          </div>
+          <button type="button" class="btn-close-modal" onclick="recordsService.closeConditionalApprovalModal()">&times;</button>
+        </div>
+
+        <div class="modal-body py-4 px-5">
+          <!-- Step 1: Select Teacher -->
+          <div class="form-group mb-3">
+            <label for="print-cond-teacher" class="font-bold text-gray-800 text-xs block mb-1">
+              <i class="fas fa-chalkboard-teacher text-primary mr-1"></i> 1. เลือกครูผู้สอนประจำวิชา <span class="text-red-500">*</span>
+            </label>
+            <select id="print-cond-teacher" class="form-control" style="font-weight: 600;" onchange="recordsService.onCondTeacherSelect(this.value)">
+              ${teacherList.map(t => `
+                <option value="${t.name}" ${t.name === defaultTeacherName ? 'selected' : ''}>
+                  ${t.name} ${t.area ? `(${t.area})` : ''}
+                </option>
+              `).join('')}
+            </select>
+          </div>
+
+          <!-- Step 2: Select Subject -->
+          <div class="form-group mb-3">
+            <label for="print-cond-subject" class="font-bold text-gray-800 text-xs block mb-1">
+              <i class="fas fa-book-open text-primary mr-1"></i> 2. เลือกรายวิชาที่ครูท่านนี้สอน <span class="text-red-500">*</span>
+            </label>
+            <select id="print-cond-subject" class="form-control font-bold text-blue-900" onchange="recordsService.onCondSubjectSelect(this.value)">
+              <!-- Dynamically populated -->
+            </select>
+          </div>
+
+          <!-- Step 3: Semester & Year -->
+          <div class="form-row mb-3">
+            <div class="form-group col-md-6">
+              <label for="print-cond-sem" class="font-bold text-gray-800 text-xs block mb-1">ภาคเรียน</label>
+              <select id="print-cond-sem" class="form-control text-xs" onchange="recordsService.onCondTermChange()">
+                <option value="1" ${String(APP_CONFIG.SEMESTER) === '1' ? 'selected' : ''}>ภาคเรียนที่ 1</option>
+                <option value="2" ${String(APP_CONFIG.SEMESTER) === '2' ? 'selected' : ''}>ภาคเรียนที่ 2</option>
+              </select>
+            </div>
+            <div class="form-group col-md-6">
+              <label for="print-cond-year" class="font-bold text-gray-800 text-xs block mb-1">ปีการศึกษา</label>
+              <select id="print-cond-year" class="form-control text-xs" onchange="recordsService.onCondTermChange()">
+                ${(APP_CONFIG.AVAILABLE_YEARS || ["2569", "2568", "2567", "2570"]).map(y => `
+                  <option value="${y}" ${String(APP_CONFIG.ACADEMIC_YEAR) === String(y) ? 'selected' : ''}>${y}</option>
+                `).join('')}
+              </select>
+            </div>
+          </div>
+
+          <!-- Live Student Summary Box -->
+          <div id="print-cond-summary-box" class="print-cond-summary-box">
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-bold text-xs text-gray-800 flex items-center gap-1">
+                <i class="fas fa-users text-blue-600"></i> รายชื่อนักเรียนที่จะปรากฏในแบบอนุมัติ:
+              </span>
+              <span id="print-cond-badge-count" class="badge badge-primary">0 คน</span>
+            </div>
+            <div id="print-cond-students-list" class="print-cond-students-table-wrap">
+              <!-- Rendered list of students -->
+            </div>
+          </div>
+
+        </div>
+
+        <div class="modal-footer" style="background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between;">
+          <button type="button" class="btn btn-outline" onclick="recordsService.closeConditionalApprovalModal()">
+            ยกเลิก
+          </button>
+          <div style="display: flex; gap: 8px;">
+            <button type="button" class="btn btn-outline-primary" onclick="recordsService.previewConditionalApproval()" style="border-color: #93c5fd; background: #eff6ff; color: #1d4ed8; font-weight: 700;">
+              <i class="fas fa-eye mr-1"></i> ดูตัวอย่างเอกสาร
+            </button>
+            <button type="button" class="btn btn-primary font-bold" onclick="recordsService.printConditionalApproval()">
+              <i class="fas fa-print mr-1"></i> พิมพ์แบบอนุมัติ (Print)
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    modal.classList.add('active');
+
+    // โหลดรายวิชาของครูเริ่มต้น
+    this.onCondTeacherSelect(defaultTeacherName);
+  }
+
+  closeConditionalApprovalModal() {
+    const modal = document.getElementById('conditional-approval-modal');
+    if (modal) modal.classList.remove('active');
+  }
+
+  onCondTeacherSelect(teacherName) {
+    const subjectSelect = document.getElementById('print-cond-subject');
+    if (!subjectSelect) return;
+
+    const allRecords = db.get('records') || [];
+    const allTeachers = db.get('teachers') || [];
+
+    const teacher = allTeachers.find(t => t.name === teacherName);
+    const subjectsMap = new Map();
+
+    // 1. จากการตั้งค่าวิชาที่ครูสอน
+    if (teacher && Array.isArray(teacher.subjects)) {
+      teacher.subjects.forEach(s => {
+        if (s && s.code) {
+          const key = s.code.trim().toLowerCase();
+          subjectsMap.set(key, {
+            code: s.code.trim(),
+            name: (s.name || '').trim(),
+            level: (s.level || '').trim(),
+            count: 0
+          });
+        }
+      });
+    }
+
+    // 2. จากประวัติผลการเรียนในฐานข้อมูล
+    allRecords.forEach(r => {
+      if (r && r.teacherName && r.teacherName.trim() === teacherName.trim() && r.subjectCode) {
+        const key = r.subjectCode.trim().toLowerCase();
+        if (subjectsMap.has(key)) {
+          subjectsMap.get(key).count++;
+        } else {
+          subjectsMap.set(key, {
+            code: r.subjectCode.trim(),
+            name: (r.subjectName || '').trim(),
+            level: (r.gradeLevel || '').trim(),
+            count: 1
+          });
+        }
+      }
+    });
+
+    const subjectsList = Array.from(subjectsMap.values());
+
+    if (subjectsList.length === 0) {
+      subjectSelect.innerHTML = `<option value="">-- ไม่พบข้อมูลรายวิชาของครูท่านนี้ --</option>`;
+      this.updateCondStudentPreview();
+      return;
+    }
+
+    subjectSelect.innerHTML = subjectsList.map(s => {
+      const label = `${s.code} - ${s.name} ${s.level ? `(${s.level})` : ''} [ติดเงื่อนไข ${s.count} รายการ]`;
+      return `<option value="${s.code}">${label}</option>`;
+    }).join('');
+
+    this.updateCondStudentPreview();
+  }
+
+  onCondSubjectSelect() {
+    this.updateCondStudentPreview();
+  }
+
+  onCondTermChange() {
+    this.updateCondStudentPreview();
+  }
+
+  updateCondStudentPreview() {
+    const teacherName = (document.getElementById('print-cond-teacher')?.value || '').trim();
+    const subjectCode = (document.getElementById('print-cond-subject')?.value || '').trim();
+    const sem = document.getElementById('print-cond-sem')?.value || APP_CONFIG.SEMESTER || '1';
+    const year = document.getElementById('print-cond-year')?.value || APP_CONFIG.ACADEMIC_YEAR || '2569';
+
+    const countBadge = document.getElementById('print-cond-badge-count');
+    const listWrap = document.getElementById('print-cond-students-list');
+
+    if (!listWrap) return;
+
+    if (!teacherName || !subjectCode) {
+      if (countBadge) countBadge.innerText = '0 คน';
+      listWrap.innerHTML = '<div class="text-center text-xs text-gray-400 py-3">กรุณาเลือกครูผู้สอนและรายวิชา</div>';
+      return;
+    }
+
+    const allRecords = db.get('records') || [];
+    const matched = allRecords.filter(r => 
+      (r.teacherName && r.teacherName.trim() === teacherName) &&
+      (r.subjectCode && r.subjectCode.trim().toLowerCase() === subjectCode.toLowerCase()) &&
+      (String(r.semester) === String(sem)) &&
+      (String(r.academicYear) === String(year))
+    );
+
+    if (countBadge) countBadge.innerText = `${matched.length} คน`;
+
+    if (matched.length === 0) {
+      listWrap.innerHTML = `
+        <div class="text-center text-xs text-amber-700 py-3 bg-amber-50 rounded border border-amber-200">
+          <i class="fas fa-info-circle mr-1"></i> ยังไม่มีข้อมูลนักเรียนติด 0/ร/มส ในวิชานี้ สำหรับภาคเรียนที่ ${sem} ปีการศึกษา ${year}
+          <div class="text-gray-500 mt-0.5 text-xs">(เมื่อกดพิมพ์ แบบฟอร์มจะมีหัวเอกสารวิชานี้ พร้อมตารางเปล่า 18 แถว)</div>
+        </div>
+      `;
+      return;
+    }
+
+    listWrap.innerHTML = `
+      <table class="table-cond-preview">
+        <thead>
+          <tr>
+            <th style="width: 8%; text-align: center;">ที่</th>
+            <th style="width: 14%; text-align: center;">ชั้น</th>
+            <th style="width: 18%; text-align: center;">รหัส</th>
+            <th style="width: 42%;">ชื่อ - นามสกุล</th>
+            <th style="width: 18%; text-align: center;">ผลการเรียน</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${matched.map((r, idx) => `
+            <tr>
+              <td class="text-center">${idx + 1}</td>
+              <td class="text-center">${r.room ? `${r.gradeLevel}/${r.room}` : r.gradeLevel}</td>
+              <td class="text-center font-mono">${r.studentId}</td>
+              <td>${r.studentName}</td>
+              <td class="text-center font-bold text-red-600">${r.conditionType}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+  }
+
+  previewConditionalApproval() {
+    const teacherName = (document.getElementById('print-cond-teacher')?.value || '').trim();
+    const subjectCode = (document.getElementById('print-cond-subject')?.value || '').trim();
+    const sem = document.getElementById('print-cond-sem')?.value || '1';
+    const year = document.getElementById('print-cond-year')?.value || '2569';
+
+    if (!teacherName || !subjectCode) {
+      alert("กรุณาเลือกครูผู้สอนและรายวิชาก่อน");
+      return;
+    }
+
+    const url = `print-conditional-approval.html?teacher=${encodeURIComponent(teacherName)}&subject=${encodeURIComponent(subjectCode)}&semester=${encodeURIComponent(sem)}&year=${encodeURIComponent(year)}`;
+    window.open(url, '_blank');
+  }
+
+  printConditionalApproval() {
+    const teacherName = (document.getElementById('print-cond-teacher')?.value || '').trim();
+    const subjectCode = (document.getElementById('print-cond-subject')?.value || '').trim();
+    const sem = document.getElementById('print-cond-sem')?.value || '1';
+    const year = document.getElementById('print-cond-year')?.value || '2569';
+
+    if (!teacherName || !subjectCode) {
+      alert("กรุณาเลือกครูผู้สอนและรายวิชาก่อน");
+      return;
+    }
+
+    const url = `print-conditional-approval.html?teacher=${encodeURIComponent(teacherName)}&subject=${encodeURIComponent(subjectCode)}&semester=${encodeURIComponent(sem)}&year=${encodeURIComponent(year)}&autoprint=1`;
+    window.open(url, '_blank');
+  }
 }
 
 // Global Singleton Instance
 const recordsService = new RecordsService();
+

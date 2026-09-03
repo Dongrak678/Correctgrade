@@ -3243,4 +3243,51 @@ select.form-control {
   color: #1e293b;
 }
 
+/* ==========================================================================
+   CONDITIONAL GRADE APPROVAL PRINT MODAL STYLES
+   ========================================================================== */
+.print-cond-summary-box {
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  margin-top: 8px;
+}
+
+.print-cond-students-table-wrap {
+  max-height: 180px;
+  overflow-y: auto;
+  border-radius: 6px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+}
+
+.table-cond-preview {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.table-cond-preview th {
+  background: #f1f5f9;
+  color: #334155;
+  padding: 6px 8px;
+  font-weight: 700;
+  border-bottom: 1.5px solid #cbd5e1;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.table-cond-preview td {
+  padding: 5px 8px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #1e293b;
+  vertical-align: middle;
+}
+
+.table-cond-preview tr:hover {
+  background: #eff6ff;
+}
+
 

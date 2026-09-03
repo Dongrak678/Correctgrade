@@ -188,6 +188,15 @@ class ExportEngine {
     const url = `print-report.html?level=${encodeURIComponent(filterLevel)}&status=${encodeURIComponent(filterStatus)}`;
     window.open(url, '_blank', 'width=1000,height=800');
   }
+
+  /**
+   * เปิดหน้าพิมพ์แบบอนุมัติผลการเรียนที่มีเงื่อนไข (ตามรายวิชา/ครูผู้สอน)
+   */
+  openConditionalApprovalModal() {
+    if (typeof recordsService !== 'undefined' && recordsService.openConditionalApprovalModal) {
+      recordsService.openConditionalApprovalModal();
+    }
+  }
 }
 
 // Global Singleton Instance

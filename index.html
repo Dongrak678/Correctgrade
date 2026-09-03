@@ -24,8 +24,8 @@
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
   <!-- Application Stylesheets (with cache busting) -->
-  <link rel="stylesheet" href="css/main.css?v=4.7.0">
-  <link rel="stylesheet" href="css/components.css?v=4.7.0">
+  <link rel="stylesheet" href="css/main.css?v=4.8.0">
+  <link rel="stylesheet" href="css/components.css?v=4.8.0">
 </head>
 <body>
 
@@ -633,6 +633,9 @@
             </div>
             
             <div class="records-action-group">
+              <button type="button" class="btn btn-outline text-blue-700 nav-teacher-only" onclick="recordsService.openConditionalApprovalModal()" style="border-color: #93c5fd; background: #eff6ff; font-weight: 700;">
+                <i class="fas fa-print"></i> พิมพ์แบบอนุมัติผลการเรียนที่มีเงื่อนไข
+              </button>
               <button type="button" class="btn btn-outline text-indigo-600 nav-admin-only" onclick="recordsService.openBulkImportModal()">
                 <i class="fas fa-file-csv"></i> นำเข้าไฟล์ CSV
               </button>
@@ -977,8 +980,29 @@
             </div>
           </div>
 
-          <!-- 4 Colorful Modern Cards Grid -->
+          <!-- Colorful Modern Cards Grid -->
           <div class="reports-grid-modern">
+
+            <!-- Card 0: Conditional Grade Approval Form (Royal Blue Theme) -->
+            <div class="report-card-modern theme-blue" style="border-top: 4px solid #1d4ed8;">
+              <div class="report-card-header">
+                <div class="report-card-avatar" style="background: #dbeafe; color: #1d4ed8;">
+                  <i class="fas fa-file-signature"></i>
+                </div>
+                <div class="report-card-heading">
+                  <h4>แบบอนุมัติผลการเรียนที่มีเงื่อนไข</h4>
+                  <span class="report-card-tag" style="background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe;">0, ร, มส, มผ, ขร (รายวิชา/ครูผู้สอน)</span>
+                </div>
+              </div>
+              <p class="report-card-desc">
+                ออกเอกสารแบบอนุมัติผลการเรียนมาตรฐาน A4 ตามรายวิชาและครูผู้สอน พร้อมตาราง 18 แถว และช่องลงนามอนุมัติของผู้บริหารสถานศึกษา
+              </p>
+              <div class="report-card-action">
+                <button type="button" class="btn-report-action" onclick="recordsService.openConditionalApprovalModal()" style="background: #1d4ed8; color: #ffffff;">
+                  <i class="fas fa-print"></i> พิมพ์แบบอนุมัติผลการเรียนที่มีเงื่อนไข
+                </button>
+              </div>
+            </div>
             
             <!-- Card 1: Official Print Document (Rose Theme) -->
             <div class="report-card-modern theme-rose">
@@ -1122,6 +1146,9 @@
   <!-- 2. Record Add/Edit Modal -->
   <div id="record-form-modal" class="modal-wrapper"></div>
 
+  <!-- 2.5 Conditional Grade Approval Print Modal -->
+  <div id="conditional-approval-modal" class="modal-wrapper"></div>
+
   <!-- 3. Teacher Add/Edit Modal -->
   <div id="teacher-form-modal" class="modal-wrapper"></div>
 
@@ -1253,19 +1280,19 @@
   <div id="toast-container" class="toast-container"></div>
 
   <!-- Application Scripts (Loaded with Cache Busting) -->
-  <script src="js/config.js?v=4.7.0"></script>
-  <script src="js/firebase-service.js?v=4.7.0"></script>
-  <script src="js/cloudinary-service.js?v=4.7.0"></script>
-  <script src="js/auth.js?v=4.7.0"></script>
-  <script src="js/dashboard.js?v=4.7.0"></script>
-  <script src="js/workflow.js?v=4.7.0"></script>
-  <script src="js/records.js?v=4.7.0"></script>
-  <script src="js/audit.js?v=4.7.0"></script>
-  <script src="js/teachers.js?v=4.7.0"></script>
-  <script src="js/students.js?v=4.7.0"></script>
-  <script src="js/users.js?v=4.7.0"></script>
-  <script src="js/export-engine.js?v=4.7.0"></script>
-  <script src="js/app.js?v=4.7.0"></script>
+  <script src="js/config.js?v=4.8.0"></script>
+  <script src="js/firebase-service.js?v=4.8.0"></script>
+  <script src="js/cloudinary-service.js?v=4.8.0"></script>
+  <script src="js/auth.js?v=4.8.0"></script>
+  <script src="js/dashboard.js?v=4.8.0"></script>
+  <script src="js/workflow.js?v=4.8.0"></script>
+  <script src="js/records.js?v=4.8.0"></script>
+  <script src="js/audit.js?v=4.8.0"></script>
+  <script src="js/teachers.js?v=4.8.0"></script>
+  <script src="js/students.js?v=4.8.0"></script>
+  <script src="js/users.js?v=4.8.0"></script>
+  <script src="js/export-engine.js?v=4.8.0"></script>
+  <script src="js/app.js?v=4.8.0"></script>
 
   <script>
     // Tab role switcher helper in login view
