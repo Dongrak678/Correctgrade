@@ -38,9 +38,10 @@ class RecordsService {
     // กรองตามสิทธิ์ผู้ใช้งาน (Role-Based Access Control)
     if (currentUser) {
       if (currentUser.role === APP_CONFIG.ROLES.STUDENT) {
-        // นักเรียนเห็นเฉพาะผลการเรียนของตัวเอง
-        records = records.filter(r => 
-          String(r.studentId) === String(currentUser.studentId) ||
+        // สำหรับนักเรียน: แสดงเฉพาะผลการเรียนที่มีเงื่อนไขของตนเองทั้งหมดทันที
+        return records.filter(r => 
+          String(r.studentId).trim() === String(currentUser.studentId || '').trim() ||
+          String(r.studentId).trim() === String(currentUser.username || '').trim() ||
           String(r.studentName).includes(currentUser.name)
         );
       } else if (currentUser.role === APP_CONFIG.ROLES.TEACHER) {
@@ -122,19 +123,27 @@ class RecordsService {
       clearBtn.style.display = (this.searchQuery && this.searchQuery.trim().length > 0) ? 'flex' : 'none';
     }
 
+    const currentUser = authService.getCurrentUser();
+    const isStudent = currentUser && currentUser.role === APP_CONFIG.ROLES.STUDENT;
+
     if (filtered.length === 0) {
       tableBody.innerHTML = `
         <tr>
           <td colspan="8" class="text-center py-10 text-gray-500">
             <div class="empty-state-card" style="padding: 28px 16px; text-align: center;">
-              <div style="width: 56px; height: 56px; border-radius: 50%; background: #eff6ff; color: #2563eb; display: inline-flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 12px;">
-                <i class="fas fa-search"></i>
+              <div style="width: 56px; height: 56px; border-radius: 50%; background: ${isStudent ? '#ecfdf5' : '#eff6ff'}; color: ${isStudent ? '#059669' : '#2563eb'}; display: inline-flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 12px;">
+                <i class="fas ${isStudent ? 'fa-check-circle' : 'fa-search'}"></i>
               </div>
-              <h4 style="font-size: 15px; font-weight: 700; color: #1e293b; margin-bottom: 4px;">ไม่พบข้อมูลผลการเรียนตามเงื่อนไขที่เลือก</h4>
-              <p style="font-size: 13px; color: #64748b; margin-bottom: 12px;">ลองเปลี่ยนตัวกรอง ค้นหาด้วยคำอื่น หรือกดปุ่มล้างตัวกรอง</p>
+              <h4 style="font-size: 15px; font-weight: 700; color: #1e293b; margin-bottom: 4px;">
+                ${isStudent ? 'ยินดีด้วย! คุณไม่มีผลการเรียนที่มีเงื่อนไข (0, ร, มส)' : 'ไม่พบข้อมูลผลการเรียนตามเงื่อนไขที่เลือก'}
+              </h4>
+              <p style="font-size: 13px; color: #64748b; margin-bottom: ${isStudent ? '0' : '12px'};">
+                ${isStudent ? 'ผลการเรียนของคุณผ่านเกณฑ์ตามปกติทุกรายวิชา' : 'ลองเปลี่ยนตัวกรอง ค้นหาด้วยคำอื่น หรือกดปุ่มล้างตัวกรอง'}
+              </p>
+              ${!isStudent ? `
               <button type="button" class="btn-sm btn-outline" onclick="recordsService.resetAllFilters()">
                 <i class="fas fa-undo mr-1"></i> ล้างตัวกรองทั้งหมด
-              </button>
+              </button>` : ''}
             </div>
           </td>
         </tr>
