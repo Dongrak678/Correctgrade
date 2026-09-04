@@ -326,8 +326,8 @@
   <div class="print-control-bar">
     <div style="font-weight: 700; color: #1e293b; font-size: 15px; display: flex; align-items: center; gap: 8px;">
       <i class="fas fa-file-signature text-blue-600"></i> แบบอนุมัติผลการเรียนที่มีเงื่อนไข (0, ร, มส, มผ, ขร)
-      <span style="font-size: 12px; font-weight: normal; color: #059669; background: #ecfdf5; border: 1px solid #a7f3d0; padding: 2px 8px; border-radius: 4px;">
-        <i class="fas fa-edit mr-1"></i> สามารถคลิกแก้ไขข้อความบนเอกสารได้โดยตรงก่อนสั่งพิมพ์
+      <span style="font-size: 12px; font-weight: normal; color: #0369a1; background: #f0f9ff; border: 1px solid #bae6fd; padding: 2px 8px; border-radius: 4px;">
+        <i class="fas fa-database mr-1"></i> ดึงข้อมูลผลการเรียนที่ถูกต้องจากระบบอัตโนมัติ (ตารางล็อกข้อมูลตรงตามฐานข้อมูล)
       </span>
     </div>
     <div style="display: flex; gap: 10px;">
@@ -572,21 +572,21 @@
 
           rowsHtml += '<tr>' +
             '<td class="col-no">' + num + '</td>' +
-            '<td class="col-class" contenteditable="true" title="คลิกเพื่อแก้ไขระดับชั้น/ห้องได้">' + classRoom + '</td>' +
-            '<td class="col-id" contenteditable="true" title="คลิกเพื่อแก้ไขรหัสนักเรียนได้">' + (r.studentId || '') + '</td>' +
-            '<td class="col-name" contenteditable="true" title="คลิกเพื่อแก้ไขชื่อ-นามสกุลได้">' + (r.studentName || '') + '</td>' +
-            '<td class="col-grade" contenteditable="true" title="คลิกเพื่อแก้ไขผลการเรียนได้">' + (r.conditionType || '') + '</td>' +
-            '<td class="col-remark" contenteditable="true" title="คลิกเพื่อแก้ไขหมายเหตุได้">' + remark + '</td>' +
+            '<td class="col-class">' + classRoom + '</td>' +
+            '<td class="col-id">' + (r.studentId || '') + '</td>' +
+            '<td class="col-name">' + (r.studentName || '') + '</td>' +
+            '<td class="col-grade">' + (r.conditionType || '') + '</td>' +
+            '<td class="col-remark">' + remark + '</td>' +
           '</tr>';
         } else {
           // Empty row with numbered counter and dashed borders
           rowsHtml += '<tr>' +
             '<td class="col-no">' + num + '</td>' +
-            '<td class="col-class" contenteditable="true"></td>' +
-            '<td class="col-id" contenteditable="true"></td>' +
-            '<td class="col-name" contenteditable="true"></td>' +
-            '<td class="col-grade" contenteditable="true"></td>' +
-            '<td class="col-remark" contenteditable="true"></td>' +
+            '<td class="col-class"></td>' +
+            '<td class="col-id"></td>' +
+            '<td class="col-name"></td>' +
+            '<td class="col-grade"></td>' +
+            '<td class="col-remark"></td>' +
           '</tr>';
         }
       }
