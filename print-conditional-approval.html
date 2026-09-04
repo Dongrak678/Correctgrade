@@ -181,6 +181,24 @@
       min-width: 24px;
     }
 
+    /* Editable Elements Styling */
+    [contenteditable="true"] {
+      cursor: text;
+      transition: background-color 0.15s ease, outline 0.15s ease;
+    }
+
+    [contenteditable="true"]:hover {
+      background-color: #eff6ff;
+      outline: 1px dashed #3b82f6;
+      border-radius: 2px;
+    }
+
+    [contenteditable="true"]:focus {
+      background-color: #dbeafe;
+      outline: 1.5px solid #2563eb;
+      border-radius: 2px;
+    }
+
     /* Data Table (Exact 18 Rows Format matching Image 3) */
     .form-table {
       width: 100%;
@@ -249,23 +267,20 @@
       flex: 1 1 auto;
       border-bottom: 1px dotted #000000;
       margin: 0 4px;
-      min-width: 40px;
-      height: 0;
     }
 
+    /* Director Approval Block */
     .director-approval-block {
       margin-top: 12px;
       font-size: 13.5px;
-      line-height: 1.45;
     }
 
     .approval-choice-left {
-      text-align: left;
-      font-size: 14px;
-      margin-bottom: 6px;
-      padding-left: 6px;
       display: flex;
-      gap: 48px;
+      justify-content: flex-start;
+      gap: 36px;
+      margin-bottom: 4px;
+      padding-left: 10px;
     }
 
     .director-signature-wrap {
@@ -293,6 +308,11 @@
         box-shadow: none;
       }
 
+      [contenteditable="true"]:hover, [contenteditable="true"]:focus {
+        background-color: transparent !important;
+        outline: none !important;
+      }
+
       @page {
         size: A4 portrait;
         margin: 10mm 15mm 8mm 15mm;
@@ -304,8 +324,11 @@
 
   <!-- Screen Control Bar -->
   <div class="print-control-bar">
-    <div style="font-weight: 700; color: #1e293b; font-size: 15px;">
-      <i class="fas fa-file-signature text-blue-600 mr-2"></i> แบบอนุมัติผลการเรียนที่มีเงื่อนไข (0, ร, มส, มผ, ขร)
+    <div style="font-weight: 700; color: #1e293b; font-size: 15px; display: flex; align-items: center; gap: 8px;">
+      <i class="fas fa-file-signature text-blue-600"></i> แบบอนุมัติผลการเรียนที่มีเงื่อนไข (0, ร, มส, มผ, ขร)
+      <span style="font-size: 12px; font-weight: normal; color: #059669; background: #ecfdf5; border: 1px solid #a7f3d0; padding: 2px 8px; border-radius: 4px;">
+        <i class="fas fa-edit mr-1"></i> สามารถคลิกแก้ไขข้อความบนเอกสารได้โดยตรงก่อนสั่งพิมพ์
+      </span>
     </div>
     <div style="display: flex; gap: 10px;">
       <button type="button" class="btn-action-print" onclick="window.print()">
@@ -322,7 +345,7 @@
     
     <!-- 1. School Logo -->
     <div class="doc-logo-wrap">
-      <img src="Pr%20Logo.png?v=5.3.0" alt="ตราโรงเรียนพนมดงรักวิทยา" class="doc-logo-img">
+      <img src="Pr%20Logo.png?v=5.8.0" alt="ตราโรงเรียนพนมดงรักวิทยา" class="doc-logo-img">
     </div>
 
     <!-- 2. Form Title -->
@@ -340,19 +363,19 @@
     <div class="memo-official-block">
       <div class="memo-line memo-line-1">
         <span class="memo-label">ด้วยข้าพเจ้า</span>
-        <span class="doc-dotted-fill fill-teacher" id="doc-teacher-name">...................................................</span>
+        <span class="doc-dotted-fill fill-teacher" id="doc-teacher-name" contenteditable="true" title="คลิกเพื่อแก้ไขชื่อครูผู้สอนได้">...................................................</span>
         <span class="memo-label">ผู้สอนรายวิชา</span>
-        <span class="doc-dotted-fill fill-subject" id="doc-subject-name">...................................................</span>
+        <span class="doc-dotted-fill fill-subject" id="doc-subject-name" contenteditable="true" title="คลิกเพื่อแก้ไขชื่อรายวิชาได้">...................................................</span>
         <span class="memo-label">รหัส</span>
-        <span class="doc-dotted-fill fill-code font-bold" id="doc-subject-code">.........................</span>
+        <span class="doc-dotted-fill fill-code font-bold" id="doc-subject-code" contenteditable="true" title="คลิกเพื่อแก้ไขรหัสวิชาได้">.........................</span>
       </div>
       <div class="memo-line memo-line-2">
         <span class="memo-label">ภาคเรียนที่</span>
-        <span class="doc-dotted-fill fill-sem font-bold" id="doc-semester">1</span>
+        <span class="doc-dotted-fill fill-sem font-bold" id="doc-semester" contenteditable="true" title="คลิกเพื่อแก้ไขภาคเรียนได้">1</span>
         <span class="memo-label">ปีการศึกษา</span>
-        <span class="doc-dotted-fill fill-year font-bold" id="doc-year">2569</span>
+        <span class="doc-dotted-fill fill-year font-bold" id="doc-year" contenteditable="true" title="คลิกเพื่อแก้ไขปีการศึกษาได้">2569</span>
         <span class="memo-label">มีนักเรียน มี ผลการเรียน“0” “ร” “มส.” “มผ” “ขร” จำนวน</span>
-        <span class="doc-dotted-fill fill-count font-bold" id="doc-student-count">0</span>
+        <span class="doc-dotted-fill fill-count font-bold" id="doc-student-count" contenteditable="true" title="คลิกเพื่อแก้ไขจำนวนนักเรียนได้">0</span>
         <span class="memo-label">คน ดังนี้</span>
       </div>
     </div>
@@ -405,7 +428,7 @@
         <div style="margin-bottom: 3px;">
           ลงชื่อ......................................................
         </div>
-        <div style="font-weight: 600; margin-bottom: 1px;">
+        <div style="font-weight: 600; margin-bottom: 1px;" contenteditable="true" title="คลิกเพื่อแก้ไขชื่อผู้อำนวยการได้">
           ( นายมนัด เทศทอง )
         </div>
         <div>
@@ -417,8 +440,8 @@
   </div>
 
   <!-- Scripts to Load Realtime Data from App Storage / Database -->
-  <script src="js/config.js?v=5.8.0"></script>
-  <script src="js/firebase-service.js?v=5.8.0"></script>
+  <script src="js/config.js?v=6.4.0"></script>
+  <script src="js/firebase-service.js?v=6.4.0"></script>
   <script>
     document.addEventListener('DOMContentLoaded', async function() {
       // 1. Initialise DB connection
@@ -548,21 +571,21 @@
 
           rowsHtml += '<tr>' +
             '<td class="col-no">' + num + '</td>' +
-            '<td class="col-class">' + classRoom + '</td>' +
-            '<td class="col-id">' + (r.studentId || '') + '</td>' +
-            '<td class="col-name">' + (r.studentName || '') + '</td>' +
-            '<td class="col-grade">' + (r.conditionType || '') + '</td>' +
+            '<td class="col-class" contenteditable="true" title="คลิกเพื่อแก้ไขระดับชั้น/ห้องได้">' + classRoom + '</td>' +
+            '<td class="col-id" contenteditable="true" title="คลิกเพื่อแก้ไขรหัสนักเรียนได้">' + (r.studentId || '') + '</td>' +
+            '<td class="col-name" contenteditable="true" title="คลิกเพื่อแก้ไขชื่อ-นามสกุลได้">' + (r.studentName || '') + '</td>' +
+            '<td class="col-grade" contenteditable="true" title="คลิกเพื่อแก้ไขผลการเรียนได้">' + (r.conditionType || '') + '</td>' +
             '<td class="col-remark" contenteditable="true" title="คลิกเพื่อแก้ไขหมายเหตุได้">' + remark + '</td>' +
           '</tr>';
         } else {
           // Empty row with numbered counter and dashed borders
           rowsHtml += '<tr>' +
             '<td class="col-no">' + num + '</td>' +
-            '<td class="col-class"></td>' +
-            '<td class="col-id"></td>' +
-            '<td class="col-name"></td>' +
-            '<td class="col-grade"></td>' +
-            '<td class="col-remark"></td>' +
+            '<td class="col-class" contenteditable="true"></td>' +
+            '<td class="col-id" contenteditable="true"></td>' +
+            '<td class="col-name" contenteditable="true"></td>' +
+            '<td class="col-grade" contenteditable="true"></td>' +
+            '<td class="col-remark" contenteditable="true"></td>' +
           '</tr>';
         }
       }
