@@ -158,8 +158,6 @@ class RecordsService {
     const startIndex = (this.currentPage - 1) * this.pageSize;
     const pageRecords = filtered.slice(startIndex, startIndex + this.pageSize);
 
-    const currentUser = authService.getCurrentUser();
-
     tableBody.innerHTML = pageRecords.map((r, idx) => {
       const statusTitle = app.getStatusTitle(r.status);
       const statusClass = app.getStatusBadgeClass(r.status);
