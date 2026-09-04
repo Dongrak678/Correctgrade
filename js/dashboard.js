@@ -110,13 +110,13 @@ class DashboardService {
 
       if (currentUser.role === APP_CONFIG.ROLES.STUDENT) {
         headingEl.innerHTML = `${timeGreeting}, ${this.escapeHtml(currentUser.name)} 🎓`;
-        if (subEl) subEl.innerText = `ติดตามผลการเรียน 0, ร, มส และยื่นคำร้องขอแก้ไขผลการเรียนของตนเอง`;
+        if (subEl) subEl.innerText = `ติดตามผลการเรียน 0, ร, มส, มผ และยื่นคำร้องขอแก้ไขผลการเรียนของตนเอง`;
       } else if (currentUser.role === APP_CONFIG.ROLES.TEACHER) {
         headingEl.innerHTML = `${timeGreeting}, ${this.escapeHtml(currentUser.name)} 👨‍🏫`;
         if (subEl) subEl.innerText = `ภาพรวมนักเรียนที่ติดเงื่อนไขในรายวิชาที่สอน และความคืบหน้าการส่งงาน`;
       } else {
         headingEl.innerHTML = `${timeGreeting}, ศูนย์บัญชาการและวิเคราะห์ผลการเรียน 👑`;
-        if (subEl) subEl.innerText = `สรุปภาพรวมสถิตินักเรียนติด 0, ร, มส และติดตามกระบวนการแก้ผลการเรียนทั้งระบบ`;
+        if (subEl) subEl.innerText = `สรุปภาพรวมสถิตินักเรียนติด 0, ร, มส, มผ และติดตามกระบวนการแก้ผลการเรียนทั้งระบบ`;
       }
     }
   }
@@ -153,7 +153,7 @@ class DashboardService {
     const total = records.length;
 
     if (total === 0) {
-      textEl.innerHTML = `🌟 <strong>ยอดเยี่ยมมาก!</strong> ขณะนี้ไม่มีรายการผลการเรียนที่ติดเงื่อนไข 0, ร, มส ในระบบ`;
+      textEl.innerHTML = `🌟 <strong>ยอดเยี่ยมมาก!</strong> ขณะนี้ไม่มีรายการผลการเรียนที่ติดเงื่อนไข 0, ร, มส, มผ ในระบบ`;
       if (rateEl) rateEl.innerText = '100%';
       return;
     }
@@ -379,6 +379,7 @@ class DashboardService {
     const levelData0 = levels.map(lvl => records.filter(r => (r.gradeLevel || '').startsWith(lvl) && r.conditionType === '0').length);
     const levelDataR = levels.map(lvl => records.filter(r => (r.gradeLevel || '').startsWith(lvl) && r.conditionType === 'ร').length);
     const levelDataMS = levels.map(lvl => records.filter(r => (r.gradeLevel || '').startsWith(lvl) && r.conditionType === 'มส').length);
+    const levelDataMF = levels.map(lvl => records.filter(r => (r.gradeLevel || '').startsWith(lvl) && r.conditionType === 'มผ').length);
 
     // วาด Bar Chart
     const barCanvas = document.getElementById('dashboard-bar-chart');
@@ -412,6 +413,15 @@ class DashboardService {
               label: 'ติด มส',
               data: levelDataMS,
               backgroundColor: '#8b5cf6',
+              borderRadius: { topLeft: 6, topRight: 6, bottomLeft: 0, bottomRight: 0 },
+              borderSkipped: false,
+              barPercentage: 0.65,
+              categoryPercentage: 0.75
+            },
+            {
+              label: 'ติด มผ',
+              data: levelDataMF,
+              backgroundColor: '#ec4899',
               borderRadius: { topLeft: 6, topRight: 6, bottomLeft: 0, bottomRight: 0 },
               borderSkipped: false,
               barPercentage: 0.65,
@@ -586,6 +596,7 @@ class DashboardService {
           count0: 0,
           countR: 0,
           countMS: 0,
+          countMF: 0,
           total: 0
         };
       }
@@ -593,6 +604,7 @@ class DashboardService {
       if (r.conditionType === '0') subjectMap[key].count0++;
       else if (r.conditionType === 'ร') subjectMap[key].countR++;
       else if (r.conditionType === 'มส') subjectMap[key].countMS++;
+      else if (r.conditionType === 'มผ') subjectMap[key].countMF++;
       subjectMap[key].total++;
     });
 
@@ -622,6 +634,7 @@ class DashboardService {
               ${sub.count0 > 0 ? `<span class="cond-pill c0">0: ${sub.count0}</span>` : ''}
               ${sub.countR > 0 ? `<span class="cond-pill cr">ร: ${sub.countR}</span>` : ''}
               ${sub.countMS > 0 ? `<span class="cond-pill cms">มส: ${sub.countMS}</span>` : ''}
+              ${sub.countMF > 0 ? `<span class="cond-pill cmf" style="background:#fce7f3; color:#db2777; border:1px solid #f9a8d4;">มผ: ${sub.countMF}</span>` : ''}
             </div>
           </div>
         </div>

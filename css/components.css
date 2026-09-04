@@ -1346,6 +1346,7 @@ select.form-control {
 .records-mini-pill.pill-0 strong { color: #dc2626; }
 .records-mini-pill.pill-r strong { color: #d97706; }
 .records-mini-pill.pill-ms strong { color: #7c3aed; }
+.records-mini-pill.pill-mf strong { color: #db2777; }
 .records-mini-pill.pill-pass strong { color: #059669; }
 
 .badge-dot {
@@ -1357,6 +1358,7 @@ select.form-control {
 .dot-red { background: #ef4444; }
 .dot-amber { background: #f59e0b; }
 .dot-purple { background: #8b5cf6; }
+.dot-pink { background: #ec4899; }
 
 .records-action-group {
   display: flex;
@@ -1573,6 +1575,13 @@ select.form-control {
   color: #7c3aed;
   border: 1.5px solid #c4b5fd;
   box-shadow: 0 2px 6px rgba(124, 58, 237, 0.12);
+}
+
+.grade-badge-modern.grade-มผ {
+  background: #fce7f3;
+  color: #db2777;
+  border: 1.5px solid #f9a8d4;
+  box-shadow: 0 2px 6px rgba(219, 39, 119, 0.12);
 }
 
 /* Teacher Modern Cell */

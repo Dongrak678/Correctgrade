@@ -135,7 +135,7 @@ class RecordsService {
                 <i class="fas ${isStudent ? 'fa-check-circle' : 'fa-search'}"></i>
               </div>
               <h4 style="font-size: 15px; font-weight: 700; color: #1e293b; margin-bottom: 4px;">
-                ${isStudent ? 'ยินดีด้วย! คุณไม่มีผลการเรียนที่มีเงื่อนไข (0, ร, มส)' : 'ไม่พบข้อมูลผลการเรียนตามเงื่อนไขที่เลือก'}
+                ${isStudent ? 'ยินดีด้วย! คุณไม่มีผลการเรียนที่มีเงื่อนไข (0, ร, มส, มผ)' : 'ไม่พบข้อมูลผลการเรียนตามเงื่อนไขที่เลือก'}
               </h4>
               <p style="font-size: 13px; color: #64748b; margin-bottom: ${isStudent ? '0' : '12px'};">
                 ${isStudent ? 'ผลการเรียนของคุณผ่านเกณฑ์ตามปกติทุกรายวิชา' : 'ลองเปลี่ยนตัวกรอง ค้นหาด้วยคำอื่น หรือกดปุ่มล้างตัวกรอง'}
@@ -235,12 +235,14 @@ class RecordsService {
     let count0 = 0;
     let countR = 0;
     let countMS = 0;
+    let countMF = 0;
     let countPass = 0;
 
     allRecords.forEach(r => {
       if (r.conditionType === '0') count0++;
       else if (r.conditionType === 'ร') countR++;
       else if (r.conditionType === 'มส') countMS++;
+      else if (r.conditionType === 'มผ') countMF++;
 
       if (r.status === 'approved') countPass++;
     });
@@ -254,6 +256,7 @@ class RecordsService {
     setVal('rec-stat-0', count0);
     setVal('rec-stat-r', countR);
     setVal('rec-stat-ms', countMS);
+    setVal('rec-stat-mf', countMF);
     setVal('rec-stat-pass', countPass);
   }
 
@@ -542,6 +545,7 @@ class RecordsService {
                   <option value="0" selected>0 (เกรดศูนย์)</option>
                   <option value="ร">ร (รอการตัดสิน)</option>
                   <option value="มส">มส (หมดสิทธิ์สอบ)</option>
+                  <option value="มผ">มผ (ไม่ผ่านการประเมิน)</option>
                 </select>
               </div>
             </div>
@@ -995,7 +999,7 @@ class RecordsService {
 
     setTimeout(() => {
       const titleEl = document.getElementById('record-modal-title');
-      if (titleEl) titleEl.innerText = "แก้ไขข้อมูลนักเรียนติด 0 / ร / มส";
+      if (titleEl) titleEl.innerText = "แก้ไขข้อมูลนักเรียนติด 0 / ร / มส / มผ";
 
       document.getElementById('rec-edit-id').value = record.id;
       document.getElementById('rec-student-id').value = record.studentId || '';
@@ -1104,7 +1108,7 @@ class RecordsService {
         <div class="modal-header">
           <div class="modal-title-wrap">
             <span class="modal-badge badge-emerald"><i class="fas fa-file-csv"></i> Bulk Import</span>
-            <h3>นำเข้าข้อมูลผลการเรียน 0 / ร / มส ด้วยไฟล์ CSV</h3>
+            <h3>นำเข้าข้อมูลผลการเรียน 0 / ร / มส / มผ ด้วยไฟล์ CSV</h3>
           </div>
           <button class="btn-close-modal" onclick="recordsService.closeCsvModal()">&times;</button>
         </div>
@@ -1663,7 +1667,7 @@ class RecordsService {
     if (matched.length === 0) {
       listWrap.innerHTML = `
         <div class="text-center text-xs text-amber-700 py-3 bg-amber-50 rounded border border-amber-200">
-          <i class="fas fa-info-circle mr-1"></i> ยังไม่มีข้อมูลนักเรียนติด 0/ร/มส ในวิชานี้ สำหรับภาคเรียนที่ ${sem} ปีการศึกษา ${year}
+          <i class="fas fa-info-circle mr-1"></i> ยังไม่มีข้อมูลนักเรียนติด 0/ร/มส/มผ ในวิชานี้ สำหรับภาคเรียนที่ ${sem} ปีการศึกษา ${year}
           <div class="text-gray-500 mt-0.5 text-xs">(เมื่อกดพิมพ์ แบบฟอร์มจะมีหัวเอกสารวิชานี้ พร้อมตารางเปล่า 18 แถว)</div>
         </div>
       `;

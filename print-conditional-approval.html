@@ -440,8 +440,8 @@
   </div>
 
   <!-- Scripts to Load Realtime Data from App Storage / Database -->
-  <script src="js/config.js?v=6.4.0"></script>
-  <script src="js/firebase-service.js?v=6.4.0"></script>
+  <script src="js/config.js?v=6.5.0"></script>
+  <script src="js/firebase-service.js?v=6.5.0"></script>
   <script>
     document.addEventListener('DOMContentLoaded', async function() {
       // 1. Initialise DB connection
@@ -565,6 +565,7 @@
             if (r.conditionType === 'ร') remark = 'ยังไม่ได้สอบ/ส่งงาน';
             else if (r.conditionType === 'มส') remark = 'เวลาเรียนไม่ถึง 80%';
             else if (r.conditionType === '0') remark = 'คะแนนไม่ถึงเกณฑ์';
+            else if (r.conditionType === 'มผ') remark = 'ไม่ผ่านเกณฑ์การประเมิน';
           } else if (remark.indexOf('ร พิเศษ') !== -1) {
             remark = remark.replace(/ร\s*พิเศษ\s*/g, '');
           }
