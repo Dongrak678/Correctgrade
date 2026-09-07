@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>แบบอนุมัติผลการเรียนที่มีเงื่อนไข - โรงเรียนพนมดงรักวิทยา</title>
+  <title></title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -520,7 +520,6 @@
         }
 
         var isMultiPage = totalPages > 1;
-        var pageTitleSuffix = isMultiPage ? ' <span style="font-size: 13px; font-weight: normal; color: #475569;">(หน้าที่ ' + pageNum + '/' + totalPages + ')</span>' : '';
         var memoContSuffix = (isMultiPage && pageNum > 1) ? ' (ต่อ)' : '';
 
         pagesHtml += '<div class="document-page" data-page="' + pageNum + '">' +
@@ -530,7 +529,7 @@
           '</div>' +
 
           '<!-- 2. Form Title -->' +
-          '<h1 class="doc-main-heading">แบบอนุมัติผลการเรียนที่มีเงื่อนไข' + pageTitleSuffix + '</h1>' +
+          '<h1 class="doc-main-heading">แบบอนุมัติผลการเรียนที่มีเงื่อนไข</h1>' +
 
           '<!-- 3. Official Memo Header -->' +
           '<div class="memo-row">' +
@@ -638,7 +637,16 @@
         });
       });
 
-      // 8. Auto-print if parameter was passed
+      // 8. Prevent browser header from displaying the page title when printing
+      document.title = '';
+      window.addEventListener('beforeprint', function() {
+        document.title = '';
+      });
+      window.addEventListener('afterprint', function() {
+        document.title = '';
+      });
+
+      // 9. Auto-print if parameter was passed
       if (autoprint) {
         setTimeout(function() {
           window.print();
