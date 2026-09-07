@@ -3153,6 +3153,39 @@ select.form-control {
   gap: 12px;
 }
 
+/* Universal Prompt Modal Styles */
+.prompt-warning-box {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+  color: #991b1b;
+  text-align: left;
+  line-height: 1.45;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.prompt-warning-box i {
+  color: #dc2626;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.prompt-keyword-pill {
+  background: #fee2e2;
+  border: 1px dashed #ef4444;
+  color: #b91c1c;
+  padding: 1px 7px;
+  border-radius: 6px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  user-select: all;
+  display: inline-block;
+}
+
 /* ==========================================================================
    TEACHER SUBJECT QUICK PICKER CHIPS
    ========================================================================== */

@@ -508,6 +508,95 @@ class AppController {
     }
   }
 
+  /**
+   * แสดงหน้าต่าง Pop-up ยืนยันแบบกรอกข้อความ (Universal Verification Prompt Modal)
+   * @param {Object} options
+   * @param {string} options.title - หัวข้อ เช่น "ยืนยันการล้างข้อมูล"
+   * @param {string} options.message - ข้อความแจ้งเตือน
+   * @param {string} options.expectedText - ข้อความที่ต้องพิมพ์ เช่น "ยืนยันลบทั้งหมด"
+   * @param {string} options.confirmText - ข้อความบนปุ่ม
+   * @param {string} options.type - 'danger' | 'warning' | 'info'
+   * @returns {Promise<boolean>}
+   */
+  promptAction(options = {}) {
+    return new Promise((resolve) => {
+      const modal = document.getElementById('modal-prompt-dialog');
+      if (!modal) {
+        const userVal = window.prompt(`${options.message || ''}\nพิมพ์ "${options.expectedText || ''}" เพื่อดำเนินการ:`);
+        resolve(userVal === options.expectedText);
+        return;
+      }
+
+      const titleEl = document.getElementById('prompt-title');
+      const msgEl = document.getElementById('prompt-message');
+      const badgeEl = document.getElementById('prompt-expected-badge');
+      const inputEl = document.getElementById('prompt-input');
+      const okBtn = document.getElementById('prompt-ok-btn');
+      const errorEl = document.getElementById('prompt-error-msg');
+      const iconBox = document.getElementById('prompt-icon-box');
+
+      if (titleEl) titleEl.innerText = options.title || "ยืนยันการทำรายการ";
+      if (msgEl) msgEl.innerText = options.message || "คำเตือน: การดำเนินการนี้ไม่สามารถย้อนกลับได้";
+      if (badgeEl) badgeEl.innerText = options.expectedText || "ยืนยัน";
+      if (errorEl) errorEl.style.display = 'none';
+
+      if (inputEl) {
+        inputEl.value = '';
+        inputEl.classList.remove('border-red-500');
+        inputEl.placeholder = `พิมพ์ "${options.expectedText || 'ยืนยัน'}"`;
+      }
+
+      const type = options.type || "danger";
+      if (iconBox) {
+        iconBox.className = `confirm-modal-icon confirm-type-${type}`;
+      }
+
+      if (okBtn) {
+        okBtn.className = `btn ${type === 'danger' ? 'btn-rose' : 'btn-primary'} px-5 font-bold`;
+        okBtn.innerHTML = `<i class="fas fa-trash-alt mr-1"></i> ${options.confirmText || 'ยืนยันลบข้อมูล'}`;
+      }
+
+      this._promptExpected = options.expectedText || '';
+      this._promptResolve = resolve;
+
+      modal.classList.add('active');
+      setTimeout(() => {
+        if (inputEl) inputEl.focus();
+      }, 120);
+    });
+  }
+
+  submitPromptDialog(e) {
+    if (e) e.preventDefault();
+    const inputEl = document.getElementById('prompt-input');
+    const errorEl = document.getElementById('prompt-error-msg');
+    const val = inputEl ? inputEl.value.trim() : '';
+
+    if (val !== this._promptExpected) {
+      if (errorEl) {
+        errorEl.innerText = `ข้อความไม่ถูกต้อง กรุณาพิมพ์คำว่า "${this._promptExpected}" ให้ถูกต้อง`;
+        errorEl.style.display = 'block';
+      }
+      if (inputEl) {
+        inputEl.classList.add('border-red-500');
+        inputEl.focus();
+      }
+      return;
+    }
+
+    this.closePromptDialog(true);
+  }
+
+  closePromptDialog(result = false) {
+    const modal = document.getElementById('modal-prompt-dialog');
+    if (modal) modal.classList.remove('active');
+    if (this._promptResolve) {
+      this._promptResolve(Boolean(result));
+      this._promptResolve = null;
+    }
+    this._promptExpected = '';
+  }
+
   bindEvents() {
     // Login Form Submit
     const loginForm = document.getElementById('main-login-form');

@@ -469,12 +469,18 @@ class StudentsService {
   }
 
   async clearAllStudentsPrompt() {
-    const confirmation = prompt('คำเตือน: คุณต้องการลบข้อมูลนักเรียนทั้งหมดในทะเบียนหรือไม่?\nพิมพ์ "ยืนยันลบนักเรียนทั้งหมด" เพื่อดำเนินการ:');
-    if (confirmation === 'ยืนยันลบนักเรียนทั้งหมด') {
+    const ok = await app.promptAction({
+      title: "ยืนยันการล้างข้อมูลทะเบียนนักเรียน",
+      message: "คำเตือน: คุณต้องการลบข้อมูลนักเรียนทั้งหมดในทะเบียนหรือไม่?",
+      expectedText: "ยืนยันลบนักเรียนทั้งหมด",
+      confirmText: "ยืนยันลบนักเรียนทั้งหมด",
+      type: "danger"
+    });
+
+    if (ok) {
       await db.clearCollection('students');
+      this.renderStudentsTable();
       app.showToast("ล้างข้อมูลทะเบียนนักเรียนทั้งหมดเรียบร้อยแล้ว", "warning");
-    } else if (confirmation !== null) {
-      alert("ข้อความยืนยันไม่ถูกต้อง ยกเลิกการลบ");
     }
   }
 

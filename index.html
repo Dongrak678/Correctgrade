@@ -24,8 +24,8 @@
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
   <!-- Application Stylesheets (with cache busting) -->
-  <link rel="stylesheet" href="css/main.css?v=6.8.0">
-  <link rel="stylesheet" href="css/components.css?v=6.8.0">
+  <link rel="stylesheet" href="css/main.css?v=6.9.0">
+  <link rel="stylesheet" href="css/components.css?v=6.9.0">
 </head>
 <body>
 
@@ -1279,6 +1279,47 @@
     </div>
   </div>
 
+  <!-- 8.7 Universal Verification Prompt Modal (Custom Popup) -->
+  <div id="modal-prompt-dialog" class="modal-wrapper">
+    <div class="modal-backdrop" onclick="app.closePromptDialog(false)"></div>
+    <div class="modal-dialog animate-scale-in" style="max-width: 440px;">
+      <div class="modal-header border-b-0 pb-0" style="justify-content: flex-end; padding: 12px 14px 0;">
+        <button type="button" class="btn-close-modal" onclick="app.closePromptDialog(false)">&times;</button>
+      </div>
+      <div class="modal-body pt-0 pb-6 px-6 text-center">
+        <div id="prompt-icon-box" class="confirm-modal-icon confirm-type-danger">
+          <i id="prompt-icon" class="fas fa-exclamation-triangle"></i>
+        </div>
+        <h3 id="prompt-title" class="confirm-modal-title">ยืนยันการทำรายการ</h3>
+        
+        <div class="prompt-warning-box my-3">
+          <i class="fas fa-shield-alt text-red-500 mr-1"></i>
+          <span id="prompt-message">คำเตือน: การดำเนินการนี้ไม่สามารถย้อนกลับได้</span>
+        </div>
+
+        <p id="prompt-instruction" class="text-xs text-gray-600 mb-2">
+          เพื่อความปลอดภัย กรุณาพิมพ์คำว่า <b id="prompt-expected-badge" class="prompt-keyword-pill">ยืนยันลบทั้งหมด</b> เพื่อดำเนินการ:
+        </p>
+
+        <form id="form-prompt-dialog" onsubmit="app.submitPromptDialog(event)">
+          <div class="form-group mb-4">
+            <input type="text" id="prompt-input" class="form-control text-center font-bold text-base" placeholder="พิมพ์ข้อความยืนยันที่นี่" autocomplete="off" required>
+            <div id="prompt-error-msg" class="text-xs text-red-500 mt-1 font-semibold" style="display: none;">ข้อความไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง</div>
+          </div>
+
+          <div class="confirm-modal-actions">
+            <button type="button" class="btn btn-outline px-4" onclick="app.closePromptDialog(false)">
+              ยกเลิก
+            </button>
+            <button type="submit" id="prompt-ok-btn" class="btn btn-rose px-5 font-bold">
+              <i class="fas fa-trash-alt mr-1"></i> ยืนยันลบข้อมูล
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <!-- 9. Toast Notification Stack Container -->
   <div id="toast-container" class="toast-container"></div>
 
@@ -1289,13 +1330,13 @@
   <script src="js/auth.js?v=6.6.0"></script>
   <script src="js/dashboard.js?v=6.6.0"></script>
   <script src="js/workflow.js?v=6.8.0"></script>
-  <script src="js/records.js?v=6.6.0"></script>
-  <script src="js/audit.js?v=6.6.0"></script>
-  <script src="js/teachers.js?v=6.6.0"></script>
-  <script src="js/students.js?v=6.6.0"></script>
+  <script src="js/records.js?v=6.9.0"></script>
+  <script src="js/audit.js?v=6.9.0"></script>
+  <script src="js/teachers.js?v=6.9.0"></script>
+  <script src="js/students.js?v=6.9.0"></script>
   <script src="js/users.js?v=6.6.0"></script>
   <script src="js/export-engine.js?v=6.6.0"></script>
-  <script src="js/app.js?v=6.8.0"></script>
+  <script src="js/app.js?v=6.9.0"></script>
 
   <script>
     // Tab role switcher helper in login view

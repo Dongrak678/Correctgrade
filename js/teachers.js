@@ -370,12 +370,18 @@ class TeachersService {
   }
 
   async clearAllTeachersPrompt() {
-    const confirmation = prompt('คำเตือน: คุณต้องการลบข้อมูลครูผู้สอนทั้งหมดหรือไม่?\nพิมพ์ "ยืนยันลบครูทั้งหมด" เพื่อดำเนินการ:');
-    if (confirmation === 'ยืนยันลบครูทั้งหมด') {
+    const ok = await app.promptAction({
+      title: "ยืนยันการล้างข้อมูลทำเนียบครู",
+      message: "คำเตือน: คุณต้องการลบข้อมูลครูผู้สอนทั้งหมดในทำเนียบหรือไม่?",
+      expectedText: "ยืนยันลบครูทั้งหมด",
+      confirmText: "ยืนยันลบครูทั้งหมด",
+      type: "danger"
+    });
+
+    if (ok) {
       await db.clearCollection('teachers');
+      this.renderTeachersTable();
       app.showToast("ล้างข้อมูลทำเนียบครูทั้งหมดเรียบร้อยแล้ว", "warning");
-    } else if (confirmation !== null) {
-      alert("ข้อความยืนยันไม่ถูกต้อง ยกเลิกการลบ");
     }
   }
 

@@ -189,12 +189,18 @@ class AuditService {
   }
 
   async clearAllAuditPrompt() {
-    const confirmation = prompt('คำเตือน: การล้างข้อมูลจะลบประวัติการอนุมัติทั้งหมดในระบบ\nพิมพ์ "ยืนยันล้างประวัติ" เพื่อดำเนินการ:');
-    if (confirmation === 'ยืนยันล้างประวัติ') {
+    const ok = await app.promptAction({
+      title: "ยืนยันการล้างประวัติ Audit Log",
+      message: "คำเตือน: การล้างข้อมูลจะลบประวัติการอนุมัติทั้งหมดในระบบอย่างถาวร",
+      expectedText: "ยืนยันล้างประวัติ",
+      confirmText: "ยืนยันล้างประวัติ",
+      type: "danger"
+    });
+
+    if (ok) {
       await db.clearCollection('auditLogs');
+      this.renderAuditTable();
       app.showToast("ล้างประวัติ Audit Log ทั้งหมดเรียบร้อยแล้ว", "warning");
-    } else if (confirmation !== null) {
-      alert("ข้อความยืนยันไม่ถูกต้อง");
     }
   }
 }

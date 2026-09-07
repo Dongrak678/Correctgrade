@@ -1082,16 +1082,20 @@ class RecordsService {
     }
   }
 
-  /**
-   * ล้างประวัติคำร้องทั้งหมด (Clear All Records)
-   */
   async clearAllRecordsPrompt() {
-    const confirmation = prompt('คำเตือน: การล้างข้อมูลจะลบรายการผลการเรียน 0/ร/มส ทั้งหมดในระบบ\nพิมพ์ "ยืนยันลบทั้งหมด" เพื่อดำเนินการ:');
-    if (confirmation === 'ยืนยันลบทั้งหมด') {
+    const ok = await app.promptAction({
+      title: "ยืนยันการล้างข้อมูลผลการเรียน",
+      message: "คำเตือน: การล้างข้อมูลจะลบรายการผลการเรียน 0, ร, มส, มผ ทั้งหมดในระบบอย่างถาวร",
+      expectedText: "ยืนยันลบทั้งหมด",
+      confirmText: "ยืนยันลบทั้งหมด",
+      type: "danger"
+    });
+
+    if (ok) {
       await db.clearCollection('records');
-      app.showToast("ล้างประวัติคำร้องทั้งหมดเรียบร้อยแล้ว", "warning");
-    } else if (confirmation !== null) {
-      alert("ข้อความยืนยันไม่ถูกต้อง ยกเลิกการลบข้อมูล");
+      this.renderRecordsTable();
+      this.renderMiniStats();
+      app.showToast("ล้างประวัติผลการเรียนทั้งหมดเรียบร้อยแล้ว", "warning");
     }
   }
 
