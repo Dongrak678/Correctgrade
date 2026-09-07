@@ -659,9 +659,10 @@ class StudentsService {
     btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> กำลังนำเข้า...`;
 
     try {
+      const count = this.parsedStudents.length;
       await db.bulkInsert('students', this.parsedStudents);
       this.closeCsvModal();
-      app.showToast(`นำเข้าข้อมูลนักเรียนสำเร็จจำนวน ${this.parsedStudents.length} คน`, "success");
+      app.showToast(`นำเข้าข้อมูลนักเรียนสำเร็จจำนวน ${count} คน`, "success");
     } catch (err) {
       alert("เกิดข้อผิดพลาด: " + err.message);
     } finally {

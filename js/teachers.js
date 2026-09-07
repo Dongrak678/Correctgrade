@@ -576,8 +576,9 @@ class TeachersService {
         }
       }
 
+      const count = this.parsedTeachers.length;
       this.closeCsvModal();
-      app.showToast(`นำเข้าข้อมูลครูและสร้างบัญชีผู้ใช้สำเร็จจำนวน ${this.parsedTeachers.length} ท่าน`, "success");
+      app.showToast(`นำเข้าข้อมูลครูและสร้างบัญชีผู้ใช้สำเร็จจำนวน ${count} ท่าน`, "success");
     } catch (err) {
       alert("เกิดข้อผิดพลาด: " + err.message);
     } finally {

@@ -1269,9 +1269,10 @@ class RecordsService {
     btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> กำลังนำเข้าข้อมูล...`;
 
     try {
+      const count = this.parsedCsvData.length;
       await db.bulkInsert('records', this.parsedCsvData);
       this.closeCsvModal();
-      app.showToast(`นำเข้าข้อมูลผลการเรียนสำเร็จจำนวน ${this.parsedCsvData.length} รายการ`, "success");
+      app.showToast(`นำเข้าข้อมูลผลการเรียนสำเร็จจำนวน ${count} รายการ`, "success");
     } catch (err) {
       alert("เกิดข้อผิดพลาดในการนำเข้า CSV: " + err.message);
     } finally {

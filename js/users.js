@@ -641,9 +641,10 @@ class UsersService {
     btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> กำลังนำเข้า...`;
 
     try {
+      const count = this.parsedUsers.length;
       await db.bulkInsert('users', this.parsedUsers);
       this.closeCsvModal();
-      app.showToast(`นำเข้าบัญชีผู้ใช้สำเร็จจำนวน ${this.parsedUsers.length} บัญชี`, "success");
+      app.showToast(`นำเข้าบัญชีผู้ใช้สำเร็จจำนวน ${count} บัญชี`, "success");
     } catch (err) {
       alert("เกิดข้อผิดพลาด: " + err.message);
     } finally {
