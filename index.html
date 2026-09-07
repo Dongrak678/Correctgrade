@@ -24,8 +24,8 @@
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
   <!-- Application Stylesheets (with cache busting) -->
-  <link rel="stylesheet" href="css/main.css?v=6.7.0">
-  <link rel="stylesheet" href="css/components.css?v=6.7.0">
+  <link rel="stylesheet" href="css/main.css?v=6.8.0">
+  <link rel="stylesheet" href="css/components.css?v=6.8.0">
 </head>
 <body>
 
@@ -186,6 +186,9 @@
           <h2>ระบบติดตามผลการเรียน</h2>
           <p class="school-name-text">โรงเรียนพนมดงรักวิทยา</p>
         </div>
+        <button type="button" class="btn-sidebar-close" onclick="app.closeMobileSidebar()" title="ปิดเมนู">
+          <i class="fas fa-times"></i>
+        </button>
       </div>
 
       <nav class="sidebar-menu">
@@ -245,14 +248,15 @@
       <!-- Top Navigation Bar -->
       <header class="topbar">
         <div class="topbar-left">
-          <button type="button" class="btn-sidebar-toggle" onclick="app.toggleMobileSidebar()">
+          <button type="button" class="btn-sidebar-toggle" onclick="app.toggleMobileSidebar()" title="เปิดเมนู">
             <i class="fas fa-bars"></i>
           </button>
           <div class="topbar-title">
             <h3 id="page-current-title">ระบบติดตามแก้ไขผลการเรียน</h3>
             <div class="term-selector-pill" onclick="app.openTermSelectorModal()" title="คลิกเพื่อเลือกปีการศึกษา / ภาคเรียนที่ 1 หรือ 2">
               <i class="far fa-calendar-alt text-primary"></i>
-              <span id="topbar-academic-term-text">ปีการศึกษา 2569 ภาคเรียนที่ 1</span>
+              <span id="topbar-academic-term-text" class="term-text-full">ปีการศึกษา 2569 ภาคเรียนที่ 1</span>
+              <span id="topbar-academic-term-text-mobile" class="term-text-short">ภาคเรียน 1/2569</span>
               <i class="fas fa-chevron-down text-xs opacity-75"></i>
             </div>
           </div>
@@ -272,7 +276,7 @@
 
           <!-- Logout Button -->
           <button type="button" class="btn-logout" onclick="authService.logout()" title="ออกจากระบบ">
-            <i class="fas fa-sign-out-alt"></i> ออกจากระบบ
+            <i class="fas fa-sign-out-alt"></i> <span class="btn-logout-text">ออกจากระบบ</span>
           </button>
         </div>
       </header>
@@ -1291,7 +1295,7 @@
   <script src="js/students.js?v=6.6.0"></script>
   <script src="js/users.js?v=6.6.0"></script>
   <script src="js/export-engine.js?v=6.6.0"></script>
-  <script src="js/app.js?v=6.6.0"></script>
+  <script src="js/app.js?v=6.8.0"></script>
 
   <script>
     // Tab role switcher helper in login view

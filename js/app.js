@@ -357,14 +357,18 @@ class AppController {
 
   // --- Academic Year & Semester Switcher ---
   updateAcademicTermDisplay() {
-    const text = `ปีการศึกษา ${APP_CONFIG.ACADEMIC_YEAR} ภาคเรียนที่ ${APP_CONFIG.SEMESTER}`;
-    document.querySelectorAll('.current-year-text').forEach(el => el.innerText = text);
+    const textFull = `ปีการศึกษา ${APP_CONFIG.ACADEMIC_YEAR} ภาคเรียนที่ ${APP_CONFIG.SEMESTER}`;
+    const textShort = `ภาคเรียน ${APP_CONFIG.SEMESTER}/${APP_CONFIG.ACADEMIC_YEAR}`;
+    document.querySelectorAll('.current-year-text').forEach(el => el.innerText = textFull);
     
     const topbarText = document.getElementById('topbar-academic-term-text');
-    if (topbarText) topbarText.innerText = text;
+    if (topbarText) topbarText.innerText = textFull;
+
+    const topbarTextMobile = document.getElementById('topbar-academic-term-text-mobile');
+    if (topbarTextMobile) topbarTextMobile.innerText = textShort;
 
     const heroTerm = document.getElementById('dashboard-hero-term');
-    if (heroTerm) heroTerm.innerText = text;
+    if (heroTerm) heroTerm.innerText = textFull;
   }
 
   setAcademicTerm(year, semester) {
