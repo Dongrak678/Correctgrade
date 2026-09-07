@@ -282,8 +282,8 @@ class WorkflowService {
 
           <form id="form-submit-request" onsubmit="workflowService.handleRequestSubmit(event)">
             <div class="form-group">
-              <label for="req-note">เหตุผลหรือหมายเหตุประกอบการยื่นคำร้อง <span class="text-red-500">*</span></label>
-              <textarea id="req-note" class="form-control" rows="3" placeholder="ระบุสาเหตุที่ติดเงื่อนไข หรือความประสงค์ในการขอแก้ไข..." required></textarea>
+              <label for="req-note">เหตุผลหรือหมายเหตุประกอบการยื่นคำร้อง <span class="text-xs text-gray-400 font-normal">(ไม่บังคับ)</span></label>
+              <textarea id="req-note" class="form-control" rows="3" placeholder="ระบุสาเหตุที่ติดเงื่อนไข หรือความประสงค์ในการขอแก้ไข (ถ้ามี)..."></textarea>
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-outline" onclick="workflowService.closeModal()">ยกเลิก</button>
@@ -300,7 +300,7 @@ class WorkflowService {
 
   async handleRequestSubmit(e) {
     e.preventDefault();
-    const note = document.getElementById('req-note').value;
+    const note = (document.getElementById('req-note')?.value || '').trim();
     try {
       await this.submitStudentRequest(this.currentModalRecordId, note);
       this.closeModal();
