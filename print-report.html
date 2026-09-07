@@ -146,6 +146,33 @@
         records = records.filter(r => r.status === statusFilter);
       }
 
+      // Sort records: Grade level -> Room number -> Student ID
+      const allStudentsList = db.get('students') || [];
+      records.sort((a, b) => {
+        const getInfo = (r) => {
+          let lvl = (r.gradeLevel || '').trim();
+          let rm = (r.room !== undefined && r.room !== null) ? String(r.room).trim() : '';
+          if (!rm) {
+            const st = allStudentsList.find(s => String(s.studentId).trim() === String(r.studentId).trim());
+            if (st && st.room) rm = String(st.room).trim();
+          }
+          let order = 999;
+          const m = lvl.match(/([^\d]+)?\s*(\d+)/);
+          if (m) {
+            const num = parseInt(m[2], 10) || 0;
+            order = (m[1] || '').includes('ปวช') ? 100 + num : num;
+          }
+          const rmNum = parseInt(rm, 10);
+          return { order, lvl, rmNum: isNaN(rmNum) ? 9999 : rmNum, rm, id: String(r.studentId || '').trim() };
+        };
+        const cA = getInfo(a), cB = getInfo(b);
+        if (cA.order !== cB.order) return cA.order - cB.order;
+        if (cA.lvl !== cB.lvl) return cA.lvl.localeCompare(cB.lvl, 'th');
+        if (cA.rmNum !== cB.rmNum) return cA.rmNum - cB.rmNum;
+        if (cA.rm !== cB.rm) return cA.rm.localeCompare(cB.rm, 'th', { numeric: true });
+        return cA.id.localeCompare(cB.id, 'th', { numeric: true });
+      });
+
       // คำนวณสถิติ
       let c0 = 0, cR = 0, cMS = 0, cPassed = 0, cPending = 0;
       records.forEach(r => {

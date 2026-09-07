@@ -433,12 +433,97 @@
         return matchTeacher && matchSubject && matchSem && matchYear;
       });
 
-      // Sort students by grade level and student ID
+      // Helper to extract clean grade level, room number, and display text for sorting and rendering
+      function getClassRoomInfo(r) {
+        var rawLevel = (r.gradeLevel || '').trim();
+        var rawRoom = (r.room !== undefined && r.room !== null) ? String(r.room).trim() : '';
+        
+        // 1. If room not directly on record, check if gradeLevel contains '/' (e.g. "ม.1/6")
+        if (!rawRoom) {
+          var slashParts = rawLevel.split('/');
+          if (slashParts.length > 1) {
+            rawLevel = slashParts[0].trim();
+            rawRoom = slashParts[1].trim();
+          }
+        }
+
+        // 2. If room still empty, look up student from allStudents list
+        if (!rawRoom) {
+          var stObj = allStudents.find(function(s) { 
+            return String(s.studentId || '').trim() === String(r.studentId || '').trim(); 
+          });
+          if (stObj) {
+            if (stObj.room) rawRoom = String(stObj.room).trim();
+            if (stObj.gradeLevel && !rawLevel) rawLevel = String(stObj.gradeLevel).trim();
+          }
+        }
+
+        // 3. Parse grade level order (ม.1 = 1, ม.2 = 2, ..., ม.6 = 6, ปวช.1 = 101, etc.)
+        var levelOrder = 999;
+        var levelMatch = rawLevel.match(/([^\d]+)?\s*(\d+)/);
+        var levelNum = 0;
+        if (levelMatch) {
+          var levelPrefix = (levelMatch[1] || '').trim();
+          levelNum = parseInt(levelMatch[2], 10) || 0;
+          if (levelPrefix.indexOf('ม.') !== -1 || levelPrefix.indexOf('ม') !== -1) {
+            levelOrder = levelNum; // ม.1=1, ม.2=2, ..., ม.6=6
+          } else if (levelPrefix.indexOf('ปวช') !== -1) {
+            levelOrder = 100 + levelNum; // ปวช.1=101, ปวช.2=102, ...
+          } else {
+            levelOrder = 50 + levelNum;
+          }
+        }
+
+        // 4. Parse room number as integer for numeric sorting (ห้อง 1, 2, 3, 4, 5, 6...)
+        var roomNum = parseInt(rawRoom, 10);
+        if (isNaN(roomNum)) roomNum = 9999;
+
+        // 5. Construct display string: e.g. "ม.1/1", "ม.1/6"
+        var display = rawLevel;
+        if (rawRoom) {
+          if (!display.endsWith('/' + rawRoom)) {
+            display = (rawLevel || 'ม.') + '/' + rawRoom;
+          }
+        }
+
+        return {
+          rawLevel: rawLevel,
+          rawRoom: rawRoom,
+          levelOrder: levelOrder,
+          levelNum: levelNum,
+          roomNum: roomNum,
+          display: display
+        };
+      }
+
+      // Sort students: Grade Level -> Room number (ห้อง 1, 2, 3...) -> Student ID
       filteredRecords.sort(function(a, b) {
-        var gA = a.gradeLevel || '';
-        var gB = b.gradeLevel || '';
-        if (gA !== gB) return gA.localeCompare(gB, 'th');
-        return (a.studentId || '').localeCompare(b.studentId || '', 'th');
+        var cA = getClassRoomInfo(a);
+        var cB = getClassRoomInfo(b);
+
+        // 1. Sort by Grade Level (ม.1 < ม.2 < ... < ม.6)
+        if (cA.levelOrder !== cB.levelOrder) {
+          return cA.levelOrder - cB.levelOrder;
+        }
+        if (cA.rawLevel !== cB.rawLevel) {
+          return cA.rawLevel.localeCompare(cB.rawLevel, 'th');
+        }
+
+        // 2. Sort by Room Number (ห้อง 1 ก่อนเสมอ -> ห้อง 2 -> ห้อง 3...)
+        if (cA.roomNum !== cB.roomNum) {
+          return cA.roomNum - cB.roomNum;
+        }
+        if (cA.rawRoom !== cB.rawRoom) {
+          return cA.rawRoom.localeCompare(cB.rawRoom, 'th', { numeric: true });
+        }
+
+        // 3. Sort by Student ID or Student Name
+        var idA = (a.studentId || '').trim();
+        var idB = (b.studentId || '').trim();
+        if (idA && idB && idA !== idB) {
+          return idA.localeCompare(idB, 'th', { numeric: true });
+        }
+        return (a.studentName || '').localeCompare(b.studentName || '', 'th');
       });
 
       // If subject name is still empty and we have records, take from first record
@@ -475,18 +560,9 @@
           if (i < pageStudents.length) {
             var r = pageStudents[i];
             
-            // Determine class room: e.g. "ม.1/1" or "ม.4/2"
-            var classRoom = '';
-            if (r.room) {
-              classRoom = r.gradeLevel + '/' + r.room;
-            } else {
-              var stObj = allStudents.find(function(s) { return s.studentId === r.studentId; });
-              if (stObj && stObj.room) {
-                classRoom = (stObj.gradeLevel || r.gradeLevel) + '/' + stObj.room;
-              } else {
-                classRoom = r.gradeLevel || '';
-              }
-            }
+            // Determine class room: e.g. "ม.1/1" or "ม.1/6"
+            var classRoomInfo = getClassRoomInfo(r);
+            var classRoom = classRoomInfo.display;
 
             // Format remarks
             var remark = r.remarks || '';
