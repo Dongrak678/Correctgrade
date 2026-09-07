@@ -168,10 +168,10 @@ body.print-document-body {
     margin: 0;
     width: 100%;
     min-height: auto;
-    padding: 10mm 15mm;
+    padding: 12mm 15mm 10mm 15mm;
   }
   @page {
     size: A4 portrait;
-    margin: 12mm;
+    margin: 0;
   }
 }

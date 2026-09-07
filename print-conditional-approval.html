@@ -302,8 +302,9 @@
 
       .document-page {
         width: 100%;
-        min-height: auto;
-        padding: 0;
+        min-height: 297mm;
+        box-sizing: border-box;
+        padding: 12mm 15mm 10mm 15mm;
         margin: 0;
         box-shadow: none;
         page-break-after: always;
@@ -324,7 +325,7 @@
 
       @page {
         size: A4 portrait;
-        margin: 10mm 15mm 8mm 15mm;
+        margin: 0;
       }
     }
   </style>
