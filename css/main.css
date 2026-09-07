@@ -1138,37 +1138,117 @@ a:hover { color: var(--primary-dark); }
   color: #2563eb;
 }
 
-/* Responsive adjustment for Mobile & Tablets */
+/* Responsive adjustment for Mobile & Tablets (iOS / Android / Tablets) */
 @media (max-width: 960px) {
   .login-view-wrapper {
     height: auto;
     min-height: 100vh;
     max-height: none;
     overflow-y: auto;
+    overflow-x: hidden;
     flex-direction: column;
-    padding: 24px 16px;
+    padding: 20px 14px 36px;
     align-items: center;
-    gap: 20px;
+    justify-content: flex-start;
+    gap: 16px;
+    box-sizing: border-box;
   }
   .login-hero-left {
-    padding-right: 0;
-    text-align: center;
-    max-width: 100%;
+    margin-left: 0 !important;
     margin-top: 0;
-  }
-  .brand-title-group-concept-b {
+    padding: 0;
     text-align: center;
+    width: 100%;
+    max-width: 440px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
-  .brand-badges-grid-concept-b {
-    justify-content: center;
+  .brand-hero-header-row {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 10px;
+    margin-bottom: 6px;
+    width: 100%;
   }
   .brand-emblem-glow-wrap {
     justify-content: center;
-    margin-bottom: 12px;
+    margin-bottom: 0;
+  }
+  .emblem-halo-ring {
+    width: 95px;
+    height: 95px;
+    border-width: 2.5px;
+    box-shadow: 0 0 25px rgba(56, 189, 248, 0.45), 0 8px 18px rgba(14, 60, 140, 0.15);
+  }
+  .brand-logo-emblem-b {
+    width: 76px;
+    height: 76px;
+  }
+  .brand-title-group-concept-b {
+    text-align: center;
+    align-items: center;
+    width: 100%;
+  }
+  .brand-title-main {
+    font-size: 21px;
+    line-height: 1.25;
+    text-align: center;
+    letter-spacing: -0.3px;
+  }
+  .brand-school-name {
+    font-size: 17px;
+    margin: 3px 0 6px 0;
+    text-align: center;
+  }
+  .brand-tagline-pill {
+    font-size: 11px;
+    padding: 4px 10px;
+    white-space: normal;
+    text-align: center;
+    max-width: 100%;
+    line-height: 1.4;
+    justify-content: center;
+  }
+  .brand-badges-grid-concept-b {
+    display: none; /* Hide cluttered marketing badges on mobile to keep login neat and above fold */
+  }
+  .login-form-wrapper-right {
+    width: 100%;
+    max-width: 440px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
   }
   .login-glass-card {
     width: 100%;
-    padding: 24px 18px;
+    max-width: 100%;
+    padding: 22px 18px;
+    border-radius: 20px;
+    box-sizing: border-box;
+    box-shadow: 0 12px 35px rgba(15, 65, 150, 0.16);
+  }
+  .login-card-header h2 {
+    font-size: 21px;
+  }
+  .login-card-header p {
+    font-size: 11.5px;
+  }
+  .role-switcher-modern {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 3px;
+    gap: 2px;
+  }
+  .role-tab-modern {
+    font-size: 11.5px;
+    padding: 7px 2px;
+    gap: 3px;
+  }
+  .input-field-modern {
+    font-size: 13.5px;
+    padding: 9px 12px 9px 36px;
   }
 }
 
