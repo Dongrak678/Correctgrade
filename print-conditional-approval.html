@@ -306,6 +306,15 @@
         padding: 0;
         margin: 0;
         box-shadow: none;
+        page-break-after: always;
+        break-after: page;
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }
+
+      .document-page:last-child {
+        page-break-after: auto;
+        break-after: auto;
       }
 
       [contenteditable="true"]:hover, [contenteditable="true"]:focus {
@@ -326,6 +335,9 @@
   <div class="print-control-bar">
     <div style="font-weight: 700; color: #1e293b; font-size: 15px; display: flex; align-items: center; gap: 8px;">
       <i class="fas fa-file-signature text-blue-600"></i> แบบอนุมัติผลการเรียนที่มีเงื่อนไข (0, ร, มส, มผ, ขร)
+      <span id="print-page-summary" style="font-size: 12px; font-weight: 700; color: #1d4ed8; background: #eff6ff; border: 1px solid #bfdbfe; padding: 2px 8px; border-radius: 4px;">
+        กำลังโหลดข้อมูล...
+      </span>
       <span style="font-size: 12px; font-weight: normal; color: #0369a1; background: #f0f9ff; border: 1px solid #bae6fd; padding: 2px 8px; border-radius: 4px;">
         <i class="fas fa-edit mr-1"></i> ดึงข้อมูลผลการเรียนอัตโนมัติ (สามารถคลิกแก้ไขเฉพาะช่อง <b>"หมายเหตุ"</b> ได้)
       </span>
@@ -340,103 +352,9 @@
     </div>
   </div>
 
-  <!-- A4 Document Sheet -->
-  <div class="document-page">
-    
-    <!-- 1. School Logo -->
-    <div class="doc-logo-wrap">
-      <img src="Pr%20Logo.png?v=5.8.0" alt="ตราโรงเรียนพนมดงรักวิทยา" class="doc-logo-img">
-    </div>
-
-    <!-- 2. Form Title -->
-    <h1 class="doc-main-heading">แบบอนุมัติผลการเรียนที่มีเงื่อนไข</h1>
-
-    <!-- 3. Official Memo Header -->
-    <div class="memo-row">
-      <strong>เรื่อง</strong> <span>ขออนุมัติผลการเรียน “0” “ร” “มส.” “มผ” “ขร”</span>
-    </div>
-    <div class="memo-row">
-      <strong>เรียน</strong> <span>ผู้อำนวยการโรงเรียนพนมดงรักวิทยา</span>
-    </div>
-
-    <!-- 4. Official Memo Body (Exact 2-Line Layout matching Image 2) -->
-    <div class="memo-official-block">
-      <div class="memo-line memo-line-1">
-        <span class="memo-label">ด้วยข้าพเจ้า</span>
-        <span class="doc-dotted-fill fill-teacher" id="doc-teacher-name" contenteditable="true" title="คลิกเพื่อแก้ไขชื่อครูผู้สอนได้">...................................................</span>
-        <span class="memo-label">ผู้สอนรายวิชา</span>
-        <span class="doc-dotted-fill fill-subject" id="doc-subject-name" contenteditable="true" title="คลิกเพื่อแก้ไขชื่อรายวิชาได้">...................................................</span>
-        <span class="memo-label">รหัส</span>
-        <span class="doc-dotted-fill fill-code font-bold" id="doc-subject-code" contenteditable="true" title="คลิกเพื่อแก้ไขรหัสวิชาได้">.........................</span>
-      </div>
-      <div class="memo-line memo-line-2">
-        <span class="memo-label">ภาคเรียนที่</span>
-        <span class="doc-dotted-fill fill-sem font-bold" id="doc-semester" contenteditable="true" title="คลิกเพื่อแก้ไขภาคเรียนได้">1</span>
-        <span class="memo-label">ปีการศึกษา</span>
-        <span class="doc-dotted-fill fill-year font-bold" id="doc-year" contenteditable="true" title="คลิกเพื่อแก้ไขปีการศึกษาได้">2569</span>
-        <span class="memo-label">มีนักเรียน มี ผลการเรียน“0” “ร” “มส.” “มผ” “ขร” จำนวน</span>
-        <span class="doc-dotted-fill fill-count font-bold" id="doc-student-count" contenteditable="true" title="คลิกเพื่อแก้ไขจำนวนนักเรียนได้">0</span>
-        <span class="memo-label">คน ดังนี้</span>
-      </div>
-    </div>
-
-    <!-- 5. 18-Rows Table with Dashed Lines (matching Image 3) -->
-    <table class="form-table">
-      <thead>
-        <tr>
-          <th class="col-no">ที่</th>
-          <th class="col-class">ชั้น</th>
-          <th class="col-id">เลขประจำตัว</th>
-          <th class="col-name">ชื่อ - นามสกุล</th>
-          <th class="col-grade">ผลการเรียน</th>
-          <th class="col-remark">หมายเหตุ</th>
-        </tr>
-      </thead>
-      <tbody id="form-table-body">
-        <!-- Rows 1 to 18 generated dynamically -->
-      </tbody>
-    </table>
-
-    <!-- 6. Bottom Submission Note -->
-    <div class="sig-intro">
-      จึงเรียนมาเพื่อโปรดพิจารณา
-    </div>
-
-    <!-- 7. 4-Staff Signatures Grid -->
-    <div class="signatures-2col-grid">
-      <div class="sig-block">
-        <span>ลงชื่อ</span><span class="sig-line-dotted"></span><span>ครูผู้สอน</span>
-      </div>
-      <div class="sig-block">
-        <span>ลงชื่อ</span><span class="sig-line-dotted"></span><span>หัวหน้ากลุ่มสาระการเรียนรู้</span>
-      </div>
-      <div class="sig-block">
-        <span>ลงชื่อ</span><span class="sig-line-dotted"></span><span>หัวหน้างานวัดและประเมินผล</span>
-      </div>
-      <div class="sig-block">
-        <span>ลงชื่อ</span><span class="sig-line-dotted"></span><span>หัวหน้ากลุ่มบริหารวิชาการ</span>
-      </div>
-    </div>
-
-    <!-- 8. School Director Decision Block -->
-    <div class="director-approval-block">
-      <div class="approval-choice-left">
-        <span>(&nbsp;&nbsp;&nbsp;) อนุมัติ</span>
-        <span>(&nbsp;&nbsp;&nbsp;) ไม่อนุมัติ</span>
-      </div>
-      <div class="director-signature-wrap">
-        <div style="margin-bottom: 3px;">
-          ลงชื่อ......................................................
-        </div>
-        <div style="font-weight: 600; margin-bottom: 1px;" contenteditable="true" title="คลิกเพื่อแก้ไขชื่อผู้อำนวยการได้">
-          ( นายมนัด เทศทอง )
-        </div>
-        <div>
-          ผู้อำนวยการโรงเรียนพนมดงรักวิทยา
-        </div>
-      </div>
-    </div>
-
+  <!-- A4 Document Sheets Container (Dynamic Multi-Page Support) -->
+  <div id="pages-container">
+    <!-- Generated dynamically: 18 students per page -->
   </div>
 
   <!-- Scripts to Load Realtime Data from App Storage / Database -->
@@ -527,73 +445,200 @@
         subjectName = filteredRecords[0].subjectName || '';
       }
 
-      // 5. Populate Header Memo Text
-      document.getElementById('doc-teacher-name').innerText = teacherDisplayName;
-      document.getElementById('doc-subject-name').innerText = subjectName || (subjectCode ? 'รายวิชา ' + subjectCode : '...................................................');
-      document.getElementById('doc-subject-code').innerText = subjectCode || '.........................';
-      document.getElementById('doc-semester').innerText = semParam;
-      document.getElementById('doc-year').innerText = yearParam;
-      document.getElementById('doc-student-count').innerText = filteredRecords.length;
+      var subjectDisplayTitle = subjectName || (subjectCode ? 'รายวิชา ' + subjectCode : '...................................................');
+      var subjectCodeDisplay = subjectCode || '.........................';
+      var totalStudents = filteredRecords.length;
 
-      // 6. Render exactly 18 Rows in the Table (matching Image 3)
-      var TOTAL_ROWS = 18;
-      var tbody = document.getElementById('form-table-body');
-      var rowsHtml = '';
+      // 5. Calculate pagination (18 rows per page)
+      var ROWS_PER_PAGE = 18;
+      var totalPages = Math.max(1, Math.ceil(totalStudents / ROWS_PER_PAGE));
 
-      for (var i = 0; i < TOTAL_ROWS; i++) {
-        var num = i + 1;
-        if (i < filteredRecords.length) {
-          var r = filteredRecords[i];
-          
-          // Determine class room: e.g. "ม.1/1" or "ม.4/2"
-          var classRoom = '';
-          if (r.room) {
-            classRoom = r.gradeLevel + '/' + r.room;
-          } else {
-            // Lookup in students database
-            var stObj = allStudents.find(function(s) { return s.studentId === r.studentId; });
-            if (stObj && stObj.room) {
-              classRoom = (stObj.gradeLevel || r.gradeLevel) + '/' + stObj.room;
-            } else {
-              classRoom = r.gradeLevel || '';
-            }
-          }
-
-          // Format remarks
-          var remark = r.remarks || '';
-          if (!remark || remark === 'ร พิเศษ ยังไม่ได้สอบ/ส่งงาน') {
-            if (r.conditionType === 'ร') remark = 'ยังไม่ได้สอบ/ส่งงาน';
-            else if (r.conditionType === 'มส') remark = 'เวลาเรียนไม่ถึง 80%';
-            else if (r.conditionType === '0') remark = 'คะแนนไม่ถึงเกณฑ์';
-            else if (r.conditionType === 'มผ') remark = 'ไม่ผ่านเกณฑ์การประเมิน';
-          } else if (remark.indexOf('ร พิเศษ') !== -1) {
-            remark = remark.replace(/ร\s*พิเศษ\s*/g, '');
-          }
-
-          rowsHtml += '<tr>' +
-            '<td class="col-no">' + num + '</td>' +
-            '<td class="col-class">' + classRoom + '</td>' +
-            '<td class="col-id">' + (r.studentId || '') + '</td>' +
-            '<td class="col-name">' + (r.studentName || '') + '</td>' +
-            '<td class="col-grade">' + (r.conditionType || '') + '</td>' +
-            '<td class="col-remark" contenteditable="true" title="คลิกเพื่อแก้ไขหมายเหตุได้">' + remark + '</td>' +
-          '</tr>';
-        } else {
-          // Empty row with numbered counter and dashed borders
-          rowsHtml += '<tr>' +
-            '<td class="col-no">' + num + '</td>' +
-            '<td class="col-class"></td>' +
-            '<td class="col-id"></td>' +
-            '<td class="col-name"></td>' +
-            '<td class="col-grade"></td>' +
-            '<td class="col-remark" contenteditable="true" title="คลิกเพื่อพิมพ์หมายเหตุได้"></td>' +
-          '</tr>';
-        }
+      // Update control bar summary
+      var summaryBadge = document.getElementById('print-page-summary');
+      if (summaryBadge) {
+        summaryBadge.innerText = 'รวม ' + totalPages + ' หน้า (' + totalStudents + ' คน)';
       }
 
-      tbody.innerHTML = rowsHtml;
+      // 6. Build HTML for each page
+      var pagesContainer = document.getElementById('pages-container');
+      var pagesHtml = '';
 
-      // 7. Auto-print if parameter was passed
+      for (var p = 0; p < totalPages; p++) {
+        var pageNum = p + 1;
+        var startIndex = p * ROWS_PER_PAGE;
+        var pageStudents = filteredRecords.slice(startIndex, startIndex + ROWS_PER_PAGE);
+
+        var rowsHtml = '';
+        for (var i = 0; i < ROWS_PER_PAGE; i++) {
+          var rowNum = startIndex + i + 1;
+          if (i < pageStudents.length) {
+            var r = pageStudents[i];
+            
+            // Determine class room: e.g. "ม.1/1" or "ม.4/2"
+            var classRoom = '';
+            if (r.room) {
+              classRoom = r.gradeLevel + '/' + r.room;
+            } else {
+              var stObj = allStudents.find(function(s) { return s.studentId === r.studentId; });
+              if (stObj && stObj.room) {
+                classRoom = (stObj.gradeLevel || r.gradeLevel) + '/' + stObj.room;
+              } else {
+                classRoom = r.gradeLevel || '';
+              }
+            }
+
+            // Format remarks
+            var remark = r.remarks || '';
+            if (!remark || remark === 'ร พิเศษ ยังไม่ได้สอบ/ส่งงาน') {
+              if (r.conditionType === 'ร') remark = 'ยังไม่ได้สอบ/ส่งงาน';
+              else if (r.conditionType === 'มส') remark = 'เวลาเรียนไม่ถึง 80%';
+              else if (r.conditionType === '0') remark = 'คะแนนไม่ถึงเกณฑ์';
+              else if (r.conditionType === 'มผ') remark = 'ไม่ผ่านเกณฑ์การประเมิน';
+            } else if (remark.indexOf('ร พิเศษ') !== -1) {
+              remark = remark.replace(/ร\s*พิเศษ\s*/g, '');
+            }
+
+            rowsHtml += '<tr>' +
+              '<td class="col-no">' + rowNum + '</td>' +
+              '<td class="col-class">' + classRoom + '</td>' +
+              '<td class="col-id">' + (r.studentId || '') + '</td>' +
+              '<td class="col-name">' + (r.studentName || '') + '</td>' +
+              '<td class="col-grade">' + (r.conditionType || '') + '</td>' +
+              '<td class="col-remark" contenteditable="true" title="คลิกเพื่อแก้ไขหมายเหตุได้">' + remark + '</td>' +
+            '</tr>';
+          } else {
+            // Empty row with continuous sequential counter and dashed line
+            rowsHtml += '<tr>' +
+              '<td class="col-no">' + rowNum + '</td>' +
+              '<td class="col-class"></td>' +
+              '<td class="col-id"></td>' +
+              '<td class="col-name"></td>' +
+              '<td class="col-grade"></td>' +
+              '<td class="col-remark" contenteditable="true" title="คลิกเพื่อพิมพ์หมายเหตุได้"></td>' +
+            '</tr>';
+          }
+        }
+
+        var isMultiPage = totalPages > 1;
+        var pageTitleSuffix = isMultiPage ? ' <span style="font-size: 13px; font-weight: normal; color: #475569;">(หน้าที่ ' + pageNum + '/' + totalPages + ')</span>' : '';
+        var memoContSuffix = (isMultiPage && pageNum > 1) ? ' (ต่อ)' : '';
+
+        pagesHtml += '<div class="document-page" data-page="' + pageNum + '">' +
+          '<!-- 1. School Logo -->' +
+          '<div class="doc-logo-wrap">' +
+            '<img src="Pr%20Logo.png?v=6.5.0" alt="ตราโรงเรียนพนมดงรักวิทยา" class="doc-logo-img">' +
+          '</div>' +
+
+          '<!-- 2. Form Title -->' +
+          '<h1 class="doc-main-heading">แบบอนุมัติผลการเรียนที่มีเงื่อนไข' + pageTitleSuffix + '</h1>' +
+
+          '<!-- 3. Official Memo Header -->' +
+          '<div class="memo-row">' +
+            '<strong>เรื่อง</strong> <span>ขออนุมัติผลการเรียน “0” “ร” “มส.” “มผ” “ขร”</span>' +
+          '</div>' +
+          '<div class="memo-row">' +
+            '<strong>เรียน</strong> <span>ผู้อำนวยการโรงเรียนพนมดงรักวิทยา</span>' +
+          '</div>' +
+
+          '<!-- 4. Official Memo Body (Exact 2-Line Layout) -->' +
+          '<div class="memo-official-block">' +
+            '<div class="memo-line memo-line-1">' +
+              '<span class="memo-label">ด้วยข้าพเจ้า</span>' +
+              '<span class="doc-dotted-fill fill-teacher sync-teacher" contenteditable="true" title="คลิกเพื่อแก้ไขชื่อครูผู้สอนได้">' + teacherDisplayName + '</span>' +
+              '<span class="memo-label">ผู้สอนรายวิชา</span>' +
+              '<span class="doc-dotted-fill fill-subject sync-subject" contenteditable="true" title="คลิกเพื่อแก้ไขชื่อรายวิชาได้">' + subjectDisplayTitle + '</span>' +
+              '<span class="memo-label">รหัส</span>' +
+              '<span class="doc-dotted-fill fill-code font-bold sync-code" contenteditable="true" title="คลิกเพื่อแก้ไขรหัสวิชาได้">' + subjectCodeDisplay + '</span>' +
+            '</div>' +
+            '<div class="memo-line memo-line-2">' +
+              '<span class="memo-label">ภาคเรียนที่</span>' +
+              '<span class="doc-dotted-fill fill-sem font-bold sync-sem" contenteditable="true" title="คลิกเพื่อแก้ไขภาคเรียนได้">' + semParam + '</span>' +
+              '<span class="memo-label">ปีการศึกษา</span>' +
+              '<span class="doc-dotted-fill fill-year font-bold sync-year" contenteditable="true" title="คลิกเพื่อแก้ไขปีการศึกษาได้">' + yearParam + '</span>' +
+              '<span class="memo-label">มีนักเรียน มี ผลการเรียน“0” “ร” “มส.” “มผ” “ขร” จำนวน</span>' +
+              '<span class="doc-dotted-fill fill-count font-bold sync-count" contenteditable="true" title="คลิกเพื่อแก้ไขจำนวนนักเรียนได้">' + totalStudents + '</span>' +
+              '<span class="memo-label">คน ดังนี้' + memoContSuffix + '</span>' +
+            '</div>' +
+          '</div>' +
+
+          '<!-- 5. 18-Rows Table with Dashed Lines -->' +
+          '<table class="form-table">' +
+            '<thead>' +
+              '<tr>' +
+                '<th class="col-no">ที่</th>' +
+                '<th class="col-class">ชั้น</th>' +
+                '<th class="col-id">เลขประจำตัว</th>' +
+                '<th class="col-name">ชื่อ - นามสกุล</th>' +
+                '<th class="col-grade">ผลการเรียน</th>' +
+                '<th class="col-remark">หมายเหตุ</th>' +
+              '</tr>' +
+            '</thead>' +
+            '<tbody>' +
+              rowsHtml +
+            '</tbody>' +
+          '</table>' +
+
+          '<!-- 6. Bottom Submission Note -->' +
+          '<div class="sig-intro">' +
+            'จึงเรียนมาเพื่อโปรดพิจารณา' +
+          '</div>' +
+
+          '<!-- 7. 4-Staff Signatures Grid -->' +
+          '<div class="signatures-2col-grid">' +
+            '<div class="sig-block">' +
+              '<span>ลงชื่อ</span><span class="sig-line-dotted"></span><span>ครูผู้สอน</span>' +
+            '</div>' +
+            '<div class="sig-block">' +
+              '<span>ลงชื่อ</span><span class="sig-line-dotted"></span><span>หัวหน้ากลุ่มสาระการเรียนรู้</span>' +
+            '</div>' +
+            '<div class="sig-block">' +
+              '<span>ลงชื่อ</span><span class="sig-line-dotted"></span><span>หัวหน้างานวัดและประเมินผล</span>' +
+            '</div>' +
+            '<div class="sig-block">' +
+              '<span>ลงชื่อ</span><span class="sig-line-dotted"></span><span>หัวหน้ากลุ่มบริหารวิชาการ</span>' +
+            '</div>' +
+          '</div>' +
+
+          '<!-- 8. School Director Decision Block -->' +
+          '<div class="director-approval-block">' +
+            '<div class="approval-choice-left">' +
+              '<span>(&nbsp;&nbsp;&nbsp;) อนุมัติ</span>' +
+              '<span>(&nbsp;&nbsp;&nbsp;) ไม่อนุมัติ</span>' +
+            '</div>' +
+            '<div class="director-signature-wrap">' +
+              '<div style="margin-bottom: 3px;">' +
+                'ลงชื่อ......................................................' +
+              '</div>' +
+              '<div style="font-weight: 600; margin-bottom: 1px;" class="sync-director" contenteditable="true" title="คลิกเพื่อแก้ไขชื่อผู้อำนวยการได้">' +
+                '( นายมนัด เทศทอง )' +
+              '</div>' +
+              '<div>' +
+                'ผู้อำนวยการโรงเรียนพนมดงรักวิทยา' +
+              '</div>' +
+            '</div>' +
+          '</div>' +
+
+        '</div>'; // end .document-page
+      }
+
+      pagesContainer.innerHTML = pagesHtml;
+
+      // 7. Synchronize editable header fields across all pages in real time
+      document.addEventListener('input', function(e) {
+        var target = e.target;
+        if (!target) return;
+        var syncClasses = ['sync-teacher', 'sync-subject', 'sync-code', 'sync-sem', 'sync-year', 'sync-count', 'sync-director'];
+        syncClasses.forEach(function(cls) {
+          if (target.classList.contains(cls)) {
+            var val = target.innerText;
+            document.querySelectorAll('.' + cls).forEach(function(el) {
+              if (el !== target) el.innerText = val;
+            });
+          }
+        });
+      });
+
+      // 8. Auto-print if parameter was passed
       if (autoprint) {
         setTimeout(function() {
           window.print();
