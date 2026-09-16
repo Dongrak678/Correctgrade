@@ -115,7 +115,7 @@ class DashboardService {
         headingEl.innerHTML = `${timeGreeting}, ${this.escapeHtml(currentUser.name)} 👨‍🏫`;
         if (subEl) subEl.innerText = `ภาพรวมนักเรียนที่ติดเงื่อนไขในรายวิชาที่สอน และความคืบหน้าการส่งงาน`;
       } else {
-        headingEl.innerHTML = `${timeGreeting}, ศูนย์บัญชาการและวิเคราะห์ผลการเรียน 👑`;
+        headingEl.innerHTML = `${timeGreeting}, Admin Phanomdongrak Wittaya School 👑`;
         if (subEl) subEl.innerText = `สรุปภาพรวมสถิตินักเรียนติด 0, ร, มส, มผ และติดตามกระบวนการแก้ผลการเรียนทั้งระบบ`;
       }
     }
