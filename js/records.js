@@ -236,6 +236,7 @@ class RecordsService {
     let countR = 0;
     let countMS = 0;
     let countMF = 0;
+    let countKR = 0;
     let countPass = 0;
 
     allRecords.forEach(r => {
@@ -243,6 +244,7 @@ class RecordsService {
       else if (r.conditionType === 'ร') countR++;
       else if (r.conditionType === 'มส') countMS++;
       else if (r.conditionType === 'มผ') countMF++;
+      else if (r.conditionType === 'ขร') countKR++;
 
       if (r.status === 'approved') countPass++;
     });
@@ -257,6 +259,7 @@ class RecordsService {
     setVal('rec-stat-r', countR);
     setVal('rec-stat-ms', countMS);
     setVal('rec-stat-mf', countMF);
+    setVal('rec-stat-kr', countKR);
     setVal('rec-stat-pass', countPass);
   }
 
@@ -466,7 +469,7 @@ class RecordsService {
         <div class="modal-header">
           <div class="modal-title-wrap">
             <span class="modal-badge badge-blue"><i class="fas fa-plus-circle"></i> บันทึกข้อมูล</span>
-            <h3 id="record-modal-title">เพิ่มข้อมูลนักเรียนติด 0 / ร / มส</h3>
+            <h3 id="record-modal-title">เพิ่มข้อมูลนักเรียนติด 0 / ร / มส / มผ / ขร</h3>
           </div>
           <button class="btn-close-modal" onclick="recordsService.closeModal()">&times;</button>
         </div>
@@ -546,6 +549,7 @@ class RecordsService {
                   <option value="ร">ร</option>
                   <option value="มส">มส</option>
                   <option value="มผ">มผ</option>
+                  <option value="ขร">ขร</option>
                 </select>
               </div>
             </div>
@@ -999,7 +1003,7 @@ class RecordsService {
 
     setTimeout(() => {
       const titleEl = document.getElementById('record-modal-title');
-      if (titleEl) titleEl.innerText = "แก้ไขข้อมูลนักเรียนติด 0 / ร / มส / มผ";
+      if (titleEl) titleEl.innerText = "แก้ไขข้อมูลนักเรียนติด 0 / ร / มส / มผ / ขร";
 
       document.getElementById('rec-edit-id').value = record.id;
       document.getElementById('rec-student-id').value = record.studentId || '';

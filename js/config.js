@@ -48,7 +48,8 @@ const APP_CONFIG = {
     "0": { label: "ผลการเรียน '0'", color: "#ef4444", bg: "#fee2e2", text: "text-red-600" },
     "ร": { label: "ผลการเรียน 'ร'", color: "#f59e0b", bg: "#fef3c7", text: "text-amber-600" },
     "มส": { label: "ผลการเรียน 'มส'", color: "#8b5cf6", bg: "#ede9fe", text: "text-purple-600" },
-    "มผ": { label: "ผลการเรียน 'มผ'", color: "#ec4899", bg: "#fce7f3", text: "text-pink-600" }
+    "มผ": { label: "ผลการเรียน 'มผ'", color: "#ec4899", bg: "#fce7f3", text: "text-pink-600" },
+    "ขร": { label: "ผลการเรียน 'ขร'", color: "#0284c7", bg: "#e0f2fe", text: "text-sky-600" }
   },
 
   // ขั้นตอนของกระบวนการแก้ไข (4-Step Workflow)

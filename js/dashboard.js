@@ -380,6 +380,7 @@ class DashboardService {
     const levelDataR = levels.map(lvl => records.filter(r => (r.gradeLevel || '').startsWith(lvl) && r.conditionType === 'ร').length);
     const levelDataMS = levels.map(lvl => records.filter(r => (r.gradeLevel || '').startsWith(lvl) && r.conditionType === 'มส').length);
     const levelDataMF = levels.map(lvl => records.filter(r => (r.gradeLevel || '').startsWith(lvl) && r.conditionType === 'มผ').length);
+    const levelDataKR = levels.map(lvl => records.filter(r => (r.gradeLevel || '').startsWith(lvl) && r.conditionType === 'ขร').length);
 
     // วาด Bar Chart
     const barCanvas = document.getElementById('dashboard-bar-chart');
@@ -422,6 +423,15 @@ class DashboardService {
               label: 'ติด มผ',
               data: levelDataMF,
               backgroundColor: '#ec4899',
+              borderRadius: { topLeft: 6, topRight: 6, bottomLeft: 0, bottomRight: 0 },
+              borderSkipped: false,
+              barPercentage: 0.65,
+              categoryPercentage: 0.75
+            },
+            {
+              label: 'ติด ขร',
+              data: levelDataKR,
+              backgroundColor: '#0284c7',
               borderRadius: { topLeft: 6, topRight: 6, bottomLeft: 0, bottomRight: 0 },
               borderSkipped: false,
               barPercentage: 0.65,
@@ -597,6 +607,7 @@ class DashboardService {
           countR: 0,
           countMS: 0,
           countMF: 0,
+          countKR: 0,
           total: 0
         };
       }
@@ -605,6 +616,7 @@ class DashboardService {
       else if (r.conditionType === 'ร') subjectMap[key].countR++;
       else if (r.conditionType === 'มส') subjectMap[key].countMS++;
       else if (r.conditionType === 'มผ') subjectMap[key].countMF++;
+      else if (r.conditionType === 'ขร') subjectMap[key].countKR++;
       subjectMap[key].total++;
     });
 
@@ -634,7 +646,8 @@ class DashboardService {
               ${sub.count0 > 0 ? `<span class="cond-pill c0">0: ${sub.count0}</span>` : ''}
               ${sub.countR > 0 ? `<span class="cond-pill cr">ร: ${sub.countR}</span>` : ''}
               ${sub.countMS > 0 ? `<span class="cond-pill cms">มส: ${sub.countMS}</span>` : ''}
-              ${sub.countMF > 0 ? `<span class="cond-pill cmf" style="background:#fce7f3; color:#db2777; border:1px solid #f9a8d4;">มผ: ${sub.countMF}</span>` : ''}
+              ${sub.countMF > 0 ? `<span class="cond-pill cmf">มผ: ${sub.countMF}</span>` : ''}
+              ${sub.countKR > 0 ? `<span class="cond-pill ckr">ขร: ${sub.countKR}</span>` : ''}
             </div>
           </div>
         </div>

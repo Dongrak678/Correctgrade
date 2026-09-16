@@ -25,7 +25,7 @@
 
   <!-- Application Stylesheets (with cache busting) -->
   <link rel="stylesheet" href="css/main.css?v=6.9.0">
-  <link rel="stylesheet" href="css/components.css?v=7.0.0">
+  <link rel="stylesheet" href="css/components.css?v=7.1.0">
 </head>
 <body>
 
@@ -581,7 +581,7 @@
                   <i class="fas fa-clipboard-list"></i>
                 </div>
                 <div>
-                  <h2>การจัดการข้อมูลผลการเรียน (0 / ร / มส / มผ)</h2>
+                  <h2>การจัดการข้อมูลผลการเรียน (0 / ร / มส / มผ / ขร)</h2>
                   <p>บันทึก ติดตามกระบวนการยื่นคำร้อง 4 ขั้นตอน และตรวจสอบสถานะการแก้ไขแบบเรียลไทม์</p>
                 </div>
               </div>
@@ -608,6 +608,10 @@
                   <span class="badge-dot dot-pink"></span>
                   <span>ติด มผ:</span> <strong id="rec-stat-mf">0</strong>
                 </div>
+                <div class="records-mini-pill pill-kr">
+                  <span class="badge-dot dot-sky"></span>
+                  <span>ติด ขร:</span> <strong id="rec-stat-kr">0</strong>
+                </div>
                 <div class="records-mini-pill pill-pass">
                   <i class="fas fa-check-circle text-emerald-500"></i>
                   <span>ผ่านแล้ว:</span> <strong id="rec-stat-pass">0</strong>
@@ -626,7 +630,7 @@
                 <i class="fas fa-trash-alt"></i> ล้างประวัติทั้งหมด
               </button>
               <button type="button" class="btn btn-primary nav-teacher-only" onclick="recordsService.openAddRecordModal()">
-                <i class="fas fa-plus-circle"></i> บันทึกข้อมูล 0/ร/มส/มผ
+                <i class="fas fa-plus-circle"></i> บันทึกข้อมูล 0/ร/มส/มผ/ขร
               </button>
             </div>
           </div>
@@ -647,6 +651,7 @@
                 <button type="button" class="filter-pill-grade" data-grade="ร" onclick="recordsService.setGradeFilter('ร')"><span class="badge-dot dot-amber"></span> ติด ร</button>
                 <button type="button" class="filter-pill-grade" data-grade="มส" onclick="recordsService.setGradeFilter('มส')"><span class="badge-dot dot-purple"></span> ติด มส</button>
                 <button type="button" class="filter-pill-grade" data-grade="มผ" onclick="recordsService.setGradeFilter('มผ')"><span class="badge-dot dot-pink"></span> ติด มผ</button>
+                <button type="button" class="filter-pill-grade" data-grade="ขร" onclick="recordsService.setGradeFilter('ขร')"><span class="badge-dot dot-sky"></span> ติด ขร</button>
               </div>
 
               <!-- Status Dropdown -->
@@ -1305,18 +1310,18 @@
   <div id="toast-container" class="toast-container"></div>
 
   <!-- Application Scripts (Loaded with Cache Busting) -->
-  <script src="js/config.js?v=6.6.0"></script>
+  <script src="js/config.js?v=7.0.0"></script>
   <script src="js/firebase-service.js?v=6.6.0"></script>
   <script src="js/cloudinary-service.js?v=6.6.0"></script>
   <script src="js/auth.js?v=6.6.0"></script>
-  <script src="js/dashboard.js?v=7.0.0"></script>
+  <script src="js/dashboard.js?v=7.1.0"></script>
   <script src="js/workflow.js?v=6.8.0"></script>
-  <script src="js/records.js?v=7.0.0"></script>
+  <script src="js/records.js?v=7.1.0"></script>
   <script src="js/audit.js?v=6.9.0"></script>
   <script src="js/teachers.js?v=6.9.0"></script>
   <script src="js/students.js?v=6.9.0"></script>
   <script src="js/users.js?v=6.6.0"></script>
-  <script src="js/export-engine.js?v=6.6.0"></script>
+  <script src="js/export-engine.js?v=7.0.0"></script>
   <script src="js/app.js?v=6.9.0"></script>
 
   <script>

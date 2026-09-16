@@ -571,6 +571,7 @@
               else if (r.conditionType === 'มส') remark = 'เวลาเรียนไม่ถึง 80%';
               else if (r.conditionType === '0') remark = 'คะแนนไม่ถึงเกณฑ์';
               else if (r.conditionType === 'มผ') remark = 'ไม่ผ่านเกณฑ์การประเมิน';
+              else if (r.conditionType === 'ขร') remark = 'ขาดเรียน';
             } else if (remark.indexOf('ร พิเศษ') !== -1) {
               remark = remark.replace(/ร\s*พิเศษ\s*/g, '');
             }
