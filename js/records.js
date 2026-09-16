@@ -542,10 +542,10 @@ class RecordsService {
               <div class="form-group col-md-3">
                 <label for="rec-condition-type">ผลการเรียนที่ติด <span class="text-red-500">*</span></label>
                 <select id="rec-condition-type" class="form-control font-bold text-red-600" required>
-                  <option value="0" selected>0 (เกรดศูนย์)</option>
-                  <option value="ร">ร (รอการตัดสิน)</option>
-                  <option value="มส">มส (หมดสิทธิ์สอบ)</option>
-                  <option value="มผ">มผ (ไม่ผ่านการประเมิน)</option>
+                  <option value="0" selected>0</option>
+                  <option value="ร">ร</option>
+                  <option value="มส">มส</option>
+                  <option value="มผ">มผ</option>
                 </select>
               </div>
             </div>
