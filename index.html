@@ -25,7 +25,7 @@
 
   <!-- Application Stylesheets (with cache busting) -->
   <link rel="stylesheet" href="css/main.css?v=6.9.0">
-  <link rel="stylesheet" href="css/components.css?v=6.9.0">
+  <link rel="stylesheet" href="css/components.css?v=7.0.0">
 </head>
 <body>
 
@@ -545,9 +545,9 @@
             </div>
           </div>
 
-          <!-- 6. Analytical Breakdown & Live Activity Row (Side by Side) -->
+          <!-- 6. Analytical Breakdown: Top 5 Subjects -->
           <div class="dashboard-bottom-grid">
-            <!-- Left Card: Top 5 Condition Subjects -->
+            <!-- Top 5 Condition Subjects -->
             <div class="dashboard-card">
               <div class="card-header-flex">
                 <div class="card-title-group">
@@ -559,25 +559,6 @@
                 </button>
               </div>
               <div id="dashboard-top-subjects" class="top-subjects-list">
-                <!-- Rendered dynamically by JS -->
-              </div>
-            </div>
-
-            <!-- Right Card: Live Activity Feed Stream -->
-            <div class="dashboard-card">
-              <div class="card-header-flex">
-                <div class="card-title-group">
-                  <h3><i class="fas fa-bolt text-purple-600"></i> Live Activity Feed Logs</h3>
-                  <p>ประวัติกิจกรรมและการดำเนินงานในระบบแบบเรียลไทม์</p>
-                </div>
-                <div class="activity-filter-tabs">
-                  <button type="button" class="btn-activity-tab active" data-type="all" onclick="dashboardService.setActivityFilter('all')">ทั้งหมด</button>
-                  <button type="button" class="btn-activity-tab" data-type="approval" onclick="dashboardService.setActivityFilter('approval')">อนุมัติ</button>
-                  <button type="button" class="btn-activity-tab" data-type="submission" onclick="dashboardService.setActivityFilter('submission')">ส่งงาน</button>
-                  <button type="button" class="btn-activity-tab" data-type="request" onclick="dashboardService.setActivityFilter('request')">คำร้อง</button>
-                </div>
-              </div>
-              <div id="dashboard-activity-feed" class="activity-feed-list">
                 <!-- Rendered dynamically by JS -->
               </div>
             </div>
