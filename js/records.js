@@ -23,12 +23,126 @@ class RecordsService {
       .replace(/'/g, '&#039;');
   }
 
-  init() {
+  async init() {
+    await this.syncRecordsWithStudentDirectory();
     this.renderRecordsTable();
 
     db.subscribe('records', () => {
       this.renderRecordsTable();
     });
+
+    db.subscribe('students', async () => {
+      await this.syncRecordsWithStudentDirectory();
+      this.renderRecordsTable();
+    });
+  }
+
+  /**
+   * ดึงข้อมูลระดับชั้นและห้องที่ถูกต้อง โดยอิงจากทะเบียนนักเรียน (Student Master Directory)
+   */
+  getClassRoomInfo(r) {
+    if (!r) return { gradeLevel: '-', room: '1', display: '-/1' };
+
+    const students = db.get('students') || [];
+    const rId = String(r.studentId || '').trim();
+    const rName = String(r.studentName || '').trim();
+
+    let st = null;
+    if (rId) {
+      st = students.find(s => String(s.studentId || '').trim() === rId);
+    }
+    if (!st && rName) {
+      const cleanR = rName.replace(/^(ด\.ช\.|ด\.ญ\.|นาย|นางสาว|นาง|เด็กชาย|เด็กหญิง)\s*/, '').trim();
+      st = students.find(s => {
+        const cleanS = String(s.name || '').replace(/^(ด\.ช\.|ด\.ญ\.|นาย|นางสาว|นาง|เด็กชาย|เด็กหญิง)\s*/, '').trim();
+        return cleanS === cleanR;
+      });
+    }
+
+    let gradeLevel = (r.gradeLevel || '').trim();
+    let room = (r.room !== undefined && r.room !== null && String(r.room).trim() !== '') ? String(r.room).trim() : '';
+
+    if (st) {
+      if (st.room) room = String(st.room).trim();
+      if (st.gradeLevel) {
+        let gl = String(st.gradeLevel).trim();
+        if (gl.includes('/')) {
+          const parts = gl.split('/');
+          gradeLevel = parts[0].trim();
+          if (!st.room && parts[1]) room = parts[1].trim();
+        } else {
+          gradeLevel = gl;
+        }
+      }
+    } else if (gradeLevel.includes('/')) {
+      const parts = gradeLevel.split('/');
+      gradeLevel = parts[0].trim();
+      if (!room || room === '1') room = parts[1].trim();
+    }
+
+    if (!room) room = '1';
+    if (!gradeLevel) gradeLevel = '-';
+
+    return {
+      gradeLevel: gradeLevel,
+      room: room,
+      display: `${gradeLevel}/${room}`
+    };
+  }
+
+  /**
+   * ซิงค์ข้อมูลชั้นและห้องของนักเรียนใน records ให้ตรงกับทะเบียนนักเรียนอัตโนมัติ
+   */
+  async syncRecordsWithStudentDirectory() {
+    const students = db.get('students') || [];
+    if (students.length === 0) return;
+
+    const records = db.get('records') || [];
+    if (records.length === 0) return;
+
+    let updatedCount = 0;
+    records.forEach(r => {
+      const rId = String(r.studentId || '').trim();
+      const rName = String(r.studentName || '').trim();
+
+      const st = students.find(s => 
+        (rId && String(s.studentId || '').trim() === rId) ||
+        (rName && s.name && s.name.trim() === rName)
+      );
+
+      if (st) {
+        let expectedLevel = (st.gradeLevel || '').trim();
+        let expectedRoom = (st.room !== undefined && st.room !== null) ? String(st.room).trim() : '';
+
+        if (expectedLevel.includes('/')) {
+          const parts = expectedLevel.split('/');
+          expectedLevel = parts[0].trim();
+          if (!expectedRoom && parts[1]) expectedRoom = parts[1].trim();
+        }
+
+        const curLevel = (r.gradeLevel || '').trim();
+        const curRoom = (r.room !== undefined && r.room !== null) ? String(r.room).trim() : '';
+
+        let changed = false;
+        if (expectedLevel && curLevel !== expectedLevel) {
+          r.gradeLevel = expectedLevel;
+          changed = true;
+        }
+        if (expectedRoom && curRoom !== expectedRoom) {
+          r.room = expectedRoom;
+          changed = true;
+        }
+
+        if (changed) {
+          updatedCount++;
+        }
+      }
+    });
+
+    if (updatedCount > 0) {
+      console.log(`🔄 ตรวจพบและซิงค์ห้องเรียนจากทะเบียนนักเรียนสำเร็จ ${updatedCount} รายการ`);
+      await db.set('records', records);
+    }
   }
 
   getFilteredRecords() {
@@ -50,7 +164,7 @@ class RecordsService {
       }
     }
 
-    // กรองตามประเภทเกรด (0, ร, มส)
+    // กรองตามประเภทเกรด (0, ร, มส, มผ, ขร)
     if (this.filterGradeType !== 'all') {
       records = records.filter(r => r.conditionType === this.filterGradeType);
     }
@@ -60,21 +174,28 @@ class RecordsService {
       records = records.filter(r => r.status === this.filterStatus);
     }
 
-    // กรองตามระดับชั้น
+    // กรองตามระดับชั้น (โดยอิงจากระดับชั้นจริงของนักเรียน)
     if (this.filterGradeLevel !== 'all') {
-      records = records.filter(r => (r.gradeLevel || '').startsWith(this.filterGradeLevel));
+      records = records.filter(r => {
+        const classInfo = this.getClassRoomInfo(r);
+        return (classInfo.gradeLevel || '').startsWith(this.filterGradeLevel);
+      });
     }
 
     // ค้นหา
     if (this.searchQuery && this.searchQuery.trim()) {
       const q = this.searchQuery.trim().toLowerCase();
-      records = records.filter(r => 
-        (r.studentId && r.studentId.toLowerCase().includes(q)) ||
-        (r.studentName && r.studentName.toLowerCase().includes(q)) ||
-        (r.subjectCode && r.subjectCode.toLowerCase().includes(q)) ||
-        (r.subjectName && r.subjectName.toLowerCase().includes(q)) ||
-        (r.teacherName && r.teacherName.toLowerCase().includes(q))
-      );
+      records = records.filter(r => {
+        const classInfo = this.getClassRoomInfo(r);
+        return (
+          (r.studentId && r.studentId.toLowerCase().includes(q)) ||
+          (r.studentName && r.studentName.toLowerCase().includes(q)) ||
+          (classInfo.display && classInfo.display.toLowerCase().includes(q)) ||
+          (r.subjectCode && r.subjectCode.toLowerCase().includes(q)) ||
+          (r.subjectName && r.subjectName.toLowerCase().includes(q)) ||
+          (r.teacherName && r.teacherName.toLowerCase().includes(q))
+        );
+      });
     }
 
     return records;
@@ -161,6 +282,7 @@ class RecordsService {
     tableBody.innerHTML = pageRecords.map((r, idx) => {
       const statusTitle = app.getStatusTitle(r.status);
       const statusClass = app.getStatusBadgeClass(r.status);
+      const classInfo = this.getClassRoomInfo(r);
 
       return `
         <tr class="hover-row">
@@ -174,7 +296,7 @@ class RecordsService {
                 <span class="student-name-bold">${this.escapeHtml(r.studentName)}</span>
                 <div class="student-sub-row">
                   <span class="student-id-chip">รหัส ${this.escapeHtml(r.studentId)}</span>
-                  <span class="class-room-badge">ชั้น ${this.escapeHtml(r.gradeLevel || '-')}/${this.escapeHtml(r.room || '1')}</span>
+                  <span class="class-room-badge">ชั้น ${this.escapeHtml(classInfo.display)}</span>
                 </div>
               </div>
             </div>
@@ -504,11 +626,11 @@ class RecordsService {
             </div>
 
             <div class="form-row">
-              <div class="form-group col-md-4">
+              <div class="form-group col-md-3">
                 <label for="rec-student-id">รหัสประจำตัวนักเรียน</label>
                 <input type="text" id="rec-student-id" class="form-control" required placeholder="เช่น 09522">
               </div>
-              <div class="form-group col-md-5">
+              <div class="form-group col-md-4">
                 <label for="rec-student-name">ชื่อ - นามสกุล นักเรียน</label>
                 <input type="text" id="rec-student-name" class="form-control" required placeholder="เช่น ด.ช.ศิลป์ชัย ชุเลิศ">
               </div>
@@ -517,6 +639,10 @@ class RecordsService {
                 <select id="rec-grade-level" class="form-control" onchange="recordsService.onGradeLevelChange()">
                   ${APP_CONFIG.GRADE_LEVELS.map(g => `<option value="${g}">${g}</option>`).join('')}
                 </select>
+              </div>
+              <div class="form-group col-md-2">
+                <label for="rec-room">ห้อง</label>
+                <input type="text" id="rec-room" class="form-control text-center font-bold" placeholder="เช่น 6" value="1">
               </div>
             </div>
 
@@ -665,6 +791,7 @@ class RecordsService {
     const idInput = document.getElementById('rec-student-id');
     const nameInput = document.getElementById('rec-student-name');
     const levelInput = document.getElementById('rec-grade-level');
+    const roomInput = document.getElementById('rec-room');
     const dropdown = document.getElementById('rec-student-dropdown-list');
 
     const roomText = student.room ? `${student.gradeLevel}/${student.room}` : (student.gradeLevel || '');
@@ -676,6 +803,9 @@ class RecordsService {
       if (g.includes('/')) g = g.split('/')[0].trim();
       levelInput.value = g;
     }
+    if (roomInput) {
+      roomInput.value = student.room || '1';
+    }
     if (dropdown) dropdown.classList.add('hidden');
 
     // อัปเดตรายการวิชาที่ครูสอนตามระดับชั้นของนักเรียนทันที
@@ -686,12 +816,14 @@ class RecordsService {
     const searchInput = document.getElementById('rec-student-search');
     const idInput = document.getElementById('rec-student-id');
     const nameInput = document.getElementById('rec-student-name');
+    const roomInput = document.getElementById('rec-room');
     if (searchInput) {
       searchInput.value = '';
       searchInput.focus();
     }
     if (idInput) idInput.value = '';
     if (nameInput) nameInput.value = '';
+    if (roomInput) roomInput.value = '1';
     this.renderStudentDropdown('');
     this.updateTeacherSubjectOptions();
   }
@@ -1009,13 +1141,17 @@ class RecordsService {
       document.getElementById('rec-student-id').value = record.studentId || '';
       document.getElementById('rec-student-name').value = record.studentName || '';
       
+      const classInfo = this.getClassRoomInfo(record);
       const sSearch = document.getElementById('rec-student-search');
-      if (sSearch) sSearch.value = `${record.studentId} - ${record.studentName} (${record.gradeLevel || ''})`;
+      if (sSearch) sSearch.value = `${record.studentId} - ${record.studentName} (${classInfo.display})`;
 
       const tSearch = document.getElementById('rec-teacher-search');
       if (tSearch) tSearch.value = record.teacherName || '';
 
-      document.getElementById('rec-grade-level').value = record.gradeLevel || 'ม.4';
+      document.getElementById('rec-grade-level').value = classInfo.gradeLevel || 'ม.4';
+      const roomInput = document.getElementById('rec-room');
+      if (roomInput) roomInput.value = classInfo.room || '1';
+
       document.getElementById('rec-subject-code').value = record.subjectCode || '';
       document.getElementById('rec-subject-name').value = record.subjectName || '';
       document.getElementById('rec-condition-type').value = record.conditionType || '0';
@@ -1034,6 +1170,8 @@ class RecordsService {
     const studentId = document.getElementById('rec-student-id').value.trim();
     const studentName = document.getElementById('rec-student-name').value.trim();
     const gradeLevel = document.getElementById('rec-grade-level').value;
+    const roomInput = document.getElementById('rec-room');
+    const room = roomInput ? roomInput.value.trim() : '';
     const subjectCode = document.getElementById('rec-subject-code').value.trim();
     const subjectName = document.getElementById('rec-subject-name').value.trim();
     const conditionType = document.getElementById('rec-condition-type').value;
@@ -1054,6 +1192,7 @@ class RecordsService {
     record.studentId = studentId;
     record.studentName = studentName;
     record.gradeLevel = gradeLevel;
+    record.room = room || '1';
     record.subjectCode = subjectCode;
     record.subjectName = subjectName;
     record.conditionType = conditionType;
@@ -1214,12 +1353,39 @@ class RecordsService {
       const subjectCode = row.subject_code || row['รหัสวิชา'] || '';
       if (!studentName && !subjectCode) continue;
 
+      let rawLevel = row.grade_level || row['ระดับชั้น'] || row['ชั้น'] || '';
+      let rawRoom = row.room || row['ห้อง'] || '';
+
+      // If rawLevel is e.g. "ม.2/6", split it
+      if (rawLevel.includes('/')) {
+        const parts = rawLevel.split('/');
+        rawLevel = parts[0].trim();
+        if (!rawRoom) rawRoom = parts[1].trim();
+      }
+
+      // Look up student from students master directory to get accurate room and level
+      const cleanName = studentName.trim();
+      const sId = (row.student_id || row['รหัสนักเรียน'] || '').trim();
+      const allStudents = db.get('students') || [];
+      const matchedStudent = allStudents.find(s => 
+        (sId && String(s.studentId).trim() === sId) ||
+        (cleanName && s.name && s.name.trim() === cleanName)
+      );
+
+      if (matchedStudent) {
+        if (matchedStudent.room) rawRoom = String(matchedStudent.room).trim();
+        if (matchedStudent.gradeLevel && !rawLevel) rawLevel = String(matchedStudent.gradeLevel).trim();
+      }
+
+      if (!rawRoom) rawRoom = '1';
+      if (!rawLevel) rawLevel = 'ม.4';
+
       result.push({
         id: `rec_${Date.now()}_${i}_${Math.random().toString(36).substr(2, 4)}`,
-        studentId: row.student_id || row['รหัสนักเรียน'] || '',
-        studentName: studentName.trim(),
-        gradeLevel: row.grade_level || row['ระดับชั้น'] || 'ม.4',
-        room: row.room || row['ห้อง'] || '1',
+        studentId: sId,
+        studentName: cleanName,
+        gradeLevel: rawLevel,
+        room: rawRoom,
         subjectCode: subjectCode.trim(),
         subjectName: (row.subject_name || row['ชื่อวิชา'] || '').trim(),
         conditionType: (row.condition_type || row['เกรด'] || '0').toUpperCase().replace('O', '0'),
@@ -1698,7 +1864,7 @@ class RecordsService {
           ${matched.map((r, idx) => `
             <tr>
               <td class="text-center">${idx + 1}</td>
-              <td class="text-center">${r.room ? `${r.gradeLevel}/${r.room}` : r.gradeLevel}</td>
+              <td class="text-center">${this.getClassRoomInfo(r).display}</td>
               <td class="text-center font-mono">${r.studentId}</td>
               <td>${r.studentName}</td>
               <td class="text-center font-bold text-red-600">${r.conditionType}</td>

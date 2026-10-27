@@ -35,24 +35,55 @@ class ExportEngine {
       "หมายเหตุ"
     ];
 
-    const rows = records.map((r, idx) => [
-      idx + 1,
-      `="${r.studentId}"`,
-      `"${r.studentName}"`,
-      `"${r.gradeLevel}"`,
-      `"${r.room || '1'}"`,
-      `"${r.subjectCode}"`,
-      `"${r.subjectName}"`,
-      `"${r.learningArea || '-'}"`,
-      `"${r.conditionType}"`,
-      `"${app.getStatusTitle(r.status)}"`,
-      `"${r.newGrade || '-'}"`,
-      `"${r.teacherName || '-'}"`,
-      `"${r.requestDate || '-'}"`,
-      `"${r.submissionDate || '-'}"`,
-      `"${r.approvalDate || '-'}"`,
-      `"${(r.approvalNote || r.requestNote || '').replace(/"/g, '""')}"`
-    ]);
+    const allStudents = db.get('students') || [];
+    const getClassInfo = (r) => {
+      let lvl = (r.gradeLevel || '').trim();
+      let rm = (r.room !== undefined && r.room !== null) ? String(r.room).trim() : '';
+      const st = allStudents.find(s => 
+        (r.studentId && String(s.studentId).trim() === String(r.studentId).trim()) ||
+        (r.studentName && s.name && s.name.trim() === r.studentName.trim())
+      );
+      if (st) {
+        if (st.room) rm = String(st.room).trim();
+        if (st.gradeLevel) {
+          let sLvl = String(st.gradeLevel).trim();
+          if (sLvl.includes('/')) {
+            const parts = sLvl.split('/');
+            lvl = parts[0].trim();
+            if (!st.room && parts[1]) rm = parts[1].trim();
+          } else {
+            lvl = sLvl;
+          }
+        }
+      } else if (lvl.includes('/')) {
+        const parts = lvl.split('/');
+        lvl = parts[0].trim();
+        if (!rm) rm = parts[1].trim();
+      }
+      return { gradeLevel: lvl || 'ม.1', room: rm || '1' };
+    };
+
+    const rows = records.map((r, idx) => {
+      const cInfo = getClassInfo(r);
+      return [
+        idx + 1,
+        `="${r.studentId}"`,
+        `"${r.studentName}"`,
+        `"${cInfo.gradeLevel}"`,
+        `"${cInfo.room}"`,
+        `"${r.subjectCode}"`,
+        `"${r.subjectName}"`,
+        `"${r.learningArea || '-'}"`,
+        `"${r.conditionType}"`,
+        `"${app.getStatusTitle(r.status)}"`,
+        `"${r.newGrade || '-'}"`,
+        `"${r.teacherName || '-'}"`,
+        `"${r.requestDate || '-'}"`,
+        `"${r.submissionDate || '-'}"`,
+        `"${r.approvalDate || '-'}"`,
+        `"${(r.approvalNote || r.requestNote || '').replace(/"/g, '""')}"`
+      ];
+    });
 
     const csvContent = "\uFEFF" + [
       headers.join(','),
@@ -79,14 +110,44 @@ class ExportEngine {
       return;
     }
 
-    const data = records.map((r, idx) => ({
-      "ลำดับ": idx + 1,
-      "รหัสนักเรียน": r.studentId,
-      "ชื่อ-นามสกุล": r.studentName,
-      "ระดับชั้น": r.gradeLevel,
-      "ห้อง": r.room || "1",
-      "รหัสวิชา": r.subjectCode,
-      "ชื่อรายวิชา": r.subjectName,
+    const allStudents = db.get('students') || [];
+    const getClassInfo = (r) => {
+      let lvl = (r.gradeLevel || '').trim();
+      let rm = (r.room !== undefined && r.room !== null) ? String(r.room).trim() : '';
+      const st = allStudents.find(s => 
+        (r.studentId && String(s.studentId).trim() === String(r.studentId).trim()) ||
+        (r.studentName && s.name && s.name.trim() === r.studentName.trim())
+      );
+      if (st) {
+        if (st.room) rm = String(st.room).trim();
+        if (st.gradeLevel) {
+          let sLvl = String(st.gradeLevel).trim();
+          if (sLvl.includes('/')) {
+            const parts = sLvl.split('/');
+            lvl = parts[0].trim();
+            if (!st.room && parts[1]) rm = parts[1].trim();
+          } else {
+            lvl = sLvl;
+          }
+        }
+      } else if (lvl.includes('/')) {
+        const parts = lvl.split('/');
+        lvl = parts[0].trim();
+        if (!rm) rm = parts[1].trim();
+      }
+      return { gradeLevel: lvl || 'ม.1', room: rm || '1' };
+    };
+
+    const data = records.map((r, idx) => {
+      const cInfo = getClassInfo(r);
+      return {
+        "ลำดับ": idx + 1,
+        "รหัสนักเรียน": r.studentId,
+        "ชื่อ-นามสกุล": r.studentName,
+        "ระดับชั้น": cInfo.gradeLevel,
+        "ห้อง": cInfo.room,
+        "รหัสวิชา": r.subjectCode,
+        "ชื่อรายวิชา": r.subjectName,
       "กลุ่มสาระฯ": r.learningArea || "-",
       "ผลการเรียนเดิม": r.conditionType,
       "สถานะ": app.getStatusTitle(r.status),

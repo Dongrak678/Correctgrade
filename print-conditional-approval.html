@@ -438,25 +438,35 @@
         var rawLevel = (r.gradeLevel || '').trim();
         var rawRoom = (r.room !== undefined && r.room !== null) ? String(r.room).trim() : '';
         
-        // 1. If room not directly on record, check if gradeLevel contains '/' (e.g. "ม.1/6")
-        if (!rawRoom) {
-          var slashParts = rawLevel.split('/');
-          if (slashParts.length > 1) {
-            rawLevel = slashParts[0].trim();
-            rawRoom = slashParts[1].trim();
+        // 1. Look up student from allStudents list to ensure student directory master accuracy
+        var rId = String(r.studentId || '').trim();
+        var rName = String(r.studentName || '').trim();
+        var stObj = allStudents.find(function(s) { 
+          if (rId && String(s.studentId || '').trim() === rId) return true;
+          if (rName && s.name && s.name.trim() === rName) return true;
+          return false;
+        });
+
+        if (stObj) {
+          if (stObj.room) rawRoom = String(stObj.room).trim();
+          if (stObj.gradeLevel) {
+            var sLevel = String(stObj.gradeLevel).trim();
+            if (sLevel.indexOf('/') !== -1) {
+              var parts = sLevel.split('/');
+              rawLevel = parts[0].trim();
+              if (!stObj.room && parts[1]) rawRoom = parts[1].trim();
+            } else {
+              rawLevel = sLevel;
+            }
           }
+        } else if (rawLevel.indexOf('/') !== -1) {
+          var slashParts = rawLevel.split('/');
+          rawLevel = slashParts[0].trim();
+          if (!rawRoom || rawRoom === '1') rawRoom = slashParts[1].trim();
         }
 
-        // 2. If room still empty, look up student from allStudents list
-        if (!rawRoom) {
-          var stObj = allStudents.find(function(s) { 
-            return String(s.studentId || '').trim() === String(r.studentId || '').trim(); 
-          });
-          if (stObj) {
-            if (stObj.room) rawRoom = String(stObj.room).trim();
-            if (stObj.gradeLevel && !rawLevel) rawLevel = String(stObj.gradeLevel).trim();
-          }
-        }
+        if (!rawRoom) rawRoom = '1';
+        if (!rawLevel) rawLevel = 'ม.1';
 
         // 3. Parse grade level order (ม.1 = 1, ม.2 = 2, ..., ม.6 = 6, ปวช.1 = 101, etc.)
         var levelOrder = 999;

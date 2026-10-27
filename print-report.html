@@ -148,23 +148,46 @@
 
       // Sort records: Grade level -> Room number -> Student ID
       const allStudentsList = db.get('students') || [];
+      const getInfo = (r) => {
+        let lvl = (r.gradeLevel || '').trim();
+        let rm = (r.room !== undefined && r.room !== null) ? String(r.room).trim() : '';
+
+        const st = allStudentsList.find(s => 
+          (r.studentId && String(s.studentId).trim() === String(r.studentId).trim()) ||
+          (r.studentName && s.name && s.name.trim() === r.studentName.trim())
+        );
+        if (st) {
+          if (st.room) rm = String(st.room).trim();
+          if (st.gradeLevel) {
+            let sLvl = String(st.gradeLevel).trim();
+            if (sLvl.includes('/')) {
+              const parts = sLvl.split('/');
+              lvl = parts[0].trim();
+              if (!st.room && parts[1]) rm = parts[1].trim();
+            } else {
+              lvl = sLvl;
+            }
+          }
+        } else if (lvl.includes('/')) {
+          const parts = lvl.split('/');
+          lvl = parts[0].trim();
+          if (!rm) rm = parts[1].trim();
+        }
+
+        if (!rm) rm = '1';
+        if (!lvl) lvl = 'ม.1';
+
+        let order = 999;
+        const m = lvl.match(/([^\d]+)?\s*(\d+)/);
+        if (m) {
+          const num = parseInt(m[2], 10) || 0;
+          order = (m[1] || '').includes('ปวช') ? 100 + num : num;
+        }
+        const rmNum = parseInt(rm, 10);
+        return { order, lvl, rmNum: isNaN(rmNum) ? 9999 : rmNum, rm, id: String(r.studentId || '').trim(), display: `${lvl}/${rm}` };
+      };
+
       records.sort((a, b) => {
-        const getInfo = (r) => {
-          let lvl = (r.gradeLevel || '').trim();
-          let rm = (r.room !== undefined && r.room !== null) ? String(r.room).trim() : '';
-          if (!rm) {
-            const st = allStudentsList.find(s => String(s.studentId).trim() === String(r.studentId).trim());
-            if (st && st.room) rm = String(st.room).trim();
-          }
-          let order = 999;
-          const m = lvl.match(/([^\d]+)?\s*(\d+)/);
-          if (m) {
-            const num = parseInt(m[2], 10) || 0;
-            order = (m[1] || '').includes('ปวช') ? 100 + num : num;
-          }
-          const rmNum = parseInt(rm, 10);
-          return { order, lvl, rmNum: isNaN(rmNum) ? 9999 : rmNum, rm, id: String(r.studentId || '').trim() };
-        };
         const cA = getInfo(a), cB = getInfo(b);
         if (cA.order !== cB.order) return cA.order - cB.order;
         if (cA.lvl !== cB.lvl) return cA.lvl.localeCompare(cB.lvl, 'th');
@@ -202,7 +225,7 @@
           <td class="center">${idx + 1}</td>
           <td class="center font-mono">${r.studentId}</td>
           <td>${r.studentName}</td>
-          <td class="center">${r.gradeLevel}/${r.room || '1'}</td>
+          <td class="center">${getInfo(r).display}</td>
           <td class="center font-bold">${r.subjectCode}</td>
           <td>${r.subjectName}</td>
           <td class="center font-bold">${r.conditionType}</td>
