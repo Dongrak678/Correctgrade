@@ -25,7 +25,51 @@
 
   <!-- Application Stylesheets (with cache busting) -->
   <link rel="stylesheet" href="css/main.css?v=6.9.0">
-  <link rel="stylesheet" href="css/components.css?v=7.1.0">
+  <link rel="stylesheet" href="css/components.css?v=7.3.0">
+  <style>
+    /* Problem Grade Detail + Semester/Year Pill */
+    .problem-grade-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+      background: #f8fafc;
+      color: #334155;
+      border: 1px solid #cbd5e1;
+    }
+    .problem-grade-pill strong {
+      font-weight: 800;
+    }
+    .problem-grade-pill.problem-grade-0 {
+      background: #fef2f2;
+      color: #b91c1c;
+      border-color: #fecaca;
+    }
+    .problem-grade-pill.problem-grade-ร {
+      background: #fffbeb;
+      color: #b45309;
+      border-color: #fde68a;
+    }
+    .problem-grade-pill.problem-grade-มส {
+      background: #f5f3ff;
+      color: #6d28d9;
+      border-color: #ddd6fe;
+    }
+    .problem-grade-pill.problem-grade-มผ {
+      background: #fdf2f8;
+      color: #be185d;
+      border-color: #fbcfe8;
+    }
+    .problem-grade-pill.problem-grade-ขร {
+      background: #f0f9ff;
+      color: #0369a1;
+      border-color: #bae6fd;
+    }
+  </style>
 </head>
 <body>
 
@@ -694,13 +738,14 @@
                 <thead>
                   <tr>
                     <th style="width: 4%;" class="text-center">#</th>
-                    <th style="width: 21%;">นักเรียน</th>
-                    <th style="width: 20%;">รายวิชา</th>
-                    <th style="width: 8%;" class="text-center">เงื่อนไข</th>
-                    <th style="width: 15%;">ครูผู้สอน</th>
-                    <th style="width: 15%;" class="text-center">สถานะการแก้ไข</th>
-                    <th style="width: 7%;" class="text-center">เกรดใหม่</th>
-                    <th style="width: 10%;" class="text-right">จัดการ</th>
+                    <th style="width: 19%;">นักเรียน</th>
+                    <th style="width: 17%;">รายวิชา</th>
+                    <th style="width: 6%;" class="text-center">เงื่อนไข</th>
+                    <th style="width: 16%;" class="text-center">ผลการเรียนที่มีปัญหา</th>
+                    <th style="width: 13%;">ครูผู้สอน</th>
+                    <th style="width: 12%;" class="text-center">สถานะการแก้ไข</th>
+                    <th style="width: 5%;" class="text-center">เกรดใหม่</th>
+                    <th style="width: 8%;" class="text-right">จัดการ</th>
                   </tr>
                 </thead>
                 <tbody id="records-table-body">
@@ -1316,7 +1361,7 @@
   <script src="js/auth.js?v=6.6.0"></script>
   <script src="js/dashboard.js?v=7.1.0"></script>
   <script src="js/workflow.js?v=6.8.0"></script>
-  <script src="js/records.js?v=7.2.0"></script>
+  <script src="js/records.js?v=7.4.0"></script>
   <script src="js/audit.js?v=6.9.0"></script>
   <script src="js/teachers.js?v=6.9.0"></script>
   <script src="js/students.js?v=6.9.0"></script>
@@ -1325,6 +1370,166 @@
   <script src="js/app.js?v=6.9.0"></script>
 
   <script>
+    // Ensure Problem Grade + Semester/Academic Year column renders even if js/records.js is cached
+    if (typeof RecordsService !== 'undefined') {
+      RecordsService.prototype.getProblemGradeDetail = function(r) {
+        if (!r) return { cond: '0', semester: '1', academicYear: '2569', fullText: '-' };
+        const cond = String(r.conditionType || '0').trim();
+        let sem = String(r.semester || APP_CONFIG.SEMESTER || '1').trim();
+        let year = String(r.academicYear || APP_CONFIG.ACADEMIC_YEAR || '2569').trim();
+
+        if (sem.includes('/')) {
+          const parts = sem.split('/');
+          sem = parts[0].replace(/ภาคเรียนที่/g, '').trim();
+          if (parts[1] && parts[1].trim()) {
+            year = parts[1].trim();
+          }
+        } else {
+          sem = sem.replace(/ภาคเรียนที่/g, '').trim();
+        }
+        if (!sem) sem = APP_CONFIG.SEMESTER || '1';
+        if (!year) year = APP_CONFIG.ACADEMIC_YEAR || '2569';
+
+        return {
+          cond,
+          semester: sem,
+          academicYear: year,
+          fullText: `ติด ${cond} ภาคเรียนที่ ${sem}/${year}`
+        };
+      };
+
+      RecordsService.prototype.renderRecordsTable = function() {
+        const tableBody = document.getElementById('records-table-body');
+        const countBadge = document.getElementById('records-count-badge');
+        if (!tableBody) return;
+
+        const tableEl = tableBody.closest('table');
+        if (tableEl) {
+          const theadRow = tableEl.querySelector('thead tr');
+          if (theadRow && theadRow.children.length < 9) {
+            theadRow.innerHTML = `
+              <th style="width: 4%;" class="text-center">#</th>
+              <th style="width: 19%;">นักเรียน</th>
+              <th style="width: 17%;">รายวิชา</th>
+              <th style="width: 6%;" class="text-center">เงื่อนไข</th>
+              <th style="width: 16%;" class="text-center">ผลการเรียนที่มีปัญหา</th>
+              <th style="width: 13%;">ครูผู้สอน</th>
+              <th style="width: 12%;" class="text-center">สถานะการแก้ไข</th>
+              <th style="width: 5%;" class="text-center">เกรดใหม่</th>
+              <th style="width: 8%;" class="text-right">จัดการ</th>
+            `;
+          }
+        }
+
+        this.renderMiniStats();
+
+        const filtered = this.getFilteredRecords();
+        if (countBadge) countBadge.innerText = `${filtered.length} รายการ`;
+
+        const clearBtn = document.getElementById('btn-clear-search');
+        if (clearBtn) {
+          clearBtn.style.display = (this.searchQuery && this.searchQuery.trim().length > 0) ? 'flex' : 'none';
+        }
+
+        const currentUser = authService.getCurrentUser();
+        const isStudent = currentUser && currentUser.role === APP_CONFIG.ROLES.STUDENT;
+
+        if (filtered.length === 0) {
+          tableBody.innerHTML = `
+            <tr>
+              <td colspan="9" class="text-center py-10 text-gray-500">
+                <div class="empty-state-card" style="padding: 28px 16px; text-align: center;">
+                  <div style="width: 56px; height: 56px; border-radius: 50%; background: ${isStudent ? '#ecfdf5' : '#eff6ff'}; color: ${isStudent ? '#059669' : '#2563eb'}; display: inline-flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 12px;">
+                    <i class="fas ${isStudent ? 'fa-check-circle' : 'fa-search'}"></i>
+                  </div>
+                  <h4 style="font-size: 15px; font-weight: 700; color: #1e293b; margin-bottom: 4px;">
+                    ${isStudent ? 'ยินดีด้วย! คุณไม่มีผลการเรียนที่มีเงื่อนไข (0, ร, มส, มผ, ขร)' : 'ไม่พบข้อมูลผลการเรียนตามเงื่อนไขที่เลือก'}
+                  </h4>
+                  <p style="font-size: 13px; color: #64748b; margin-bottom: ${isStudent ? '0' : '12px'};">
+                    ${isStudent ? 'ผลการเรียนของคุณผ่านเกณฑ์ตามปกติทุกรายวิชา' : 'ลองเปลี่ยนตัวกรอง ค้นหาด้วยคำอื่น หรือกดปุ่มล้างตัวกรอง'}
+                  </p>
+                  ${!isStudent ? `
+                  <button type="button" class="btn-sm btn-outline" onclick="recordsService.resetAllFilters()">
+                    <i class="fas fa-undo mr-1"></i> ล้างตัวกรองทั้งหมด
+                  </button>` : ''}
+                </div>
+              </td>
+            </tr>
+          `;
+          this.renderPagination(0);
+          return;
+        }
+
+        const totalPages = Math.ceil(filtered.length / this.pageSize);
+        if (this.currentPage > totalPages) this.currentPage = 1;
+        const startIndex = (this.currentPage - 1) * this.pageSize;
+        const pageRecords = filtered.slice(startIndex, startIndex + this.pageSize);
+
+        tableBody.innerHTML = pageRecords.map((r, idx) => {
+          const statusTitle = app.getStatusTitle(r.status);
+          const statusClass = app.getStatusBadgeClass(r.status);
+          const classInfo = this.getClassRoomInfo ? this.getClassRoomInfo(r) : { display: `${r.gradeLevel || '-'}/${r.room || '1'}` };
+          const problemInfo = this.getProblemGradeDetail(r);
+
+          return `
+            <tr class="hover-row">
+              <td class="text-center text-xs text-gray-400 font-mono font-bold">${startIndex + idx + 1}</td>
+              <td>
+                <div class="student-cell-modern">
+                  <div class="student-avatar-circle" title="${this.escapeHtml(r.studentName)}">
+                    <i class="fas fa-user-graduate"></i>
+                  </div>
+                  <div class="student-info-col">
+                    <span class="student-name-bold">${this.escapeHtml(r.studentName)}</span>
+                    <div class="student-sub-row">
+                      <span class="student-id-chip">รหัส ${this.escapeHtml(r.studentId)}</span>
+                      <span class="class-room-badge">ชั้น ${this.escapeHtml(classInfo.display)}</span>
+                    </div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="subject-cell-modern">
+                  <span class="subject-code-chip">${this.escapeHtml(r.subjectCode)}</span>
+                  <span class="subject-name-text">${this.escapeHtml(r.subjectName)}</span>
+                </div>
+              </td>
+              <td class="text-center">
+                <span class="grade-badge-modern grade-${r.conditionType}">${r.conditionType}</span>
+              </td>
+              <td class="text-center">
+                <span class="problem-grade-pill problem-grade-${r.conditionType}">
+                  <i class="far fa-calendar-alt"></i>
+                  <span>ติด <strong>${this.escapeHtml(problemInfo.cond)}</strong> ภาคเรียนที่ ${this.escapeHtml(problemInfo.semester)}/${this.escapeHtml(problemInfo.academicYear)}</span>
+                </span>
+              </td>
+              <td>
+                <div class="teacher-cell-modern">
+                  <span class="teacher-dot"></span>
+                  <span>${this.escapeHtml(r.teacherName || '-')}</span>
+                </div>
+              </td>
+              <td class="text-center">
+                <span class="status-pill-modern ${statusClass}">
+                  <i class="${app.getStatusIcon(r.status)}"></i> ${statusTitle}
+                </span>
+              </td>
+              <td class="text-center">
+                ${r.newGrade ? `<span class="new-grade-pill">${r.newGrade}</span>` : '<span class="text-gray-300 font-bold">-</span>'}
+              </td>
+              <td class="text-right">
+                <div class="action-btn-group">
+                  ${this.renderActionButtons(r, currentUser)}
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
+
+        this.renderPagination(filtered.length);
+      };
+    }
+
     // Tab role switcher helper in login view
     function setLoginRoleTab(role, btn) {
       document.querySelectorAll('.role-tab-modern, .login-tab-btn').forEach(b => b.classList.remove('active'));

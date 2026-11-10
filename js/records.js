@@ -145,6 +145,35 @@ class RecordsService {
     }
   }
 
+  /**
+   * คืนค่าข้อมูลผลการเรียนที่มีปัญหา พร้อมภาคเรียนและปีการศึกษา เช่น "ติด มส ภาคเรียนที่ 2/2569"
+   */
+  getProblemGradeDetail(r) {
+    if (!r) return { cond: '0', semester: '1', academicYear: '2569', fullText: '-' };
+    const cond = String(r.conditionType || '0').trim();
+    let sem = String(r.semester || APP_CONFIG.SEMESTER || '1').trim();
+    let year = String(r.academicYear || APP_CONFIG.ACADEMIC_YEAR || '2569').trim();
+
+    if (sem.includes('/')) {
+      const parts = sem.split('/');
+      sem = parts[0].replace(/ภาคเรียนที่/g, '').trim();
+      if (parts[1] && parts[1].trim()) {
+        year = parts[1].trim();
+      }
+    } else {
+      sem = sem.replace(/ภาคเรียนที่/g, '').trim();
+    }
+    if (!sem) sem = APP_CONFIG.SEMESTER || '1';
+    if (!year) year = APP_CONFIG.ACADEMIC_YEAR || '2569';
+
+    return {
+      cond,
+      semester: sem,
+      academicYear: year,
+      fullText: `ติด ${cond} ภาคเรียนที่ ${sem}/${year}`
+    };
+  }
+
   getFilteredRecords() {
     let records = db.get('records') || [];
     const currentUser = authService.getCurrentUser();
@@ -187,13 +216,15 @@ class RecordsService {
       const q = this.searchQuery.trim().toLowerCase();
       records = records.filter(r => {
         const classInfo = this.getClassRoomInfo(r);
+        const problemInfo = this.getProblemGradeDetail(r);
         return (
           (r.studentId && r.studentId.toLowerCase().includes(q)) ||
           (r.studentName && r.studentName.toLowerCase().includes(q)) ||
           (classInfo.display && classInfo.display.toLowerCase().includes(q)) ||
           (r.subjectCode && r.subjectCode.toLowerCase().includes(q)) ||
           (r.subjectName && r.subjectName.toLowerCase().includes(q)) ||
-          (r.teacherName && r.teacherName.toLowerCase().includes(q))
+          (r.teacherName && r.teacherName.toLowerCase().includes(q)) ||
+          (problemInfo.fullText && problemInfo.fullText.toLowerCase().includes(q))
         );
       });
     }
@@ -233,6 +264,24 @@ class RecordsService {
     const countBadge = document.getElementById('records-count-badge');
     if (!tableBody) return;
 
+    const tableEl = tableBody.closest('table');
+    if (tableEl) {
+      const theadRow = tableEl.querySelector('thead tr');
+      if (theadRow && theadRow.children.length < 9) {
+        theadRow.innerHTML = `
+          <th style="width: 4%;" class="text-center">#</th>
+          <th style="width: 19%;">นักเรียน</th>
+          <th style="width: 17%;">รายวิชา</th>
+          <th style="width: 6%;" class="text-center">เงื่อนไข</th>
+          <th style="width: 16%;" class="text-center">ผลการเรียนที่มีปัญหา</th>
+          <th style="width: 13%;">ครูผู้สอน</th>
+          <th style="width: 12%;" class="text-center">สถานะการแก้ไข</th>
+          <th style="width: 5%;" class="text-center">เกรดใหม่</th>
+          <th style="width: 8%;" class="text-right">จัดการ</th>
+        `;
+      }
+    }
+
     this.renderMiniStats();
 
     const filtered = this.getFilteredRecords();
@@ -250,13 +299,13 @@ class RecordsService {
     if (filtered.length === 0) {
       tableBody.innerHTML = `
         <tr>
-          <td colspan="8" class="text-center py-10 text-gray-500">
+          <td colspan="9" class="text-center py-10 text-gray-500">
             <div class="empty-state-card" style="padding: 28px 16px; text-align: center;">
               <div style="width: 56px; height: 56px; border-radius: 50%; background: ${isStudent ? '#ecfdf5' : '#eff6ff'}; color: ${isStudent ? '#059669' : '#2563eb'}; display: inline-flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 12px;">
                 <i class="fas ${isStudent ? 'fa-check-circle' : 'fa-search'}"></i>
               </div>
               <h4 style="font-size: 15px; font-weight: 700; color: #1e293b; margin-bottom: 4px;">
-                ${isStudent ? 'ยินดีด้วย! คุณไม่มีผลการเรียนที่มีเงื่อนไข (0, ร, มส, มผ)' : 'ไม่พบข้อมูลผลการเรียนตามเงื่อนไขที่เลือก'}
+                ${isStudent ? 'ยินดีด้วย! คุณไม่มีผลการเรียนที่มีเงื่อนไข (0, ร, มส, มผ, ขร)' : 'ไม่พบข้อมูลผลการเรียนตามเงื่อนไขที่เลือก'}
               </h4>
               <p style="font-size: 13px; color: #64748b; margin-bottom: ${isStudent ? '0' : '12px'};">
                 ${isStudent ? 'ผลการเรียนของคุณผ่านเกณฑ์ตามปกติทุกรายวิชา' : 'ลองเปลี่ยนตัวกรอง ค้นหาด้วยคำอื่น หรือกดปุ่มล้างตัวกรอง'}
@@ -283,6 +332,7 @@ class RecordsService {
       const statusTitle = app.getStatusTitle(r.status);
       const statusClass = app.getStatusBadgeClass(r.status);
       const classInfo = this.getClassRoomInfo(r);
+      const problemInfo = this.getProblemGradeDetail(r);
 
       return `
         <tr class="hover-row">
@@ -309,6 +359,12 @@ class RecordsService {
           </td>
           <td class="text-center">
             <span class="grade-badge-modern grade-${r.conditionType}">${r.conditionType}</span>
+          </td>
+          <td class="text-center">
+            <span class="problem-grade-pill problem-grade-${r.conditionType}">
+              <i class="far fa-calendar-alt"></i>
+              <span>ติด <strong>${this.escapeHtml(problemInfo.cond)}</strong> ภาคเรียนที่ ${this.escapeHtml(problemInfo.semester)}/${this.escapeHtml(problemInfo.academicYear)}</span>
+            </span>
           </td>
           <td>
             <div class="teacher-cell-modern">
@@ -1294,6 +1350,7 @@ class RecordsService {
                       <th>รหัสวิชา</th>
                       <th>ชื่อวิชา</th>
                       <th>เกรด</th>
+                      <th>ภาคเรียน/ปี</th>
                       <th>ครูผู้สอน</th>
                     </tr>
                   </thead>
@@ -1380,6 +1437,18 @@ class RecordsService {
       if (!rawRoom) rawRoom = '1';
       if (!rawLevel) rawLevel = 'ม.4';
 
+      let rawSem = String(row.term || row.semester || row['ภาคเรียน'] || row['เทอม'] || APP_CONFIG.SEMESTER).trim();
+      let rawYear = String(row.year || row.academic_year || row['ปีการศึกษา'] || row['ปี'] || APP_CONFIG.ACADEMIC_YEAR).trim();
+      if (rawSem.includes('/')) {
+        const sParts = rawSem.split('/');
+        rawSem = sParts[0].replace(/ภาคเรียนที่/g, '').trim() || APP_CONFIG.SEMESTER;
+        if (sParts[1] && sParts[1].trim()) {
+          rawYear = sParts[1].trim();
+        }
+      } else {
+        rawSem = rawSem.replace(/ภาคเรียนที่/g, '').trim() || APP_CONFIG.SEMESTER;
+      }
+
       result.push({
         id: `rec_${Date.now()}_${i}_${Math.random().toString(36).substr(2, 4)}`,
         studentId: sId,
@@ -1391,8 +1460,8 @@ class RecordsService {
         conditionType: (row.condition_type || row['เกรด'] || '0').toUpperCase().replace('O', '0'),
         teacherName: row.teacher_name || row['ครูผู้สอน'] || 'ครูผู้สอน',
         learningArea: row.learning_area || row['กลุ่มสาระ'] || APP_CONFIG.LEARNING_AREAS[0],
-        semester: row.term || row.semester || APP_CONFIG.SEMESTER,
-        academicYear: row.year || row.academic_year || APP_CONFIG.ACADEMIC_YEAR,
+        semester: rawSem,
+        academicYear: rawYear,
         status: 'pending_request',
         timeline: []
       });
@@ -1423,6 +1492,7 @@ class RecordsService {
         <td>${r.subjectCode}</td>
         <td>${r.subjectName}</td>
         <td class="font-bold text-red-600">${r.conditionType}</td>
+        <td>ภาคเรียนที่ ${r.semester}/${r.academicYear}</td>
         <td>${r.teacherName}</td>
       </tr>
     `).join('');

@@ -1595,6 +1595,55 @@ select.form-control {
   box-shadow: 0 2px 6px rgba(2, 132, 199, 0.12);
 }
 
+/* Problem Grade Detail + Semester/Year Pill */
+.problem-grade-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  background: #f8fafc;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+}
+
+.problem-grade-pill strong {
+  font-weight: 800;
+}
+
+.problem-grade-pill.problem-grade-0 {
+  background: #fef2f2;
+  color: #b91c1c;
+  border-color: #fecaca;
+}
+
+.problem-grade-pill.problem-grade-ร {
+  background: #fffbeb;
+  color: #b45309;
+  border-color: #fde68a;
+}
+
+.problem-grade-pill.problem-grade-มส {
+  background: #f5f3ff;
+  color: #6d28d9;
+  border-color: #ddd6fe;
+}
+
+.problem-grade-pill.problem-grade-มผ {
+  background: #fdf2f8;
+  color: #be185d;
+  border-color: #fbcfe8;
+}
+
+.problem-grade-pill.problem-grade-ขร {
+  background: #f0f9ff;
+  color: #0369a1;
+  border-color: #bae6fd;
+}
+
 /* Teacher Modern Cell */
 .teacher-cell-modern {
   display: flex;
