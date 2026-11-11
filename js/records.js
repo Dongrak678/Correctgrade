@@ -170,7 +170,7 @@ class RecordsService {
       cond,
       semester: sem,
       academicYear: year,
-      fullText: `ติด ${cond} ภาคเรียนที่ ${sem}/${year}`
+      fullText: `${sem}/${year}`
     };
   }
 
@@ -267,15 +267,15 @@ class RecordsService {
     const tableEl = tableBody.closest('table');
     if (tableEl) {
       const theadRow = tableEl.querySelector('thead tr');
-      if (theadRow && theadRow.children.length < 9) {
+      if (theadRow && (theadRow.children.length < 9 || theadRow.innerHTML.includes('ผลการเรียนที่มีปัญหา'))) {
         theadRow.innerHTML = `
           <th style="width: 4%;" class="text-center">#</th>
-          <th style="width: 19%;">นักเรียน</th>
-          <th style="width: 17%;">รายวิชา</th>
+          <th style="width: 21%;">นักเรียน</th>
+          <th style="width: 19%;">รายวิชา</th>
           <th style="width: 6%;" class="text-center">เงื่อนไข</th>
-          <th style="width: 16%;" class="text-center">ผลการเรียนที่มีปัญหา</th>
-          <th style="width: 13%;">ครูผู้สอน</th>
-          <th style="width: 12%;" class="text-center">สถานะการแก้ไข</th>
+          <th style="width: 10%;" class="text-center">ภาคเรียนที่/ปี</th>
+          <th style="width: 14%;">ครูผู้สอน</th>
+          <th style="width: 13%;" class="text-center">สถานะการแก้ไข</th>
           <th style="width: 5%;" class="text-center">เกรดใหม่</th>
           <th style="width: 8%;" class="text-right">จัดการ</th>
         `;
@@ -362,8 +362,7 @@ class RecordsService {
           </td>
           <td class="text-center">
             <span class="problem-grade-pill problem-grade-${r.conditionType}">
-              <i class="far fa-calendar-alt"></i>
-              <span>ติด <strong>${this.escapeHtml(problemInfo.cond)}</strong> ภาคเรียนที่ ${this.escapeHtml(problemInfo.semester)}/${this.escapeHtml(problemInfo.academicYear)}</span>
+              <strong>${this.escapeHtml(problemInfo.semester)}/${this.escapeHtml(problemInfo.academicYear)}</strong>
             </span>
           </td>
           <td>
@@ -1492,7 +1491,7 @@ class RecordsService {
         <td>${r.subjectCode}</td>
         <td>${r.subjectName}</td>
         <td class="font-bold text-red-600">${r.conditionType}</td>
-        <td>ภาคเรียนที่ ${r.semester}/${r.academicYear}</td>
+        <td>${r.semester}/${r.academicYear}</td>
         <td>${r.teacherName}</td>
       </tr>
     `).join('');

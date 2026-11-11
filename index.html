@@ -738,12 +738,12 @@
                 <thead>
                   <tr>
                     <th style="width: 4%;" class="text-center">#</th>
-                    <th style="width: 19%;">นักเรียน</th>
-                    <th style="width: 17%;">รายวิชา</th>
+                    <th style="width: 21%;">นักเรียน</th>
+                    <th style="width: 19%;">รายวิชา</th>
                     <th style="width: 6%;" class="text-center">เงื่อนไข</th>
-                    <th style="width: 16%;" class="text-center">ผลการเรียนที่มีปัญหา</th>
-                    <th style="width: 13%;">ครูผู้สอน</th>
-                    <th style="width: 12%;" class="text-center">สถานะการแก้ไข</th>
+                    <th style="width: 10%;" class="text-center">ภาคเรียนที่/ปี</th>
+                    <th style="width: 14%;">ครูผู้สอน</th>
+                    <th style="width: 13%;" class="text-center">สถานะการแก้ไข</th>
                     <th style="width: 5%;" class="text-center">เกรดใหม่</th>
                     <th style="width: 8%;" class="text-right">จัดการ</th>
                   </tr>
@@ -1361,7 +1361,7 @@
   <script src="js/auth.js?v=6.6.0"></script>
   <script src="js/dashboard.js?v=7.1.0"></script>
   <script src="js/workflow.js?v=6.8.0"></script>
-  <script src="js/records.js?v=7.4.0"></script>
+  <script src="js/records.js?v=7.5.0"></script>
   <script src="js/audit.js?v=6.9.0"></script>
   <script src="js/teachers.js?v=6.9.0"></script>
   <script src="js/students.js?v=6.9.0"></script>
@@ -1370,7 +1370,7 @@
   <script src="js/app.js?v=6.9.0"></script>
 
   <script>
-    // Ensure Problem Grade + Semester/Academic Year column renders even if js/records.js is cached
+    // Ensure Semester/Academic Year column renders even if js/records.js is cached
     if (typeof RecordsService !== 'undefined') {
       RecordsService.prototype.getProblemGradeDetail = function(r) {
         if (!r) return { cond: '0', semester: '1', academicYear: '2569', fullText: '-' };
@@ -1394,7 +1394,7 @@
           cond,
           semester: sem,
           academicYear: year,
-          fullText: `ติด ${cond} ภาคเรียนที่ ${sem}/${year}`
+          fullText: `${sem}/${year}`
         };
       };
 
@@ -1406,15 +1406,15 @@
         const tableEl = tableBody.closest('table');
         if (tableEl) {
           const theadRow = tableEl.querySelector('thead tr');
-          if (theadRow && theadRow.children.length < 9) {
+          if (theadRow && (theadRow.children.length < 9 || theadRow.innerHTML.includes('ผลการเรียนที่มีปัญหา'))) {
             theadRow.innerHTML = `
               <th style="width: 4%;" class="text-center">#</th>
-              <th style="width: 19%;">นักเรียน</th>
-              <th style="width: 17%;">รายวิชา</th>
+              <th style="width: 21%;">นักเรียน</th>
+              <th style="width: 19%;">รายวิชา</th>
               <th style="width: 6%;" class="text-center">เงื่อนไข</th>
-              <th style="width: 16%;" class="text-center">ผลการเรียนที่มีปัญหา</th>
-              <th style="width: 13%;">ครูผู้สอน</th>
-              <th style="width: 12%;" class="text-center">สถานะการแก้ไข</th>
+              <th style="width: 10%;" class="text-center">ภาคเรียนที่/ปี</th>
+              <th style="width: 14%;">ครูผู้สอน</th>
+              <th style="width: 13%;" class="text-center">สถานะการแก้ไข</th>
               <th style="width: 5%;" class="text-center">เกรดใหม่</th>
               <th style="width: 8%;" class="text-right">จัดการ</th>
             `;
@@ -1499,8 +1499,7 @@
               </td>
               <td class="text-center">
                 <span class="problem-grade-pill problem-grade-${r.conditionType}">
-                  <i class="far fa-calendar-alt"></i>
-                  <span>ติด <strong>${this.escapeHtml(problemInfo.cond)}</strong> ภาคเรียนที่ ${this.escapeHtml(problemInfo.semester)}/${this.escapeHtml(problemInfo.academicYear)}</span>
+                  <strong>${this.escapeHtml(problemInfo.semester)}/${this.escapeHtml(problemInfo.academicYear)}</strong>
                 </span>
               </td>
               <td>
