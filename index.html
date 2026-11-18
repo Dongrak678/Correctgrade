@@ -1360,9 +1360,9 @@
   <script src="js/cloudinary-service.js?v=6.6.0"></script>
   <script src="js/auth.js?v=6.6.0"></script>
   <script src="js/dashboard.js?v=7.1.0"></script>
-  <script src="js/workflow.js?v=7.6.0"></script>
-  <script src="js/records.js?v=7.6.0"></script>
-  <script src="js/audit.js?v=7.6.0"></script>
+  <script src="js/workflow.js?v=7.7.0"></script>
+  <script src="js/records.js?v=7.7.0"></script>
+  <script src="js/audit.js?v=7.7.0"></script>
   <script src="js/teachers.js?v=6.9.0"></script>
   <script src="js/students.js?v=6.9.0"></script>
   <script src="js/users.js?v=6.6.0"></script>
@@ -1712,6 +1712,26 @@
 
         return record;
       };
+
+      const _origRenderReviewModal = WorkflowService.prototype.renderReviewModal;
+      if (_origRenderReviewModal) {
+        WorkflowService.prototype.renderReviewModal = function(record) {
+          _origRenderReviewModal.call(this, record);
+          const opt = document.querySelector('#review-new-grade option[value="ผ"]');
+          if (opt) opt.remove();
+        };
+      }
+    }
+
+    if (typeof RecordsService !== 'undefined') {
+      const _origOpenAddRecordModal = RecordsService.prototype.openAddRecordModal;
+      if (_origOpenAddRecordModal) {
+        RecordsService.prototype.openAddRecordModal = function() {
+          _origOpenAddRecordModal.call(this);
+          const opt = document.querySelector('#rec-new-grade option[value="ผ"]');
+          if (opt) opt.remove();
+        };
+      }
     }
 
     // Tab role switcher helper in login view

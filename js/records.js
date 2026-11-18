@@ -795,7 +795,6 @@ class RecordsService {
                   <option value="3.0">เกรด 3.0</option>
                   <option value="3.5">เกรด 3.5</option>
                   <option value="4.0">เกรด 4.0</option>
-                  <option value="ผ">ผ (ผ่าน)</option>
                   <option value="ผ่าน">ผ่าน</option>
                 </select>
               </div>

@@ -703,7 +703,6 @@ class WorkflowService {
                       <option value="3.0" ${currentGrade === '3.0' ? 'selected' : ''}>เกรด 3.0</option>
                       <option value="3.5" ${currentGrade === '3.5' ? 'selected' : ''}>เกรด 3.5</option>
                       <option value="4.0" ${currentGrade === '4.0' ? 'selected' : ''}>เกรด 4.0</option>
-                      <option value="ผ" ${currentGrade === 'ผ' ? 'selected' : ''}>ผ (ผ่าน)</option>
                       <option value="ผ่าน" ${currentGrade === 'ผ่าน' ? 'selected' : ''}>ผ่าน (สำหรับกิจกรรม/วิชาที่ไม่มีเกรดเฉลี่ย)</option>
                     </select>
                   </div>
