@@ -129,18 +129,22 @@ class WorkflowService {
   }
 
   /**
-   * ขั้นตอนที่ 4: ครูตรวจและอนุมัติเกรด หรือส่งคืนให้แก้ไข
+   * ขั้นตอนที่ 4: ครูตรวจและอนุมัติเกรด หรือส่งคืนให้แก้ไข (รวมถึงแอดมินแก้ไขเกรดที่ครูอนุมัติแล้ว)
    */
   async reviewAndApproveGrade(recordId, decisionData) {
     const record = db.getById('records', recordId);
     if (!record) throw new Error("ไม่พบข้อมูลผลการเรียน");
 
     const now = db.formatDateTime(new Date());
-    const teacherUser = authService.getCurrentUser();
-    const actorName = teacherUser ? teacherUser.name : record.teacherName;
+    const currentUser = authService.getCurrentUser();
+    const isAdmin = authService.isAdmin();
+    const actorName = currentUser ? currentUser.name : record.teacherName;
+    const roleLabel = isAdmin ? "ผู้ดูแลระบบ (Admin)" : "ครูผู้สอน";
+    const oldNewGrade = record.newGrade || "";
 
     if (decisionData.action === 'approve') {
-      // 1. อนุมัติผ่าน
+      // 1. อนุมัติผ่าน หรือ แอดมินแก้ไขเกรดใหม่
+      const isEditingExistingGrade = (record.status === 'approved' && oldNewGrade);
       record.status = 'approved';
       record.newGrade = decisionData.newGrade || "1.0";
       record.approvalDate = now;
@@ -150,42 +154,56 @@ class WorkflowService {
       record.timeline = record.timeline || [];
       record.timeline.push({
         step: 4,
-        title: "อนุมัติผลการเรียน (ผ่าน)",
+        title: isEditingExistingGrade ? `แก้ไขเกรดใหม่ (${oldNewGrade} ➔ ${record.newGrade})` : "อนุมัติผลการเรียน (ผ่าน)",
         date: now,
-        actor: `${actorName} (ครูผู้สอน)`,
-        note: `อนุมัติปรับผลการเรียนเป็น ${record.newGrade} (${record.approvalNote})`
+        actor: `${actorName} (${roleLabel})`,
+        note: isEditingExistingGrade
+          ? `แก้ไขเกรดจาก ${oldNewGrade} เป็น ${record.newGrade} (${record.approvalNote})`
+          : `อนุมัติปรับผลการเรียนเป็น ${record.newGrade} (${record.approvalNote})`
       });
 
       await db.saveItem('records', record);
 
-      // สร้างบันทึกประวัติใน Audit Log อัตโนมัติ (Audit Trail)
-      const auditItem = {
-        id: `aud_${Date.now()}`,
-        recordId: record.id,
-        studentId: record.studentId,
-        studentName: record.studentName,
-        gradeLevel: `${record.gradeLevel}/${record.room || '1'}`,
-        subjectCode: record.subjectCode,
-        subjectName: record.subjectName,
-        previousGrade: record.conditionType,
-        newGrade: record.newGrade,
-        approvedBy: actorName,
-        approvedAt: now,
-        notes: record.approvalNote
-      };
-      await db.saveItem('auditLogs', auditItem);
+      // อัปเดตหรือสร้างบันทึกประวัติใน Audit Log อัตโนมัติ (Audit Trail)
+      const auditLogs = db.get('auditLogs') || [];
+      const existingAudit = auditLogs.find(a => a.recordId === record.id);
+      if (existingAudit) {
+        existingAudit.previousGrade = record.conditionType;
+        existingAudit.newGrade = record.newGrade;
+        existingAudit.approvedBy = isAdmin ? `${record.teacherName || actorName} (แก้ไขโดย ${actorName})` : actorName;
+        existingAudit.approvedAt = now;
+        existingAudit.notes = record.approvalNote;
+        await db.saveItem('auditLogs', existingAudit);
+      } else {
+        const auditItem = {
+          id: `aud_${Date.now()}`,
+          recordId: record.id,
+          studentId: record.studentId,
+          studentName: record.studentName,
+          gradeLevel: `${record.gradeLevel}/${record.room || '1'}`,
+          subjectCode: record.subjectCode,
+          subjectName: record.subjectName,
+          previousGrade: record.conditionType,
+          newGrade: record.newGrade,
+          approvedBy: actorName,
+          approvedAt: now,
+          notes: record.approvalNote
+        };
+        await db.saveItem('auditLogs', auditItem);
+      }
 
       // Activity Log
       await db.addActivityLog(
         'approval',
-        'อนุมัติปรับผลการเรียนสำเร็จ',
-        `${actorName} อนุมัติผลการเรียนวิชา ${record.subjectCode} ให้แก่ ${record.studentName} (${record.conditionType} ➔ ${record.newGrade})`,
+        isEditingExistingGrade ? 'แก้ไขเกรดหลังอนุมัติสำเร็จ' : 'อนุมัติปรับผลการเรียนสำเร็จ',
+        `${actorName} ${isEditingExistingGrade ? `แก้ไขเกรด (${oldNewGrade} ➔ ${record.newGrade})` : `อนุมัติผลการเรียน (${record.conditionType} ➔ ${record.newGrade})`} วิชา ${record.subjectCode} ให้แก่ ${record.studentName}`,
         'badge-emerald'
       );
 
     } else {
       // 2. ไม่อนุมัติ / ส่งกลับแก้ไข
       record.status = 'rejected';
+      record.newGrade = '';
       record.approvalDate = now;
       record.approvalNote = decisionData.approvalNote || "ชิ้นงานยังไม่สมบูรณ์ กรุณาแก้ไขและส่งใหม่";
 
@@ -195,7 +213,7 @@ class WorkflowService {
         step: 4,
         title: "ส่งคืนให้แก้ไขเพิ่มเติม",
         date: now,
-        actor: `${actorName} (ครูผู้สอน)`,
+        actor: `${actorName} (${roleLabel})`,
         note: `ส่งคืน: ${record.approvalNote}`
       });
 
@@ -572,13 +590,17 @@ class WorkflowService {
     const modal = document.getElementById('workflow-action-modal');
     if (!modal) return;
 
+    const currentGrade = record.newGrade || '1.0';
+    const currentNote = record.approvalNote || 'ผ่านเกณฑ์การประเมินการแก้ผลการเรียน ผลงานมีความสมบูรณ์';
+    const isAlreadyApproved = record.status === 'approved' && record.newGrade;
+
     modal.innerHTML = `
       <div class="modal-backdrop" onclick="workflowService.closeModal()"></div>
       <div class="modal-dialog modal-xl">
         <div class="modal-header">
           <div class="modal-title-wrap">
-            <span class="modal-badge badge-emerald">ขั้นตอนที่ 4</span>
-            <h3>ตรวจชิ้นงานและอนุมัติปรับผลการเรียน</h3>
+            <span class="modal-badge badge-emerald">${isAlreadyApproved ? 'แก้ไขเกรด' : 'ขั้นตอนที่ 4'}</span>
+            <h3>${isAlreadyApproved ? 'แก้ไขเกรดที่อนุมัติแล้ว (สำหรับผู้ดูแลระบบ / ครูผู้สอน)' : 'ตรวจชิ้นงานและอนุมัติปรับผลการเรียน'}</h3>
           </div>
           <button class="btn-close-modal" onclick="workflowService.closeModal()">&times;</button>
         </div>
@@ -595,9 +617,18 @@ class WorkflowService {
                   <span class="info-val">${record.subjectCode} ${record.subjectName}</span>
                 </div>
                 <div class="info-row">
+                  <span class="info-label">ครูผู้สอน:</span>
+                  <span class="info-val font-semibold text-indigo-700">${record.teacherName || '-'}</span>
+                </div>
+                <div class="info-row">
                   <span class="info-label">ผลการเรียนเดิม:</span>
                   <span class="grade-badge grade-${record.conditionType}">${record.conditionType}</span>
                 </div>
+                ${isAlreadyApproved ? `
+                <div class="info-row">
+                  <span class="info-label">เกรดปัจจุบันที่อนุมัติไว้:</span>
+                  <span class="new-grade-pill font-bold">${record.newGrade}</span>
+                </div>` : ''}
                 <div class="info-row">
                   <span class="info-label">ภาระงานที่สั่ง:</span>
                   <span class="info-val">${record.taskTitle || '-'}</span>
@@ -636,7 +667,7 @@ class WorkflowService {
             <div class="review-right">
               <form id="form-review-decision" onsubmit="workflowService.handleReviewSubmit(event)">
                 <div class="decision-box">
-                  <h4 class="mb-3 font-bold text-gray-800"><i class="fas fa-gavel text-indigo-600 mr-1"></i> ผลการประเมิน</h4>
+                  <h4 class="mb-3 font-bold text-gray-800"><i class="fas fa-gavel text-indigo-600 mr-1"></i> ${isAlreadyApproved ? 'แก้ไขผลการเรียนใหม่' : 'ผลการประเมิน'}</h4>
                   
                   <div class="decision-radios">
                     <label class="decision-label approve-label">
@@ -644,7 +675,7 @@ class WorkflowService {
                       <div class="decision-card-inner">
                         <i class="fas fa-check-circle text-emerald-500"></i>
                         <div>
-                          <strong>อนุมัติผ่าน</strong>
+                          <strong>${isAlreadyApproved ? 'บันทึกการแก้ไขเกรดใหม่' : 'อนุมัติผ่าน'}</strong>
                           <span>กำหนดเกรดใหม่และผ่านการแก้ไข</span>
                         </div>
                       </div>
@@ -665,26 +696,27 @@ class WorkflowService {
                   <div id="new-grade-group" class="form-group mt-3">
                     <label for="review-new-grade">กำหนดเกรดใหม่ (New Grade) <span class="text-red-500">*</span></label>
                     <select id="review-new-grade" class="form-control font-semibold text-emerald-700">
-                      <option value="1.0" selected>เกรด 1.0 (มาตรฐานการแก้ 0)</option>
-                      <option value="1.5">เกรด 1.5</option>
-                      <option value="2.0">เกรด 2.0</option>
-                      <option value="2.5">เกรด 2.5</option>
-                      <option value="3.0">เกรด 3.0</option>
-                      <option value="3.5">เกรด 3.5</option>
-                      <option value="4.0">เกรด 4.0</option>
-                      <option value="ผ่าน">ผ่าน (สำหรับกิจกรรม/วิชาที่ไม่มีเกรดเฉลี่ย)</option>
+                      <option value="1.0" ${currentGrade === '1.0' ? 'selected' : ''}>เกรด 1.0 (มาตรฐานการแก้ 0)</option>
+                      <option value="1.5" ${currentGrade === '1.5' ? 'selected' : ''}>เกรด 1.5</option>
+                      <option value="2.0" ${currentGrade === '2.0' ? 'selected' : ''}>เกรด 2.0</option>
+                      <option value="2.5" ${currentGrade === '2.5' ? 'selected' : ''}>เกรด 2.5</option>
+                      <option value="3.0" ${currentGrade === '3.0' ? 'selected' : ''}>เกรด 3.0</option>
+                      <option value="3.5" ${currentGrade === '3.5' ? 'selected' : ''}>เกรด 3.5</option>
+                      <option value="4.0" ${currentGrade === '4.0' ? 'selected' : ''}>เกรด 4.0</option>
+                      <option value="ผ" ${currentGrade === 'ผ' ? 'selected' : ''}>ผ (ผ่าน)</option>
+                      <option value="ผ่าน" ${currentGrade === 'ผ่าน' ? 'selected' : ''}>ผ่าน (สำหรับกิจกรรม/วิชาที่ไม่มีเกรดเฉลี่ย)</option>
                     </select>
                   </div>
 
                   <div class="form-group mt-3">
-                    <label for="review-note">ความเห็นครูผู้สอน / หมายเหตุการประเมิน <span class="text-red-500">*</span></label>
-                    <textarea id="review-note" class="form-control" rows="4" placeholder="ระบุเหตุผลการอนุมัติ หรือคำแนะนำในการปรับปรุงงาน..." required>ผ่านเกณฑ์การประเมินการแก้ผลการเรียน ผลงานมีความสมบูรณ์</textarea>
+                    <label for="review-note">ความเห็น / หมายเหตุการประเมิน <span class="text-red-500">*</span></label>
+                    <textarea id="review-note" class="form-control" rows="4" placeholder="ระบุเหตุผลการอนุมัติ หรือหมายเหตุการแก้ไขเกรด..." required>${currentNote}</textarea>
                   </div>
 
                   <div class="modal-footer mt-4">
                     <button type="button" class="btn btn-outline" onclick="workflowService.closeModal()">ยกเลิก</button>
                     <button type="submit" id="btn-save-review" class="btn btn-emerald">
-                      <i class="fas fa-save mr-1"></i> บันทึกผลการประเมิน
+                      <i class="fas fa-save mr-1"></i> ${isAlreadyApproved ? 'บันทึกการแก้ไขเกรด' : 'บันทึกผลการประเมิน'}
                     </button>
                   </div>
                 </div>

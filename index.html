@@ -1360,9 +1360,9 @@
   <script src="js/cloudinary-service.js?v=6.6.0"></script>
   <script src="js/auth.js?v=6.6.0"></script>
   <script src="js/dashboard.js?v=7.1.0"></script>
-  <script src="js/workflow.js?v=6.8.0"></script>
-  <script src="js/records.js?v=7.5.0"></script>
-  <script src="js/audit.js?v=6.9.0"></script>
+  <script src="js/workflow.js?v=7.6.0"></script>
+  <script src="js/records.js?v=7.6.0"></script>
+  <script src="js/audit.js?v=7.6.0"></script>
   <script src="js/teachers.js?v=6.9.0"></script>
   <script src="js/students.js?v=6.9.0"></script>
   <script src="js/users.js?v=6.6.0"></script>
@@ -1514,7 +1514,11 @@
                 </span>
               </td>
               <td class="text-center">
-                ${r.newGrade ? `<span class="new-grade-pill">${r.newGrade}</span>` : '<span class="text-gray-300 font-bold">-</span>'}
+                ${r.newGrade
+                  ? (currentUser && currentUser.role === APP_CONFIG.ROLES.ADMIN
+                      ? `<span class="new-grade-pill" style="cursor: pointer;" title="คลิกเพื่อแก้ไขเกรดใหม่ (สำหรับแอดมิน)" onclick="workflowService.openStepModal('${r.id}', 'review')">${this.escapeHtml(r.newGrade)} <i class="fas fa-pen" style="font-size: 10px; margin-left: 3px; opacity: 0.8;"></i></span>`
+                      : `<span class="new-grade-pill">${this.escapeHtml(r.newGrade)}</span>`)
+                  : '<span class="text-gray-300 font-bold">-</span>'}
               </td>
               <td class="text-right">
                 <div class="action-btn-group">
@@ -1526,6 +1530,187 @@
         }).join('');
 
         this.renderPagination(filtered.length);
+      };
+
+      RecordsService.prototype.renderActionButtons = function(r, currentUser) {
+        const role = currentUser ? currentUser.role : null;
+        let buttons = '';
+
+        buttons += `
+          <button type="button" class="btn-icon text-blue-600" title="ดูลำดับขั้นตอนและประวัติ (Timeline)" onclick="workflowService.openStepModal('${r.id}', 'timeline')">
+            <i class="fas fa-history"></i>
+          </button>
+        `;
+
+        if (role === APP_CONFIG.ROLES.STUDENT) {
+          if (r.status === 'pending_request' || !r.status) {
+            buttons += `
+              <button type="button" class="btn-sm btn-primary" onclick="workflowService.openStepModal('${r.id}', 'request')">
+                <i class="fas fa-paper-plane mr-1"></i> ยื่นคำร้อง
+              </button>
+            `;
+          } else if (r.status === 'assigned' || r.status === 'rejected') {
+            buttons += `
+              <button type="button" class="btn-sm btn-purple" onclick="workflowService.openStepModal('${r.id}', 'submit')">
+                <i class="fas fa-upload mr-1"></i> ส่งงาน
+              </button>
+            `;
+          } else if (r.status === 'approved') {
+            buttons += `
+              <button type="button" class="btn-sm btn-emerald" onclick="workflowService.openStepModal('${r.id}', 'timeline')" title="ผลการเรียนผ่านการอนุมัติแล้ว">
+                <i class="fas fa-check-circle mr-1"></i> ผ่านแล้ว
+              </button>
+            `;
+          }
+        }
+
+        if (role === APP_CONFIG.ROLES.TEACHER || role === APP_CONFIG.ROLES.ADMIN) {
+          if (r.status === 'pending_request' || !r.status) {
+            buttons += `
+              <button type="button" class="btn-sm btn-outline text-gray-400" disabled style="cursor: not-allowed; opacity: 0.65; border-color: #cbd5e1;" title="รอนักเรียนกดยื่นคำร้องขอแก้ไขผลการเรียนก่อน จึงจะสามารถมอบหมายงานได้">
+                <i class="fas fa-clock mr-1"></i> รอนักเรียนยื่นคำร้อง
+              </button>
+            `;
+          } else if (r.status === 'requested') {
+            buttons += `
+              <button type="button" class="btn-sm btn-amber" onclick="workflowService.openStepModal('${r.id}', 'assign')">
+                <i class="fas fa-tasks mr-1"></i> มอบหมายงาน
+              </button>
+            `;
+          } else if (r.status === 'submitted') {
+            buttons += `
+              <button type="button" class="btn-sm btn-emerald" onclick="workflowService.openStepModal('${r.id}', 'review')">
+                <i class="fas fa-gavel mr-1"></i> ตรวจชิ้นงาน
+              </button>
+            `;
+          } else if (r.status === 'assigned') {
+            buttons += `
+              <button type="button" class="btn-sm btn-outline text-amber-600" title="แก้ไขงานที่มอบหมาย" onclick="workflowService.openStepModal('${r.id}', 'assign')">
+                <i class="fas fa-edit mr-1"></i> แก้งาน
+              </button>
+            `;
+          } else if (r.status === 'approved') {
+            if (role === APP_CONFIG.ROLES.ADMIN) {
+              buttons += `
+                <button type="button" class="btn-sm btn-outline text-emerald-600" title="คลิกเพื่อแก้ไขเกรดที่ครูอนุมัติแล้ว" onclick="workflowService.openStepModal('${r.id}', 'review')">
+                  <i class="fas fa-pen-square mr-1"></i> แก้ไขเกรด
+                </button>
+              `;
+            } else {
+              buttons += `
+                <button type="button" class="btn-sm btn-outline text-emerald-600" title="ดูผลการอนุมัติ" onclick="workflowService.openStepModal('${r.id}', 'timeline')">
+                  <i class="fas fa-check-circle mr-1"></i> ผ่านแล้ว
+                </button>
+              `;
+            }
+          }
+        }
+
+        if (role === APP_CONFIG.ROLES.ADMIN) {
+          buttons += `
+            <button type="button" class="btn-icon text-gray-500 hover:text-indigo-600" title="แก้ไขข้อมูลและเกรด" onclick="recordsService.openEditRecordModal('${r.id}')">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button type="button" class="btn-icon text-gray-500 hover:text-red-600" title="ลบรายการ" onclick="recordsService.deleteRecordPrompt('${r.id}', '${r.studentName}', '${r.subjectCode}')">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          `;
+        }
+
+        return buttons;
+      };
+    }
+
+    if (typeof WorkflowService !== 'undefined') {
+      WorkflowService.prototype.reviewAndApproveGrade = async function(recordId, decisionData) {
+        const record = db.getById('records', recordId);
+        if (!record) throw new Error("ไม่พบข้อมูลผลการเรียน");
+
+        const now = db.formatDateTime(new Date());
+        const currentUser = authService.getCurrentUser();
+        const isAdmin = authService.isAdmin();
+        const actorName = currentUser ? currentUser.name : record.teacherName;
+        const roleLabel = isAdmin ? "ผู้ดูแลระบบ (Admin)" : "ครูผู้สอน";
+        const oldNewGrade = record.newGrade || "";
+
+        if (decisionData.action === 'approve') {
+          const isEditingExistingGrade = (record.status === 'approved' && oldNewGrade);
+          record.status = 'approved';
+          record.newGrade = decisionData.newGrade || "1.0";
+          record.approvalDate = now;
+          record.approvalNote = decisionData.approvalNote || "ผ่านการประเมินตามเกณฑ์";
+
+          record.timeline = record.timeline || [];
+          record.timeline.push({
+            step: 4,
+            title: isEditingExistingGrade ? `แก้ไขเกรดใหม่ (${oldNewGrade} ➔ ${record.newGrade})` : "อนุมัติผลการเรียน (ผ่าน)",
+            date: now,
+            actor: `${actorName} (${roleLabel})`,
+            note: isEditingExistingGrade
+              ? `แก้ไขเกรดจาก ${oldNewGrade} เป็น ${record.newGrade} (${record.approvalNote})`
+              : `อนุมัติปรับผลการเรียนเป็น ${record.newGrade} (${record.approvalNote})`
+          });
+
+          await db.saveItem('records', record);
+
+          const auditLogs = db.get('auditLogs') || [];
+          const existingAudit = auditLogs.find(a => a.recordId === record.id);
+          if (existingAudit) {
+            existingAudit.previousGrade = record.conditionType;
+            existingAudit.newGrade = record.newGrade;
+            existingAudit.approvedBy = isAdmin ? `${record.teacherName || actorName} (แก้ไขโดย ${actorName})` : actorName;
+            existingAudit.approvedAt = now;
+            existingAudit.notes = record.approvalNote;
+            await db.saveItem('auditLogs', existingAudit);
+          } else {
+            await db.saveItem('auditLogs', {
+              id: `aud_${Date.now()}`,
+              recordId: record.id,
+              studentId: record.studentId,
+              studentName: record.studentName,
+              gradeLevel: `${record.gradeLevel}/${record.room || '1'}`,
+              subjectCode: record.subjectCode,
+              subjectName: record.subjectName,
+              previousGrade: record.conditionType,
+              newGrade: record.newGrade,
+              approvedBy: actorName,
+              approvedAt: now,
+              notes: record.approvalNote
+            });
+          }
+
+          await db.addActivityLog(
+            'approval',
+            isEditingExistingGrade ? 'แก้ไขเกรดหลังอนุมัติสำเร็จ' : 'อนุมัติปรับผลการเรียนสำเร็จ',
+            `${actorName} ${isEditingExistingGrade ? `แก้ไขเกรด (${oldNewGrade} ➔ ${record.newGrade})` : `อนุมัติผลการเรียน (${record.conditionType} ➔ ${record.newGrade})`} วิชา ${record.subjectCode} ให้แก่ ${record.studentName}`,
+            'badge-emerald'
+          );
+        } else {
+          record.status = 'rejected';
+          record.newGrade = '';
+          record.approvalDate = now;
+          record.approvalNote = decisionData.approvalNote || "ชิ้นงานยังไม่สมบูรณ์ กรุณาแก้ไขและส่งใหม่";
+
+          record.timeline = record.timeline || [];
+          record.timeline.push({
+            step: 4,
+            title: "ส่งคืนให้แก้ไขเพิ่มเติม",
+            date: now,
+            actor: `${actorName} (${roleLabel})`,
+            note: `ส่งคืน: ${record.approvalNote}`
+          });
+
+          await db.saveItem('records', record);
+
+          await db.addActivityLog(
+            'reject',
+            'ส่งคืนงานให้นักเรียนแก้ไข',
+            `${actorName} ส่งคืนงานวิชา ${record.subjectCode} ให้นักเรียน ${record.studentName} ปรับปรุง`,
+            'badge-rose'
+          );
+        }
+
+        return record;
       };
     }
 

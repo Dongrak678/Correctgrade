@@ -102,7 +102,11 @@ class AuditService {
           <div class="grade-compare-wrapper">
             <span class="grade-badge grade-${l.previousGrade}">${l.previousGrade}</span>
             <i class="fas fa-long-arrow-alt-right grade-arrow"></i>
-            <span class="new-grade-pill font-bold">${l.newGrade}</span>
+            ${isAdmin ? `
+              <span class="new-grade-pill font-bold" style="cursor: pointer;" title="คลิกเพื่อแก้ไขเกรดใหม่" onclick="auditService.editAuditGrade('${l.id}')">
+                ${l.newGrade} <i class="fas fa-pen" style="font-size: 10px; margin-left: 3px; opacity: 0.8;"></i>
+              </span>
+            ` : `<span class="new-grade-pill font-bold">${l.newGrade}</span>`}
           </div>
         </td>
         <td>
@@ -118,9 +122,14 @@ class AuditService {
         </td>
         <td class="text-right">
           ${isAdmin ? `
-            <button type="button" class="btn-icon text-gray-400 hover:text-red-600" title="ลบประวัติรายการนี้" onclick="auditService.deleteAuditPrompt('${l.id}')">
-              <i class="fas fa-trash-alt"></i>
-            </button>
+            <div class="action-btn-group">
+              <button type="button" class="btn-icon text-indigo-600 hover:text-indigo-800" title="แก้ไขเกรดที่อนุมัติแล้ว" onclick="auditService.editAuditGrade('${l.id}')">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button type="button" class="btn-icon text-gray-400 hover:text-red-600" title="ลบประวัติรายการนี้" onclick="auditService.deleteAuditPrompt('${l.id}')">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </div>
           ` : '<span class="text-gray-300">-</span>'}
         </td>
       </tr>
@@ -171,6 +180,26 @@ class AuditService {
     this.searchQuery = q;
     this.currentPage = 1;
     this.renderAuditTable();
+  }
+
+  editAuditGrade(auditId) {
+    const auditItem = db.getById('auditLogs', auditId);
+    if (!auditItem) return;
+
+    const records = db.get('records') || [];
+    let targetRecord = auditItem.recordId ? db.getById('records', auditItem.recordId) : null;
+    if (!targetRecord) {
+      targetRecord = records.find(r =>
+        String(r.studentId || '').trim() === String(auditItem.studentId || '').trim() &&
+        String(r.subjectCode || '').trim() === String(auditItem.subjectCode || '').trim()
+      );
+    }
+
+    if (targetRecord && typeof workflowService !== 'undefined') {
+      workflowService.openStepModal(targetRecord.id, 'review');
+    } else {
+      alert("ไม่พบรายการผลการเรียนต้นทางของประวัตินี้");
+    }
   }
 
   async deleteAuditPrompt(id) {

@@ -377,7 +377,11 @@ class RecordsService {
             </span>
           </td>
           <td class="text-center">
-            ${r.newGrade ? `<span class="new-grade-pill">${r.newGrade}</span>` : '<span class="text-gray-300 font-bold">-</span>'}
+            ${r.newGrade
+              ? (currentUser && currentUser.role === APP_CONFIG.ROLES.ADMIN
+                  ? `<span class="new-grade-pill" style="cursor: pointer;" title="คลิกเพื่อแก้ไขเกรดใหม่ (สำหรับแอดมิน)" onclick="workflowService.openStepModal('${r.id}', 'review')">${this.escapeHtml(r.newGrade)} <i class="fas fa-pen" style="font-size: 10px; margin-left: 3px; opacity: 0.8;"></i></span>`
+                  : `<span class="new-grade-pill">${this.escapeHtml(r.newGrade)}</span>`)
+              : '<span class="text-gray-300 font-bold">-</span>'}
           </td>
           <td class="text-right">
             <div class="action-btn-group">
@@ -501,11 +505,19 @@ class RecordsService {
           </button>
         `;
       } else if (r.status === 'approved') {
-        buttons += `
-          <button type="button" class="btn-sm btn-outline text-emerald-600" title="ดูผลการอนุมัติ" onclick="workflowService.openStepModal('${r.id}', 'timeline')">
-            <i class="fas fa-check-circle mr-1"></i> ผ่านแล้ว
-          </button>
-        `;
+        if (role === APP_CONFIG.ROLES.ADMIN) {
+          buttons += `
+            <button type="button" class="btn-sm btn-outline text-emerald-600" title="คลิกเพื่อแก้ไขเกรดที่ครูอนุมัติแล้ว" onclick="workflowService.openStepModal('${r.id}', 'review')">
+              <i class="fas fa-pen-square mr-1"></i> แก้ไขเกรด
+            </button>
+          `;
+        } else {
+          buttons += `
+            <button type="button" class="btn-sm btn-outline text-emerald-600" title="ดูผลการอนุมัติ" onclick="workflowService.openStepModal('${r.id}', 'timeline')">
+              <i class="fas fa-check-circle mr-1"></i> ผ่านแล้ว
+            </button>
+          `;
+        }
       }
     }
 
@@ -755,6 +767,36 @@ class RecordsService {
                   ${(APP_CONFIG.AVAILABLE_YEARS || ["2569", "2568", "2567", "2570"]).map(y => `
                     <option value="${y}" ${String(APP_CONFIG.ACADEMIC_YEAR) === String(y) ? 'selected' : ''}>${y}</option>
                   `).join('')}
+                </select>
+              </div>
+            </div>
+
+            <!-- ส่วนแก้ไขสถานะและเกรดใหม่สำหรับผู้ดูแลระบบ (Admin Override) -->
+            <div id="rec-admin-grade-section" class="form-row" style="display: none; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 12px; margin-top: 6px;">
+              <div class="form-group col-md-6" style="margin-bottom: 0;">
+                <label for="rec-status" class="text-emerald-800"><i class="fas fa-tasks mr-1"></i> สถานะการแก้ไขผลการเรียน</label>
+                <select id="rec-status" class="form-control">
+                  <option value="pending_request">⚪ ยังไม่ยื่นคำร้อง</option>
+                  <option value="requested">🟡 ยื่นคำร้องแล้ว</option>
+                  <option value="assigned">🔵 ครูมอบหมายงานแล้ว</option>
+                  <option value="submitted">🟣 นักเรียนส่งงานแล้ว (รอตรวจ)</option>
+                  <option value="approved">🟢 ผ่านการแก้ไข (อนุมัติแล้ว)</option>
+                  <option value="rejected">🔴 ส่งคืนให้แก้ไขเพิ่มเติม</option>
+                </select>
+              </div>
+              <div class="form-group col-md-6" style="margin-bottom: 0;">
+                <label for="rec-new-grade" class="text-emerald-800"><i class="fas fa-award mr-1"></i> เกรดใหม่ (แก้ไขเกรดที่ครูให้)</label>
+                <select id="rec-new-grade" class="form-control font-bold text-emerald-700" onchange="if(this.value) document.getElementById('rec-status').value = 'approved';">
+                  <option value="">-- ยังไม่กำหนดเกรดใหม่ --</option>
+                  <option value="1.0">เกรด 1.0</option>
+                  <option value="1.5">เกรด 1.5</option>
+                  <option value="2.0">เกรด 2.0</option>
+                  <option value="2.5">เกรด 2.5</option>
+                  <option value="3.0">เกรด 3.0</option>
+                  <option value="3.5">เกรด 3.5</option>
+                  <option value="4.0">เกรด 4.0</option>
+                  <option value="ผ">ผ (ผ่าน)</option>
+                  <option value="ผ่าน">ผ่าน</option>
                 </select>
               </div>
             </div>
@@ -1215,6 +1257,15 @@ class RecordsService {
       document.getElementById('rec-academic-year').value = record.academicYear || '2569';
       document.getElementById('rec-teacher-name').value = record.teacherName || '';
 
+      const adminGradeSection = document.getElementById('rec-admin-grade-section');
+      if (adminGradeSection && authService.isAdmin()) {
+        adminGradeSection.style.display = 'flex';
+        const statusSelect = document.getElementById('rec-status');
+        const newGradeSelect = document.getElementById('rec-new-grade');
+        if (statusSelect) statusSelect.value = record.status || 'pending_request';
+        if (newGradeSelect) newGradeSelect.value = record.newGrade || '';
+      }
+
       this.updateTeacherSubjectOptions();
     }, 50);
   }
@@ -1234,8 +1285,11 @@ class RecordsService {
     const semester = document.getElementById('rec-semester').value.trim();
     const academicYear = document.getElementById('rec-academic-year').value.trim();
     const teacherName = document.getElementById('rec-teacher-name').value || "ครูผู้สอน";
+    const statusInput = document.getElementById('rec-status');
+    const newGradeInput = document.getElementById('rec-new-grade');
 
     let record = editId ? db.getById('records', editId) : null;
+    const oldNewGrade = record ? (record.newGrade || '') : '';
     if (!record) {
       record = {
         id: `rec_${Date.now()}`,
@@ -1255,6 +1309,61 @@ class RecordsService {
     record.semester = semester;
     record.academicYear = academicYear;
     record.teacherName = teacherName;
+
+    if (editId && authService.isAdmin() && statusInput && newGradeInput) {
+      const selectedStatus = statusInput.value;
+      const selectedNewGrade = newGradeInput.value;
+      const now = db.formatDateTime(new Date());
+      const currentUser = authService.getCurrentUser();
+      const actorName = currentUser ? currentUser.name : 'ผู้ดูแลระบบ (Admin)';
+
+      if (selectedNewGrade) {
+        record.newGrade = selectedNewGrade;
+        record.status = 'approved';
+        record.approvalDate = now;
+        if (oldNewGrade !== selectedNewGrade) {
+          record.timeline = record.timeline || [];
+          record.timeline.push({
+            step: 4,
+            title: oldNewGrade ? "ผู้ดูแลระบบแก้ไขเกรดใหม่" : "ผู้ดูแลระบบอนุมัติผลการเรียน",
+            date: now,
+            actor: `${actorName} (ผู้ดูแลระบบ)`,
+            note: oldNewGrade
+              ? `แก้ไขเกรดใหม่จาก ${oldNewGrade} เป็น ${selectedNewGrade}`
+              : `กำหนดเกรดใหม่เป็น ${selectedNewGrade}`
+          });
+
+          // อัปเดตหรือสร้างรายการใน Audit Log
+          const auditLogs = db.get('auditLogs') || [];
+          const existingAudit = auditLogs.find(a => a.recordId === record.id);
+          if (existingAudit) {
+            existingAudit.previousGrade = record.conditionType;
+            existingAudit.newGrade = selectedNewGrade;
+            existingAudit.approvedAt = now;
+            existingAudit.notes = `แก้ไขเกรดโดยแอดมิน (${oldNewGrade} ➔ ${selectedNewGrade})`;
+            await db.saveItem('auditLogs', existingAudit);
+          } else {
+            await db.saveItem('auditLogs', {
+              id: `aud_${Date.now()}`,
+              recordId: record.id,
+              studentId: record.studentId,
+              studentName: record.studentName,
+              gradeLevel: `${record.gradeLevel}/${record.room || '1'}`,
+              subjectCode: record.subjectCode,
+              subjectName: record.subjectName,
+              previousGrade: record.conditionType,
+              newGrade: selectedNewGrade,
+              approvedBy: `${record.teacherName} (แก้ไขโดยแอดมิน)`,
+              approvedAt: now,
+              notes: "อนุมัติ/แก้ไขเกรดโดยผู้ดูแลระบบ"
+            });
+          }
+        }
+      } else {
+        record.newGrade = '';
+        record.status = selectedStatus;
+      }
+    }
 
     await db.saveItem('records', record);
     this.closeModal();
